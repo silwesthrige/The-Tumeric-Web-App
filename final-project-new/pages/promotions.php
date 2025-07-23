@@ -345,10 +345,6 @@
                             <label for="discountValue" class="form-label">Discount Value</label>
                             <input type="number" class="form-control" id="discountValue" placeholder="20" required>
                         </div>
-                        <div class="col-md-4">
-                            <label for="minOrderValue" class="form-label">Min Order Value (₹)</label>
-                            <input type="number" class="form-control" id="minOrderValue" placeholder="200">
-                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -358,42 +354,6 @@
                         <div class="col-md-6">
                             <label for="endDate" class="form-label">End Date</label>
                             <input type="datetime-local" class="form-control" id="endDate" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="usageLimit" class="form-label">Usage Limit</label>
-                            <input type="number" class="form-control" id="usageLimit" placeholder="100">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="userLimit" class="form-label">Per User Limit</label>
-                            <input type="number" class="form-control" id="userLimit" placeholder="1">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Applicable To</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="applicableTo" id="allItems" value="all" checked>
-                            <label class="form-check-label" for="allItems">All Items</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="applicableTo" id="specificItems" value="specific">
-                            <label class="form-check-label" for="specificItems">Specific Items</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="applicableTo" id="categories" value="categories">
-                            <label class="form-check-label" for="categories">Categories</label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Customer Eligibility</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="newCustomers">
-                            <label class="form-check-label" for="newCustomers">New Customers Only</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="vipCustomers">
-                            <label class="form-check-label" for="vipCustomers">VIP Customers Only</label>
                         </div>
                     </div>
                     <div class="mb-3">
