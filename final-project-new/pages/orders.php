@@ -142,7 +142,7 @@
                                         <div class="invalid-feedback">Please enter quantity.</div>
                                     </div>
                                     <div class="col-md-2">
-                                        <span class="form-control-plaintext item-price">₹0</span>
+                                        <span class="form-control-plaintext item-price">$0</span>
                                     </div>
                                     <div class="col-md-1">
                                         <button type="button" class="btn btn-outline-danger btn-sm remove-item" disabled>
@@ -157,7 +157,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <strong>Total: ₹<span id="orderTotal">0</span></strong>
+                                <strong>Total: $<span id="orderTotal">0</span></strong>
                             </div>
                         </div>
                     </form>
@@ -207,7 +207,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <strong>Total: ₹<span id="editOrderTotal">0</span></strong>
+                                <strong>Total: $<span id="editOrderTotal">0</span></strong>
                             </div>
                         </div>
                     </form>
@@ -472,9 +472,9 @@
         }
 
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-IN', {
+            return new Intl.NumberFormat('en-US', {
                 style: 'currency',
-                currency: 'INR'
+                currency: 'USD'
             }).format(amount);
         }
 
@@ -920,7 +920,7 @@
                     <div class="invalid-feedback">Please enter quantity.</div>
                 </div>
                 <div class="col-md-2">
-                    <span class="form-control-plaintext item-price">₹0</span>
+                    <span class="form-control-plaintext item-price">$0</span>
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-outline-danger btn-sm remove-item" ${isFirst ? 'disabled' : ''}>
@@ -982,7 +982,7 @@
                     <div class="invalid-feedback">Please enter quantity.</div>
                 </div>
                 <div class="col-md-2">
-                    <span class="form-control-plaintext item-price">₹0</span>
+                    <span class="form-control-plaintext item-price">$0</span>
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-outline-danger btn-sm remove-item" ${isFirst ? 'disabled' : ''}>

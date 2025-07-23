@@ -81,6 +81,118 @@
         .table img {
             object-fit: cover;
         }
+
+        .card {
+            border: 1px solid #e3e6f0;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+            padding: 0.75rem 1.25rem;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .table {
+            color: #5a5c69;
+        }
+
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #e3e6f0;
+            font-weight: 800;
+            color: #5a5c69;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+
+        .table td {
+            border-top: 1px solid #e3e6f0;
+            vertical-align: middle;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.025);
+        }
+
+        .btn {
+            font-weight: 400;
+            border-radius: 0.35rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8125rem;
+            border-radius: 0.2rem;
+        }
+
+        .badge {
+            font-weight: 700;
+            font-size: 0.65rem;
+            border-radius: 10rem;
+            padding: 0.25em 0.6em;
+        }
+
+        .border-bottom {
+            border-bottom: 1px solid #e3e6f0 !important;
+        }
+
+        .h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            line-height: 1.2;
+            color: #5a5c69;
+        }
+
+        .text-muted {
+            color: #858796 !important;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #e3e6f0;
+            background-color: #f8f9fc;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #e3e6f0;
+            background-color: #f8f9fc;
+        }
+
+        .form-control {
+            border: 1px solid #d1d3e2;
+            border-radius: 0.35rem;
+            color: #6e707e;
+        }
+
+        .form-control:focus {
+            border-color: #bac8f3;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        .form-select {
+            border: 1px solid #d1d3e2;
+            border-radius: 0.35rem;
+            color: #6e707e;
+        }
+
+        .form-label {
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: #5a5c69;
+            font-size: 0.875rem;
+        }
+
+        .container-fluid {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
     </style>
 </head>
 <body>
@@ -257,7 +369,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="itemPrice" class="form-label">Price (₹)</label>
+                                    <label for="itemPrice" class="form-label">Price ($)</label>
                                     <input type="number" class="form-control" id="itemPrice" step="0.01" min="0" required>
                                     <div class="invalid-feedback">Please provide a valid price.</div>
                                 </div>
@@ -335,7 +447,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="editItemPrice" class="form-label">Price (₹)</label>
+                                    <label for="editItemPrice" class="form-label">Price ($)</label>
                                     <input type="number" class="form-control" id="editItemPrice" step="0.01" min="0" required>
                                     <div class="invalid-feedback">Please provide a valid price.</div>
                                 </div>
@@ -828,7 +940,7 @@
                     </div>
                 </td>
                 <td><span class="badge bg-${getCategoryColor(item.category)}">${getCategoryName(item.category)}</span></td>
-                <td><strong>₹${item.price}</strong></td>
+                <td><strong>${item.price}</strong></td>
                 <td>${item.cookedTime} min</td>
                 <td><span class="badge ${item.status === 'available' ? 'bg-success' : 'bg-danger'}">${item.status === 'available' ? 'Available' : 'Out of Stock'}</span></td>
                 <td>
