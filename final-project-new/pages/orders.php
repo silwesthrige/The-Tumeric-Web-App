@@ -428,6 +428,7 @@
         let allUsers = [];
         let allMenuItems = [];
         let nextOrderId = 1;
+        let isInitialLoad = true;
 
         // Utility functions
         function showToast(message, type = 'success') {
@@ -447,6 +448,98 @@
 
             toast.addEventListener('hidden.bs.toast', () => {
                 document.body.removeChild(toast);
+            });
+        }
+
+        function showTopNotification(message, type = 'info') {
+            // Create notification container if it doesn't exist
+            let notificationContainer = document.getElementById('notificationContainer');
+            if (!notificationContainer) {
+                notificationContainer = document.createElement('div');
+                notificationContainer.id = 'notificationContainer';
+                notificationContainer.style.cssText = `
+                    position: fixed;
+                    top: 70px;
+                    right: 20px;
+                    z-index: 9999;
+                    pointer-events: none;
+                    width: 350px;
+                `;
+                document.body.appendChild(notificationContainer);
+            }
+
+            // Create notification
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show mb-2`;
+            notification.style.cssText = `
+                pointer-events: auto;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                border-radius: 8px;
+                animation: slideInRight 0.3s ease-out;
+                padding: 12px 16px;
+                font-size: 0.95rem;
+                border: none;
+                min-height: 50px;
+            `;
+            
+            const iconMap = {
+                'success': 'check-circle',
+                'warning': 'exclamation-triangle', 
+                'info': 'info-circle',
+                'danger': 'times-circle'
+            };
+            
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-${iconMap[type]} me-3" style="font-size: 1rem;"></i>
+                    <span style="font-size: 0.9rem; line-height: 1.4; flex-grow: 1;">${message}</span>
+                    <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" style="font-size: 0.8rem;"></button>
+                </div>
+            `;
+
+            // Add CSS animation if not already added
+            if (!document.getElementById('notificationStyles')) {
+                const style = document.createElement('style');
+                style.id = 'notificationStyles';
+                style.textContent = `
+                    @keyframes slideInRight {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOutRight {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                    .notification-exit {
+                        animation: slideOutRight 0.3s ease-in forwards;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            notificationContainer.appendChild(notification);
+
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.classList.add('notification-exit');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 4000);
+
+            // Handle manual close
+            const closeBtn = notification.querySelector('.btn-close');
+            closeBtn.addEventListener('click', () => {
+                notification.classList.add('notification-exit');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
             });
         }
 
@@ -512,7 +605,10 @@
                 
                 allUsers = [];
                 querySnapshot.forEach((doc) => {
-                    allUsers.push({ id: doc.id, ...doc.data() });
+                    const userData = { id: doc.id, ...doc.data() };
+                    // Use userId from the document if it exists, otherwise use doc.id
+                    userData.userId = userData.userId || doc.id;
+                    allUsers.push(userData);
                 });
                 
                 populateCustomerSelects();
@@ -529,12 +625,14 @@
                 allMenuItems = [];
                 querySnapshot.forEach((doc) => {
                     const menuData = { id: doc.id, ...doc.data() };
-                    // Use foodId as the identifier if it exists, otherwise use document id
+                    // Ensure we have the required fields
                     menuData.foodId = menuData.foodId || doc.id;
+                    menuData.foodName = menuData.foodName || menuData.name || 'Unnamed Item';
+                    menuData.price = menuData.price || 0;
                     allMenuItems.push(menuData);
                 });
                 
-                console.log('Loaded menu items:', allMenuItems); // Debug log
+                console.log('Loaded menu items:', allMenuItems);
                 populateFoodSelects();
             } catch (error) {
                 console.error('Error loading menu items:', error);
@@ -545,22 +643,64 @@
         async function loadOrders() {
             try {
                 const ordersRef = collection(db, 'orders');
-                const q = query(ordersRef, orderBy('createdTime', 'desc'));
-                const querySnapshot = await getDocs(q);
+                const q = query(ordersRef, orderBy('createdAt', 'desc'));
                 
-                allOrders = [];
-                let maxOrderId = 0;
-                querySnapshot.forEach((doc) => {
-                    const orderData = { id: doc.id, ...doc.data() };
-                    allOrders.push(orderData);
-                    if (orderData.orderID > maxOrderId) {
-                        maxOrderId = orderData.orderID;
+                // Use onSnapshot for real-time updates
+                onSnapshot(q, (querySnapshot) => {
+                    const newOrders = [];
+                    let maxOrderId = 0;
+                    
+                    querySnapshot.forEach((doc) => {
+                        const orderData = { id: doc.id, ...doc.data() };
+                        newOrders.push(orderData);
+                        if (orderData.orderId > maxOrderId) {
+                            maxOrderId = orderData.orderId;
+                        }
+                    });
+                    
+                    // Check for new orders (only after initial load)
+                    if (!isInitialLoad) {
+                        const previousOrderIds = allOrders.map(order => order.id);
+                        const newOrdersAdded = newOrders.filter(order => !previousOrderIds.includes(order.id));
+                        
+                        newOrdersAdded.forEach(order => {
+                            const customer = allUsers.find(u => u.userId === order.userId);
+                            const customerName = customer ? (customer.name || customer.username || 'Unknown Customer') : 'Unknown Customer';
+                            showTopNotification(`🆕 New order #${order.orderId} from ${customerName}`, 'success');
+                        });
+                        
+                        // Check for status changes
+                        allOrders.forEach(oldOrder => {
+                            const updatedOrder = newOrders.find(order => order.id === oldOrder.id);
+                            if (updatedOrder && updatedOrder.status !== oldOrder.status) {
+                                const statusMessages = {
+                                    'confirmed': '✅ Order confirmed',
+                                    'preparing': '👨‍🍳 Order is being prepared',
+                                    'out_for_delivery': '🚚 Order out for delivery',
+                                    'delivered': '📦 Order delivered',
+                                    'cancelled': '❌ Order cancelled',
+                                    'rejected': '🚫 Order rejected'
+                                };
+                                
+                                const message = statusMessages[updatedOrder.status] || `Status changed to ${updatedOrder.status}`;
+                                const notificationType = updatedOrder.status === 'delivered' ? 'success' : 
+                                                       updatedOrder.status === 'cancelled' || updatedOrder.status === 'rejected' ? 'warning' : 'info';
+                                
+                                showTopNotification(`${message} - Order #${updatedOrder.orderId}`, notificationType);
+                            }
+                        });
+                    }
+                    
+                    allOrders = newOrders;
+                    nextOrderId = maxOrderId + 1;
+                    updateOrdersDisplay();
+                    updateStats();
+                    
+                    if (isInitialLoad) {
+                        isInitialLoad = false;
                     }
                 });
                 
-                nextOrderId = maxOrderId + 1;
-                updateOrdersDisplay();
-                updateStats();
             } catch (error) {
                 console.error('Error loading orders:', error);
                 showToast('Error loading orders', 'error');
@@ -575,7 +715,10 @@
                 if (select) {
                     select.innerHTML = '<option value="">Select Customer</option>';
                     allUsers.forEach(user => {
-                        select.innerHTML += `<option value="${user.id}">${user.name} - ${user.phone || user.email}</option>`;
+                        const userDisplayName = user.name || user.username || 'Unnamed User';
+                        const userContact = user.phone || user.email || '';
+                        const displayText = userContact ? `${userDisplayName} - ${userContact}` : userDisplayName;
+                        select.innerHTML += `<option value="${user.userId}">${displayText}</option>`;
                     });
                 }
             });
@@ -591,15 +734,11 @@
                 }
                 
                 allMenuItems.forEach(item => {
-                    const itemId = item.foodId || item.id;
-                    const itemName = item.name || item.title || 'Unnamed Item';
-                    const itemPrice = item.price || 0;
-                    
-                    select.innerHTML += `<option value="${itemId}" data-price="${itemPrice}">${itemName} - ${formatCurrency(itemPrice)}</option>`;
+                    select.innerHTML += `<option value="${item.foodId}" data-price="${item.price}" data-name="${item.foodName}">${item.foodName} - ${formatCurrency(item.price)}</option>`;
                 });
             });
             
-            console.log('Populated food selects with', allMenuItems.length, 'items'); // Debug log
+            console.log('Populated food selects with', allMenuItems.length, 'items');
         }
 
         // Update displays
@@ -612,25 +751,26 @@
             tbody.innerHTML = '';
             
             allOrders.forEach(order => {
-                const customer = allUsers.find(u => u.id === order.userId);
-                const customerName = customer ? customer.name : 'Unknown Customer';
-                const customerPhone = customer ? (customer.phone || customer.email) : 'N/A';
+                const customer = allUsers.find(u => u.userId === order.userId);
+                const customerName = customer ? (customer.name || customer.username || 'Unknown Customer') : 'Unknown Customer';
+                const customerPhone = customer ? (customer.phone || customer.email || '') : 'N/A';
                 
                 // Get order items details
                 let itemsDisplay = '';
                 let totalQuantity = 0;
+                let calculatedTotal = 0;
                 
-                if (order.items && Array.isArray(order.items)) {
-                    order.items.forEach((item, index) => {
-                        // Look for menu item using foodId first, then fallback to id
-                        const menuItem = allMenuItems.find(m => m.foodId === item.foodId || m.id === item.foodId);
-                        const itemName = menuItem ? (menuItem.name || menuItem.title || 'Unknown Item') : 'Unknown Item';
-                        totalQuantity += item.quantity;
+                if (order.items && typeof order.items === 'object') {
+                    const itemKeys = Object.keys(order.items);
+                    itemKeys.forEach((key, index) => {
+                        const item = order.items[key];
+                        totalQuantity += item.qty;
+                        calculatedTotal += (item.price * item.qty);
                         
                         if (index === 0) {
-                            itemsDisplay = `${itemName} x${item.quantity}`;
+                            itemsDisplay = `${item.name} x${item.qty}`;
                         } else if (index === 1) {
-                            itemsDisplay += `<br><small class="text-muted">+${order.items.length - 1} more items</small>`;
+                            itemsDisplay += `<br><small class="text-muted">+${itemKeys.length - 1} more items</small>`;
                         }
                     });
                 } else {
@@ -638,8 +778,8 @@
                 }
                 
                 tbody.innerHTML += `
-                    <tr data-status="${order.status}" data-order-id="${order.orderID}">
-                        <td><strong>#${order.orderID}</strong></td>
+                    <tr data-status="${order.status}" data-order-id="${order.orderId}">
+                        <td><strong>#${order.orderId}</strong></td>
                         <td>
                             <div>
                                 <strong>${customerName}</strong><br>
@@ -649,12 +789,12 @@
                         <td>
                             <div>${itemsDisplay}</div>
                         </td>
-                        <td><strong>${formatCurrency(order.total)}</strong></td>
+                        <td><strong>${formatCurrency(calculatedTotal)}</strong></td>
                         <td>${getStatusBadge(order.status)}</td>
                         <td>
                             <div>
-                                <strong>${formatDate(order.createdTime)}</strong><br>
-                                <small class="text-muted">${new Date(order.createdTime).toDateString() === new Date().toDateString() ? 'Today' : new Date(order.createdTime).toLocaleDateString()}</small>
+                                <strong>${formatDate(order.createdAt)}</strong><br>
+                                <small class="text-muted">${new Date(order.createdAt).toDateString() === new Date().toDateString() ? 'Today' : new Date(order.createdAt).toLocaleDateString()}</small>
                             </div>
                         </td>
                         <td>
@@ -718,7 +858,7 @@
             const delivery = allOrders.filter(order => order.status === 'out_for_delivery').length;
             const delivered = allOrders.filter(order => 
                 order.status === 'delivered' && 
-                new Date(order.createdTime).toDateString() === today
+                new Date(order.createdAt).toDateString() === today
             ).length;
 
             document.getElementById('pendingCount').textContent = pending;
@@ -731,14 +871,17 @@
         async function createOrder(orderData) {
             try {
                 const docRef = await addDoc(collection(db, 'orders'), {
-                    ...orderData,
-                    orderID: getNextOrderId(),
+                    createdAt: new Date().toISOString(),
+                    deliveryAddress: orderData.deliveryAddress,
+                    items: orderData.items,
+                    orderId: getNextOrderId(),
                     status: 'pending',
-                    createdTime: new Date().toISOString()
+                    updatedAt: new Date().toISOString(),
+                    userId: orderData.userId
                 });
                 
                 showToast('Order created successfully!');
-                loadOrders();
+                // Real-time listener will handle the update and notification
                 return docRef.id;
             } catch (error) {
                 console.error('Error creating order:', error);
@@ -751,12 +894,14 @@
             try {
                 const orderRef = doc(db, 'orders', id);
                 await updateDoc(orderRef, {
-                    ...orderData,
-                    updatedTime: new Date().toISOString()
+                    deliveryAddress: orderData.deliveryAddress,
+                    items: orderData.items,
+                    updatedAt: new Date().toISOString(),
+                    userId: orderData.userId
                 });
                 
                 showToast('Order updated successfully!');
-                loadOrders();
+                // Real-time listener will handle the update
             } catch (error) {
                 console.error('Error updating order:', error);
                 showToast('Error updating order', 'error');
@@ -770,11 +915,11 @@
                 const orderRef = doc(db, 'orders', id);
                 await updateDoc(orderRef, { 
                     status: newStatus,
-                    updatedTime: new Date().toISOString()
+                    updatedAt: new Date().toISOString()
                 });
                 
-                showToast(`Order ${newStatus.replace('_', ' ')} successfully!`);
-                loadOrders();
+                // Don't show toast here as the real-time listener will handle the notification
+                console.log(`Order ${newStatus} successfully!`);
             } catch (error) {
                 console.error('Error updating order status:', error);
                 showToast('Error updating order status', 'error');
@@ -789,7 +934,7 @@
             try {
                 await deleteDoc(doc(db, 'orders', id));
                 showToast('Order deleted successfully!');
-                loadOrders();
+                // Real-time listener will handle the update
             } catch (error) {
                 console.error('Error deleting order:', error);
                 showToast('Error deleting order', 'error');
@@ -809,9 +954,11 @@
             const itemsContainer = document.getElementById('editOrderItems');
             itemsContainer.innerHTML = '';
             
-            if (order.items && Array.isArray(order.items)) {
-                order.items.forEach((item, index) => {
-                    addEditOrderItem(item.foodId, item.quantity, index === 0);
+            if (order.items && typeof order.items === 'object') {
+                const itemKeys = Object.keys(order.items);
+                itemKeys.forEach((key, index) => {
+                    const item = order.items[key];
+                    addEditOrderItem(item.foodId, item.qty, index === 0);
                 });
             } else {
                 addEditOrderItem('', 1, true);
@@ -825,29 +972,26 @@
             const order = allOrders.find(o => o.id === id);
             if (!order) return;
             
-            const customer = allUsers.find(u => u.id === order.userId);
-            const customerName = customer ? customer.name : 'Unknown Customer';
-            const customerPhone = customer ? (customer.phone || customer.email) : 'N/A';
+            const customer = allUsers.find(u => u.userId === order.userId);
+            const customerName = customer ? (customer.name || customer.username || 'Unknown Customer') : 'Unknown Customer';
+            const customerPhone = customer ? (customer.phone || customer.email || '') : 'N/A';
             
-            document.getElementById('orderDetailsTitle').textContent = `Order Details - #${order.orderID}`;
+            document.getElementById('orderDetailsTitle').textContent = `Order Details - #${order.orderId}`;
             
             let itemsHtml = '';
             let subtotal = 0;
             
-            if (order.items && Array.isArray(order.items)) {
-                order.items.forEach(item => {
-                    // Look for menu item using foodId first, then fallback to id
-                    const menuItem = allMenuItems.find(m => m.foodId === item.foodId || m.id === item.foodId);
-                    const itemName = menuItem ? (menuItem.name || menuItem.title || 'Unknown Item') : 'Unknown Item';
-                    const itemPrice = menuItem ? (menuItem.price || 0) : 0;
-                    const itemTotal = itemPrice * item.quantity;
+            if (order.items && typeof order.items === 'object') {
+                Object.keys(order.items).forEach(key => {
+                    const item = order.items[key];
+                    const itemTotal = item.price * item.qty;
                     subtotal += itemTotal;
                     
                     itemsHtml += `
                         <tr>
-                            <td>${itemName}</td>
-                            <td>${item.quantity}</td>
-                            <td>${formatCurrency(itemPrice)}</td>
+                            <td>${item.name}</td>
+                            <td>${item.qty}</td>
+                            <td>${formatCurrency(item.price)}</td>
                             <td>${formatCurrency(itemTotal)}</td>
                         </tr>
                     `;
@@ -864,10 +1008,10 @@
                     </div>
                     <div class="col-md-6">
                         <h6>Order Information</h6>
-                        <p><strong>Order ID:</strong> #${order.orderID}</p>
+                        <p><strong>Order ID:</strong> #${order.orderId}</p>
                         <p><strong>Status:</strong> ${getStatusBadge(order.status)}</p>
-                        <p><strong>Order Time:</strong> ${formatDate(order.createdTime)}</p>
-                        <p><strong>Total:</strong> ${formatCurrency(order.total)}</p>
+                        <p><strong>Order Time:</strong> ${formatDate(order.createdAt)}</p>
+                        <p><strong>Total:</strong> ${formatCurrency(subtotal)}</p>
                     </div>
                 </div>
                 <hr>
@@ -888,7 +1032,7 @@
                         <tfoot>
                             <tr>
                                 <th colspan="3">Total</th>
-                                <th>${formatCurrency(order.total)}</th>
+                                <th>${formatCurrency(subtotal)}</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -940,14 +1084,11 @@
             } else {
                 allMenuItems.forEach(item => {
                     const option = document.createElement('option');
-                    const itemId = item.foodId || item.id;
-                    const itemName = item.name || item.title || 'Unnamed Item';
-                    const itemPrice = item.price || 0;
-                    
-                    option.value = itemId;
-                    option.setAttribute('data-price', itemPrice);
-                    option.textContent = `${itemName} - ${formatCurrency(itemPrice)}`;
-                    if (itemId === foodId) option.selected = true;
+                    option.value = item.foodId;
+                    option.setAttribute('data-price', item.price);
+                    option.setAttribute('data-name', item.foodName);
+                    option.textContent = `${item.foodName} - ${formatCurrency(item.price)}`;
+                    if (item.foodId === foodId) option.selected = true;
                     foodSelect.appendChild(option);
                 });
             }
@@ -1002,14 +1143,11 @@
             } else {
                 allMenuItems.forEach(item => {
                     const option = document.createElement('option');
-                    const itemId = item.foodId || item.id;
-                    const itemName = item.name || item.title || 'Unnamed Item';
-                    const itemPrice = item.price || 0;
-                    
-                    option.value = itemId;
-                    option.setAttribute('data-price', itemPrice);
-                    option.textContent = `${itemName} - ${formatCurrency(itemPrice)}`;
-                    if (itemId === foodId) option.selected = true;
+                    option.value = item.foodId;
+                    option.setAttribute('data-price', item.price);
+                    option.setAttribute('data-name', item.foodName);
+                    option.textContent = `${item.foodName} - ${formatCurrency(item.price)}`;
+                    if (item.foodId === foodId) option.selected = true;
                     foodSelect.appendChild(option);
                 });
             }
@@ -1108,18 +1246,23 @@
                 spinner.classList.remove('d-none');
                 
                 // Collect order items
-                const items = [];
+                const items = {};
                 let hasValidItems = false;
+                let itemIndex = 0;
                 
                 document.querySelectorAll('#orderItems .order-item').forEach(item => {
                     const foodSelect = item.querySelector('.food-select');
                     const quantityInput = item.querySelector('.quantity-input');
+                    const selectedOption = foodSelect.options[foodSelect.selectedIndex];
                     
-                    if (foodSelect.value && quantityInput.value) {
-                        items.push({
+                    if (foodSelect.value && quantityInput.value && selectedOption) {
+                        items[itemIndex.toString()] = {
                             foodId: foodSelect.value,
-                            quantity: parseInt(quantityInput.value)
-                        });
+                            name: selectedOption.getAttribute('data-name'),
+                            price: parseFloat(selectedOption.getAttribute('data-price')),
+                            qty: parseInt(quantityInput.value)
+                        };
+                        itemIndex++;
                         hasValidItems = true;
                     }
                 });
@@ -1129,13 +1272,10 @@
                     return;
                 }
                 
-                const total = parseFloat(document.getElementById('orderTotal').textContent);
-                
                 const orderData = {
-                    userId: document.getElementById('customerSelect').value,
                     deliveryAddress: document.getElementById('deliveryAddress').value,
                     items: items,
-                    total: total
+                    userId: document.getElementById('customerSelect').value
                 };
                 
                 await createOrder(orderData);
@@ -1171,18 +1311,23 @@
                 spinner.classList.remove('d-none');
                 
                 // Collect order items
-                const items = [];
+                const items = {};
                 let hasValidItems = false;
+                let itemIndex = 0;
                 
                 document.querySelectorAll('#editOrderItems .order-item').forEach(item => {
                     const foodSelect = item.querySelector('.food-select');
                     const quantityInput = item.querySelector('.quantity-input');
+                    const selectedOption = foodSelect.options[foodSelect.selectedIndex];
                     
-                    if (foodSelect.value && quantityInput.value) {
-                        items.push({
+                    if (foodSelect.value && quantityInput.value && selectedOption) {
+                        items[itemIndex.toString()] = {
                             foodId: foodSelect.value,
-                            quantity: parseInt(quantityInput.value)
-                        });
+                            name: selectedOption.getAttribute('data-name'),
+                            price: parseFloat(selectedOption.getAttribute('data-price')),
+                            qty: parseInt(quantityInput.value)
+                        };
+                        itemIndex++;
                         hasValidItems = true;
                     }
                 });
@@ -1192,14 +1337,12 @@
                     return;
                 }
                 
-                const total = parseFloat(document.getElementById('editOrderTotal').textContent);
                 const orderId = document.getElementById('editOrderId').value;
                 
                 const orderData = {
-                    userId: document.getElementById('editCustomerSelect').value,
                     deliveryAddress: document.getElementById('editDeliveryAddress').value,
                     items: items,
-                    total: total
+                    userId: document.getElementById('editCustomerSelect').value
                 };
                 
                 await updateOrder(orderId, orderData);
