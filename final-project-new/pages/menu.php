@@ -193,6 +193,13 @@
             padding-left: 1.5rem;
             padding-right: 1.5rem;
         }
+
+        .category-image {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -202,15 +209,13 @@
             <div class="btn-toolbar mb-2 mb-md-0">
                 <div class="btn-group me-2">
                     <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                        <i class="fas fa-tags me-2"></i>Add Categories (Coming Soon)
+                        <i class="fas fa-tags me-2"></i>Add Category
                     </button>
                 </div>
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
                     <i class="fas fa-plus me-1"></i>Add Item
                 </button>
-                <button type="button" class="btn btn-sm btn-info" onclick="loadMenuItems()">
-                    <i class="fas fa-refresh me-1"></i>Reload Items
-                </button>
+
             </div>
         </div>
 
@@ -234,42 +239,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-3">
-                                <div class="card text-center category-card" data-category="appetizers">
-                                    <div class="card-body">
-                                        <i class="fas fa-cookie-bite fa-2x mb-2 text-warning"></i>
-                                        <h6>Appetizers</h6>
-                                        <span class="badge bg-warning" id="count-appetizers">0</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 mb-3">
-                                <div class="card text-center category-card" data-category="mains">
-                                    <div class="card-body">
-                                        <i class="fas fa-drumstick-bite fa-2x mb-2 text-success"></i>
-                                        <h6>Main Course</h6>
-                                        <span class="badge bg-success" id="count-mains">0</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 mb-3">
-                                <div class="card text-center category-card" data-category="beverages">
-                                    <div class="card-body">
-                                        <i class="fas fa-glass-martini fa-2x mb-2 text-info"></i>
-                                        <h6>Beverages</h6>
-                                        <span class="badge bg-info" id="count-beverages">0</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 mb-3">
-                                <div class="card text-center category-card" data-category="desserts">
-                                    <div class="card-body">
-                                        <i class="fas fa-ice-cream fa-2x mb-2 text-danger"></i>
-                                        <h6>Desserts</h6>
-                                        <span class="badge bg-danger" id="count-desserts">0</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- Dynamic categories will be loaded here -->
                         </div>
                     </div>
                 </div>
@@ -318,7 +288,7 @@
             </div>
         </div>
 
-        <!-- Add Category Modal (Coming Soon) -->
+        <!-- Add Category Modal -->
         <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -326,19 +296,120 @@
                         <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body text-center">
-                        <i class="fas fa-tools fa-3x text-muted mb-3"></i>
-                        <h5>Coming Soon!</h5>
-                        <p class="text-muted">The ability to add custom categories will be implemented in the next update.</p>
+                    <div class="modal-body">
+                        <form class="needs-validation" id="addCategoryForm" novalidate>
+                            <div class="mb-3">
+                                <label for="categoryName" class="form-label">Category Name</label>
+                                <input type="text" class="form-control" id="categoryName" required>
+                                <div class="invalid-feedback">Please provide a valid category name.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="categoryImageUpload" class="form-label">Category Image</label>
+                                <div class="upload-area" id="categoryUploadArea">
+                                    <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                                    <p class="mb-2">Click to upload or drag and drop</p>
+                                    <input type="file" class="form-control" id="categoryImageUpload" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('categoryImageUpload').click()">
+                                        Choose File
+                                    </button>
+                                </div>
+                                <img id="categoryImagePreview" class="image-preview" style="display: none;" alt="Preview">
+                                <div class="form-text">Upload an image for the category (JPG, PNG, GIF - Max 5MB)</div>
+                            </div>
+                        </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" form="addCategoryForm" id="categorySubmitBtn">Add Category</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Add Item Modal -->
+        <!-- Edit Category Modal -->
+        <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="needs-validation" id="editCategoryForm" novalidate>
+                            <input type="hidden" id="editCategoryId">
+                            <div class="mb-3">
+                                <label for="editCategoryName" class="form-label">Category Name</label>
+                                <input type="text" class="form-control" id="editCategoryName" required>
+                                <div class="invalid-feedback">Please provide a valid category name.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Current Image</label>
+                                <img id="editCategoryCurrentImage" class="image-preview mb-2" style="display: block;" alt="Current image">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="editCategoryImageUpload" class="form-label">Update Image (Optional)</label>
+                                <div class="upload-area" id="editCategoryUploadArea">
+                                    <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                                    <p class="mb-2">Click to upload or drag and drop a new image</p>
+                                    <input type="file" class="form-control" id="editCategoryImageUpload" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('editCategoryImageUpload').click()">
+                                        Choose File
+                                    </button>
+                                </div>
+                                <img id="editCategoryImagePreview" class="image-preview" style="display: none;" alt="Preview">
+                                <div class="form-text">Upload a new image to replace the current one (JPG, PNG, GIF - Max 5MB)</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" form="editCategoryForm" id="editCategorySubmitBtn">Update Category</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Item Modal -->
+        <div class="modal fade" id="viewItemModal" tabindex="-1" aria-labelledby="viewItemModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewItemModalLabel">Item Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <img id="viewItemImage" class="img-fluid rounded mb-3" alt="Food item image">
+                            </div>
+                            <div class="col-md-6">
+                                <h3 id="viewItemName" class="mb-3"></h3>
+                                <p><strong>Category:</strong> <span id="viewItemCategory" class="badge bg-primary"></span></p>
+                                <p><strong>Price:</strong> <span id="viewItemPrice" class="text-success fw-bold fs-5"></span></p>
+                                <p><strong>Cook Time:</strong> <span id="viewItemCookTime"></span> minutes</p>
+                                <p><strong>Status:</strong> <span id="viewItemStatus"></span></p>
+                                <p><strong>Orders:</strong> <span id="viewItemOrders"></span></p>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h5>Short Description</h5>
+                                <p id="viewItemShortDesc" class="text-muted"></p>
+                                <h5>Full Description</h5>
+                                <p id="viewItemFullDesc"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="editFromViewBtn">Edit Item</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="modal fade" id="addItemModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -384,10 +455,7 @@
                                 <label for="itemCategory" class="form-label">Category</label>
                                 <select class="form-select" id="itemCategory" required>
                                     <option value="">Select Category</option>
-                                    <option value="appetizers">Appetizers</option>
-                                    <option value="mains">Main Course</option>
-                                    <option value="beverages">Beverages</option>
-                                    <option value="desserts">Desserts</option>
+                                    <!-- Dynamic categories will be loaded here -->
                                 </select>
                                 <div class="invalid-feedback">Please select a category.</div>
                             </div>
@@ -462,10 +530,7 @@
                                 <label for="editItemCategory" class="form-label">Category</label>
                                 <select class="form-select" id="editItemCategory" required>
                                     <option value="">Select Category</option>
-                                    <option value="appetizers">Appetizers</option>
-                                    <option value="mains">Main Course</option>
-                                    <option value="beverages">Beverages</option>
-                                    <option value="desserts">Desserts</option>
+                                    <!-- Dynamic categories will be loaded here -->
                                 </select>
                                 <div class="invalid-feedback">Please select a category.</div>
                             </div>
@@ -503,6 +568,7 @@
     
     <script>
         let allMenuItems = [];
+        let allCategories = [];
         let currentFilter = 'all';
 
         function toggleAvailability(button, itemId) {
@@ -526,19 +592,84 @@
         }
 
         // Category filtering
-        document.querySelectorAll('.category-card').forEach(card => {
-            card.addEventListener('click', function() {
-                // Remove active class from all cards
-                document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+        function setupCategoryFiltering() {
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove active class from all cards
+                    document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked card
+                    this.classList.add('active');
+                    
+                    const category = this.dataset.category;
+                    currentFilter = category;
+                    filterMenuByCategory(category);
+                });
+
+        // Edit category form submission handler
+        const editCategoryForm = document.getElementById("editCategoryForm");
+        const editCategorySubmitBtn = document.getElementById("editCategorySubmitBtn");
+
+        editCategoryForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            // Validate form
+            if (!editCategoryForm.checkValidity()) {
+                e.stopPropagation();
+                editCategoryForm.classList.add('was-validated');
+                return;
+            }
+
+            // Show loading state
+            editCategorySubmitBtn.disabled = true;
+            editCategorySubmitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+
+            const categoryId = document.getElementById("editCategoryId").value;
+            const categoryName = document.getElementById("editCategoryName").value.trim();
+            const imageFile = document.getElementById("editCategoryImageUpload").files[0];
+
+            try {
+                let updateData = {
+                    categoryName: categoryName,
+                    updatedAt: serverTimestamp()
+                };
+
+                // Upload new image if provided
+                if (imageFile) {
+                    const imageRef = ref(storage, `category-images/${Date.now()}_${imageFile.name}`);
+                    const uploadResult = await uploadBytes(imageRef, imageFile);
+                    updateData.imageUrl = await getDownloadURL(uploadResult.ref);
+                }
+
+                // Update document in Firestore
+                const categoryRef = doc(db, "category", categoryId);
+                await updateDoc(categoryRef, updateData);
+
+                console.log("Category updated successfully");
                 
-                // Add active class to clicked card
-                this.classList.add('active');
+                // Show success message
+                alert("Category updated successfully!");
                 
-                const category = this.dataset.category;
-                currentFilter = category;
-                filterMenuByCategory(category);
-            });
+                // Reset form and hide modal
+                editCategoryForm.reset();
+                editCategoryForm.classList.remove('was-validated');
+                document.getElementById('editCategoryImagePreview').style.display = 'none';
+                bootstrap.Modal.getInstance(document.getElementById("editCategoryModal")).hide();
+                
+                // Reload data
+                loadData();
+
+            } catch (error) {
+                console.error("Error updating category: ", error);
+                alert("Failed to update category. Please try again.");
+            } finally {
+                // Reset button state
+                editCategorySubmitBtn.disabled = false;
+                editCategorySubmitBtn.innerHTML = 'Update Category';
+            }
         });
+            });
+        }
 
         function filterMenuByCategory(category) {
             const rows = document.querySelectorAll('#menuTable tbody tr');
@@ -551,9 +682,9 @@
                     if (categoryCell) {
                         const categoryBadge = categoryCell.querySelector('.badge');
                         if (categoryBadge) {
-                            const itemCategory = categoryBadge.textContent.toLowerCase().replace(' course', 's').replace(' ', '');
+                            const categoryId = categoryBadge.dataset.categoryId;
                             
-                            if (itemCategory.includes(category)) {
+                            if (categoryId === category) {
                                 row.style.display = '';
                             } else {
                                 row.style.display = 'none';
@@ -565,23 +696,16 @@
         }
 
         function updateCategoryCounts() {
-            const counts = {
-                all: 0,
-                appetizers: 0,
-                mains: 0,
-                beverages: 0,
-                desserts: 0
-            };
+            // Count all items
+            let allCount = allMenuItems.length;
+            document.getElementById('count-all').textContent = allCount;
 
-            allMenuItems.forEach(item => {
-                counts.all++;
-                counts[item.category]++;
-            });
-
-            Object.keys(counts).forEach(category => {
-                const badge = document.getElementById(`count-${category}`);
-                if (badge) {
-                    badge.textContent = counts[category];
+            // Count items per category
+            allCategories.forEach(category => {
+                const count = allMenuItems.filter(item => item.category === category.categoryId).length;
+                const countElement = document.getElementById(`count-${category.categoryId}`);
+                if (countElement) {
+                    countElement.textContent = count;
                 }
             });
         }
@@ -662,10 +786,12 @@
             }
         }
 
-        // Initialize image upload for both modals
+        // Initialize image upload for all modals
         document.addEventListener('DOMContentLoaded', function() {
             setupImageUpload('uploadArea', 'imageUpload', 'imagePreview');
             setupImageUpload('editUploadArea', 'editImageUpload', 'editImagePreview');
+            setupImageUpload('categoryUploadArea', 'categoryImageUpload', 'categoryImagePreview');
+            setupImageUpload('editCategoryUploadArea', 'editCategoryImageUpload', 'editCategoryImagePreview');
         });
     </script>
 
@@ -681,7 +807,9 @@
             updateDoc, 
             deleteDoc,
             getDoc,
-            serverTimestamp 
+            serverTimestamp,
+            arrayUnion,
+            arrayRemove 
         } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
         import { 
             getStorage, 
@@ -708,10 +836,84 @@
         const storage = getStorage(app);
 
         // Make functions globally available
-        window.loadMenuItems = loadMenuItems;
+        window.loadData = loadData;
         window.updateItemStatus = updateItemStatus;
         window.deleteMenuItem = deleteMenuItem;
         window.editMenuItem = editMenuItem;
+        window.viewMenuItem = viewMenuItem;
+        window.deleteCategory = deleteCategory;
+        window.editCategory = editCategory;
+
+        // Add category form submission handler
+        const categoryForm = document.getElementById("addCategoryForm");
+        const categorySubmitBtn = document.getElementById("categorySubmitBtn");
+
+        categoryForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            // Validate form
+            if (!categoryForm.checkValidity()) {
+                e.stopPropagation();
+                categoryForm.classList.add('was-validated');
+                return;
+            }
+
+            // Show loading state
+            categorySubmitBtn.disabled = true;
+            categorySubmitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding...';
+
+            const categoryName = document.getElementById("categoryName").value.trim();
+            const imageFile = document.getElementById("categoryImageUpload").files[0];
+
+            try {
+                let imageUrl = "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop";
+
+                // Upload image if provided
+                if (imageFile) {
+                    const imageRef = ref(storage, `category-images/${Date.now()}_${imageFile.name}`);
+                    const uploadResult = await uploadBytes(imageRef, imageFile);
+                    imageUrl = await getDownloadURL(uploadResult.ref);
+                }
+
+                // Add document to Firestore
+                const docRef = await addDoc(collection(db, "category"), {
+                    categoryName: categoryName,
+                    imageUrl: imageUrl,
+                    FoodId: [],
+                    createdAt: serverTimestamp()
+                });
+
+                // Generate categoryId using the document ID
+                const categoryId = docRef.id;
+
+                // Update the document to include the categoryId
+                await updateDoc(docRef, {
+                    categoryId: categoryId
+                });
+
+                console.log("Category added with ID: ", docRef.id);
+                
+                // Show success message
+                alert("Category added successfully!");
+                
+                // Reset form and hide modal
+                categoryForm.reset();
+                categoryForm.classList.remove('was-validated');
+                document.getElementById('categoryImagePreview').style.display = 'none';
+                bootstrap.Modal.getInstance(document.getElementById("addCategoryModal")).hide();
+                
+                // Reload data
+                loadData();
+
+            } catch (error) {
+                console.error("Error adding category: ", error);
+                alert("Failed to add category. Please try again.");
+            } finally {
+                // Reset button state
+                categorySubmitBtn.disabled = false;
+                categorySubmitBtn.innerHTML = 'Add Category';
+            }
+        });
 
         // Add form submission handler
         const form = document.getElementById("addItemForm");
@@ -736,7 +938,7 @@
             const fullDesc = document.getElementById("itemDescription").value.trim();
             const price = parseFloat(document.getElementById("itemPrice").value);
             const cookTime = parseInt(document.getElementById("prepTime").value);
-            const category = document.getElementById("itemCategory").value;
+            const categoryId = document.getElementById("itemCategory").value;
             const imageFile = document.getElementById("imageUpload").files[0];
 
             try {
@@ -756,7 +958,7 @@
                     disc: fullDesc,
                     price: price,
                     cookedTime: cookTime,
-                    category: category,
+                    category: categoryId,
                     imageUrl: imageUrl,
                     status: "available",
                     createdAt: serverTimestamp(),
@@ -771,6 +973,12 @@
                     foodId: foodId
                 });
 
+                // Update category's FoodId array
+                const categoryRef = doc(db, "category", categoryId);
+                await updateDoc(categoryRef, {
+                    FoodId: arrayUnion(foodId)
+                });
+
                 console.log("Document written with ID: ", docRef.id);
                 
                 // Show success message
@@ -783,7 +991,7 @@
                 bootstrap.Modal.getInstance(document.getElementById("addItemModal")).hide();
                 
                 // Reload menu items
-                loadMenuItems();
+                loadData();
 
             } catch (error) {
                 console.error("Error adding document: ", error);
@@ -819,17 +1027,22 @@
             const fullDesc = document.getElementById("editItemDescription").value.trim();
             const price = parseFloat(document.getElementById("editItemPrice").value);
             const cookTime = parseInt(document.getElementById("editPrepTime").value);
-            const category = document.getElementById("editItemCategory").value;
+            const newCategoryId = document.getElementById("editItemCategory").value;
             const imageFile = document.getElementById("editImageUpload").files[0];
 
             try {
+                // Get current item data to check category change
+                const itemDoc = await getDoc(doc(db, "menus", itemId));
+                const currentItem = itemDoc.data();
+                const oldCategoryId = currentItem.category;
+
                 let updateData = {
                     foodName: name,
                     shortDisc: shortDesc,
                     disc: fullDesc,
                     price: price,
                     cookedTime: cookTime,
-                    category: category,
+                    category: newCategoryId,
                     updatedAt: serverTimestamp()
                 };
 
@@ -844,6 +1057,23 @@
                 const itemRef = doc(db, "menus", itemId);
                 await updateDoc(itemRef, updateData);
 
+                // If category changed, update category FoodId arrays
+                if (oldCategoryId !== newCategoryId) {
+                    // Remove from old category
+                    if (oldCategoryId) {
+                        const oldCategoryRef = doc(db, "category", oldCategoryId);
+                        await updateDoc(oldCategoryRef, {
+                            FoodId: arrayRemove(itemId)
+                        });
+                    }
+
+                    // Add to new category
+                    const newCategoryRef = doc(db, "category", newCategoryId);
+                    await updateDoc(newCategoryRef, {
+                        FoodId: arrayUnion(itemId)
+                    });
+                }
+
                 console.log("Document updated successfully");
                 
                 // Show success message
@@ -856,7 +1086,7 @@
                 bootstrap.Modal.getInstance(document.getElementById("editItemModal")).hide();
                 
                 // Reload menu items
-                loadMenuItems();
+                loadData();
 
             } catch (error) {
                 console.error("Error updating document: ", error);
@@ -867,6 +1097,81 @@
                 editSubmitBtn.innerHTML = 'Update Item';
             }
         });
+
+        // Function to load categories from Firestore
+        async function loadCategories() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "category"));
+                allCategories = [];
+                
+                querySnapshot.forEach((doc) => {
+                    const category = doc.data();
+                    category.id = doc.id;
+                    allCategories.push(category);
+                });
+
+                // Update categories display
+                updateCategoriesDisplay();
+                updateCategoryDropdowns();
+                
+            } catch (error) {
+                console.error("Error loading categories: ", error);
+            }
+        }
+
+        // Function to update categories display
+        function updateCategoriesDisplay() {
+            const container = document.getElementById('categoriesContainer');
+            
+            // Keep the "All Items" card and remove other dynamic categories
+            const allItemsCard = container.querySelector('[data-category="all"]').parentElement;
+            container.innerHTML = '';
+            container.appendChild(allItemsCard);
+
+            // Add dynamic categories
+            allCategories.forEach(category => {
+                const categoryCard = document.createElement('div');
+                categoryCard.className = 'col-md-2 mb-3';
+                categoryCard.innerHTML = `
+                    <div class="card text-center category-card" data-category="${category.categoryId}">
+                        <div class="card-body">
+                            <img src="${category.imageUrl}" alt="${category.categoryName}" class="category-image mb-2">
+                            <h6>${category.categoryName}</h6>
+                            <span class="badge bg-secondary" id="count-${category.categoryId}">0</span>
+                            <div class="mt-2">
+                                <button class="btn btn-outline-primary btn-sm me-1" onclick="editCategory('${category.categoryId}')" title="Edit Category">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="deleteCategory('${category.categoryId}')" title="Delete Category">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(categoryCard);
+            });
+
+            // Re-setup category filtering
+            setupCategoryFiltering();
+        }
+
+        // Function to update category dropdowns
+        function updateCategoryDropdowns() {
+            const addCategorySelect = document.getElementById('itemCategory');
+            const editCategorySelect = document.getElementById('editItemCategory');
+
+            // Clear existing options (except the first default option)
+            addCategorySelect.innerHTML = '<option value="">Select Category</option>';
+            editCategorySelect.innerHTML = '<option value="">Select Category</option>';
+
+            // Add categories to dropdowns
+            allCategories.forEach(category => {
+                const option = `<option value="${category.categoryId}">${category.categoryName}</option>`;
+                addCategorySelect.innerHTML += option;
+                editCategorySelect.innerHTML += option;
+            });
+        }
 
         // Function to load menu items from Firestore
         async function loadMenuItems() {
@@ -924,9 +1229,27 @@
             }
         }
 
+        // Function to load all data
+        async function loadData() {
+            await loadCategories();
+            await loadMenuItems();
+            
+            // Re-setup category filtering after loading
+            setTimeout(() => {
+                setupCategoryFiltering();
+                // Re-apply current filter if not 'all'
+                if (currentFilter !== 'all') {
+                    filterMenuByCategory(currentFilter);
+                }
+            }, 100);
+        }
+
         // Function to create menu item row
         function createMenuItemRow(id, item) {
             const row = document.createElement('tr');
+            const category = allCategories.find(cat => cat.categoryId === item.category);
+            const categoryName = category ? category.categoryName : 'Unknown';
+            
             row.innerHTML = `
                 <td>
                     <img src="${item.imageUrl || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop'}" 
@@ -939,12 +1262,15 @@
                         <small class="text-muted">${item.shortDisc}</small>
                     </div>
                 </td>
-                <td><span class="badge bg-${getCategoryColor(item.category)}">${getCategoryName(item.category)}</span></td>
+                <td><span class="badge bg-primary" data-category-id="${item.category}">${categoryName}</span></td>
                 <td><strong>${item.price}</strong></td>
                 <td>${item.cookedTime} min</td>
                 <td><span class="badge ${item.status === 'available' ? 'bg-success' : 'bg-danger'}">${item.status === 'available' ? 'Available' : 'Out of Stock'}</span></td>
                 <td>
                     <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-info" onclick="viewMenuItem('${id}')" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
                         <button class="btn btn-outline-primary" onclick="editMenuItem('${id}')" title="Edit">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -959,27 +1285,6 @@
                 </td>
             `;
             return row;
-        }
-
-        // Helper functions
-        function getCategoryColor(category) {
-            const colors = {
-                'appetizers': 'warning',
-                'mains': 'success',
-                'beverages': 'info',
-                'desserts': 'danger'
-            };
-            return colors[category] || 'secondary';
-        }
-
-        function getCategoryName(category) {
-            const names = {
-                'appetizers': 'Appetizers',
-                'mains': 'Main Course',
-                'beverages': 'Beverages',
-                'desserts': 'Desserts'
-            };
-            return names[category] || category;
         }
 
         // Function to update item status
@@ -1010,6 +1315,19 @@
             }
 
             try {
+                // Get item data to remove from category
+                const itemDoc = await getDoc(doc(db, "menus", itemId));
+                const itemData = itemDoc.data();
+                
+                // Remove from category's FoodId array
+                if (itemData.category) {
+                    const categoryRef = doc(db, "category", itemData.category);
+                    await updateDoc(categoryRef, {
+                        FoodId: arrayRemove(itemId)
+                    });
+                }
+
+                // Delete the menu item
                 await deleteDoc(doc(db, "menus", itemId));
                 console.log("Document successfully deleted!");
                 
@@ -1025,7 +1343,104 @@
             }
         }
 
-        // Function to edit menu item
+        // Function to delete category
+        async function deleteCategory(categoryId) {
+            // Check if category has items
+            const categoryData = allCategories.find(cat => cat.categoryId === categoryId);
+            if (categoryData && categoryData.FoodId && categoryData.FoodId.length > 0) {
+                alert("Cannot delete category that contains menu items. Please move or delete all items in this category first.");
+                return;
+            }
+
+            if (!confirm("Are you sure you want to delete this category? This action cannot be undone.")) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, "category", categoryId));
+                console.log("Category successfully deleted!");
+                
+                alert("Category deleted successfully!");
+                loadData(); // Reload all data
+            } catch (error) {
+                console.error("Error deleting category: ", error);
+                alert("Failed to delete category");
+            }
+        }
+
+        // Function to edit category
+        async function editCategory(categoryId) {
+            try {
+                const categoryDoc = await getDoc(doc(db, "category", categoryId));
+                if (categoryDoc.exists()) {
+                    const category = categoryDoc.data();
+                    
+                    // Populate edit form
+                    document.getElementById('editCategoryId').value = categoryId;
+                    document.getElementById('editCategoryName').value = category.categoryName;
+                    
+                    // Show current image
+                    const currentImage = document.getElementById('editCategoryCurrentImage');
+                    currentImage.src = category.imageUrl || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=200&h=150&fit=crop';
+                    currentImage.style.display = 'block';
+                    
+                    // Hide preview and reset file input
+                    document.getElementById('editCategoryImagePreview').style.display = 'none';
+                    document.getElementById('editCategoryImageUpload').value = '';
+                    
+                    // Show modal
+                    const editModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+                    editModal.show();
+                } else {
+                    alert("Category not found!");
+                }
+            } catch (error) {
+                console.error("Error loading category for edit: ", error);
+                alert("Failed to load category details");
+            }
+        }
+
+        // Function to view menu item
+        async function viewMenuItem(itemId) {
+            try {
+                const itemDoc = await getDoc(doc(db, "menus", itemId));
+                if (itemDoc.exists()) {
+                    const item = itemDoc.data();
+                    const category = allCategories.find(cat => cat.categoryId === item.category);
+                    const categoryName = category ? category.categoryName : 'Unknown';
+                    
+                    // Populate view modal
+                    document.getElementById('viewItemImage').src = item.imageUrl || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop';
+                    document.getElementById('viewItemName').textContent = item.foodName;
+                    document.getElementById('viewItemCategory').textContent = categoryName;
+                    document.getElementById('viewItemPrice').textContent = `${item.price}`;
+                    document.getElementById('viewItemCookTime').textContent = item.cookedTime;
+                    document.getElementById('viewItemOrders').textContent = item.orders || 0;
+                    document.getElementById('viewItemShortDesc').textContent = item.shortDisc;
+                    document.getElementById('viewItemFullDesc').textContent = item.disc;
+                    
+                    // Set status badge
+                    const statusElement = document.getElementById('viewItemStatus');
+                    statusElement.textContent = item.status === 'available' ? 'Available' : 'Out of Stock';
+                    statusElement.className = `badge ${item.status === 'available' ? 'bg-success' : 'bg-danger'}`;
+                    
+                    // Set up edit button
+                    document.getElementById('editFromViewBtn').onclick = () => {
+                        bootstrap.Modal.getInstance(document.getElementById('viewItemModal')).hide();
+                        editMenuItem(itemId);
+                    };
+                    
+                    // Show modal
+                    const viewModal = new bootstrap.Modal(document.getElementById('viewItemModal'));
+                    viewModal.show();
+                } else {
+                    alert("Item not found!");
+                }
+            } catch (error) {
+                console.error("Error loading item for view: ", error);
+                alert("Failed to load item details");
+            }
+        }
         async function editMenuItem(itemId) {
             try {
                 const itemDoc = await getDoc(doc(db, "menus", itemId));
@@ -1062,9 +1477,9 @@
             }
         }
 
-        // Load menu items when page loads
+        // Load all data when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            loadMenuItems();
+            loadData();
         });
     </script>
 </body>
