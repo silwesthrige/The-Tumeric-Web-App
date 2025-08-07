@@ -533,7 +533,8 @@
             query,
             where,
             orderBy,
-            onSnapshot
+            onSnapshot,
+            Timestamp
         } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
         import { 
             getStorage, 
@@ -585,8 +586,25 @@
             });
         }
 
-        function formatDate(date) {
-            return new Date(date).toLocaleDateString();
+        function formatDate(dateInput) {
+            let date;
+            
+            // Handle both Timestamp and Date objects
+            if (dateInput && typeof dateInput.toDate === 'function') {
+                // It's a Firestore Timestamp
+                date = dateInput.toDate();
+            } else if (dateInput instanceof Date) {
+                // It's already a Date object
+                date = dateInput;
+            } else if (typeof dateInput === 'string') {
+                // It's a string, parse it
+                date = new Date(dateInput);
+            } else {
+                // Fallback
+                return 'Invalid Date';
+            }
+            
+            return date.toLocaleDateString();
         }
 
         function formatCurrency(amount) {
@@ -598,13 +616,25 @@
 
         function getPromotionStatus(promotion) {
             const now = new Date();
-            const endDate = new Date(promotion.endDate);
-            const startDate = new Date(promotion.startDate);
+            let endDate, startDate;
+            
+            // Handle both Timestamp and Date objects
+            if (promotion.endDate && typeof promotion.endDate.toDate === 'function') {
+                endDate = promotion.endDate.toDate();
+            } else {
+                endDate = new Date(promotion.endDate);
+            }
+            
+            if (promotion.startDate && typeof promotion.startDate.toDate === 'function') {
+                startDate = promotion.startDate.toDate();
+            } else {
+                startDate = new Date(promotion.startDate);
+            }
             
             if (promotion.status === 'paused') return 'paused';
             if (endDate < now) return 'expired';
             if (startDate > now) return 'scheduled';
-            if (promotion.usageCount >= promotion.usageLimit) return 'exhausted';
+            if ((promotion.usageCount || 0) >= promotion.usageLimit) return 'exhausted';
             return 'active';
         }
 
@@ -617,6 +647,35 @@
                 'exhausted': 'bg-secondary'
             };
             return `<span class="badge ${badges[status]}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
+        }
+
+        // Convert Date to datetime-local format
+        function dateToInputFormat(dateInput) {
+            let date;
+            
+            // Handle both Timestamp and Date objects
+            if (dateInput && typeof dateInput.toDate === 'function') {
+                // It's a Firestore Timestamp
+                date = dateInput.toDate();
+            } else if (dateInput instanceof Date) {
+                // It's already a Date object
+                date = dateInput;
+            } else if (typeof dateInput === 'string') {
+                // It's a string, parse it
+                date = new Date(dateInput);
+            } else {
+                // Fallback to current date
+                date = new Date();
+            }
+            
+            // Convert to local timezone and format for datetime-local input
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
         }
 
         // Upload image to Firebase Storage
@@ -659,8 +718,14 @@
             
             container.innerHTML = '';
             
+            if (activePromotions.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center text-muted">No active promotions available</div>';
+                return;
+            }
+            
             activePromotions.forEach(promotion => {
-                const usagePercentage = Math.round((promotion.usageCount / promotion.usageLimit) * 100);
+                const usageCount = promotion.usageCount || 0;
+                const usagePercentage = Math.round((usageCount / promotion.usageLimit) * 100);
                 const discountDisplay = promotion.discountType === 'percentage' 
                     ? `${promotion.discountValue}%` 
                     : `₹${promotion.discountValue}`;
@@ -685,7 +750,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <small class="text-muted">
-                                        <i class="fas fa-users me-1"></i>Used: ${promotion.usageCount}/${promotion.usageLimit} times
+                                        <i class="fas fa-users me-1"></i>Used: ${usageCount}/${promotion.usageLimit} times
                                     </small>
                                 </div>
                                 <div class="progress mb-3" style="height: 5px;">
@@ -708,9 +773,15 @@
             const tbody = document.getElementById('promotionsTableBody');
             tbody.innerHTML = '';
             
+            if (allPromotions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No promotions available</td></tr>';
+                return;
+            }
+            
             allPromotions.forEach(promotion => {
                 const status = getPromotionStatus(promotion);
-                const usagePercentage = Math.round((promotion.usageCount / promotion.usageLimit) * 100);
+                const usageCount = promotion.usageCount || 0;
+                const usagePercentage = Math.round((usageCount / promotion.usageLimit) * 100);
                 const discountDisplay = promotion.discountType === 'percentage' 
                     ? `${promotion.discountValue}%` 
                     : `₹${promotion.discountValue}`;
@@ -723,7 +794,7 @@
                         <td><strong>${discountDisplay}</strong></td>
                         <td>
                             <div>
-                                <strong>${promotion.usageCount}/${promotion.usageLimit}</strong><br>
+                                <strong>${usageCount}/${promotion.usageLimit}</strong><br>
                                 <small class="text-muted">${usagePercentage}% used</small>
                             </div>
                         </td>
@@ -762,8 +833,9 @@
             // Most Used Promo
             let mostUsed = { code: 'None', usageCount: 0 };
             allPromotions.forEach(promo => {
-                if ((promo.usageCount || 0) > mostUsed.usageCount) {
-                    mostUsed = { code: promo.code, usageCount: promo.usageCount || 0 };
+                const usageCount = promo.usageCount || 0;
+                if (usageCount > mostUsed.usageCount) {
+                    mostUsed = { code: promo.code, usageCount };
                 }
             });
             document.getElementById('mostUsedPromo').textContent = mostUsed.code;
@@ -788,7 +860,13 @@
             sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
             
             const expiringSoon = allPromotions.filter(promo => {
-                const endDate = new Date(promo.endDate);
+                let endDate;
+                if (promo.endDate && typeof promo.endDate.toDate === 'function') {
+                    endDate = promo.endDate.toDate();
+                } else {
+                    endDate = new Date(promo.endDate);
+                }
+                
                 const now = new Date();
                 return endDate > now && endDate <= sevenDaysFromNow && getPromotionStatus(promo) === 'active';
             }).length;
@@ -806,13 +884,18 @@
                     imageUrl = await uploadImage(imageFile, imagePath);
                 }
                 
-                const docRef = await addDoc(collection(db, 'promotions'), {
+                // Convert dates to Firestore Timestamps
+                const dataWithTimestamps = {
                     ...promotionData,
                     imageUrl,
                     usageCount: 0,
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-                });
+                    startDate: Timestamp.fromDate(new Date(promotionData.startDate)),
+                    endDate: Timestamp.fromDate(new Date(promotionData.endDate)),
+                    createdAt: Timestamp.now(),
+                    updatedAt: Timestamp.now()
+                };
+                
+                const docRef = await addDoc(collection(db, 'promotions'), dataWithTimestamps);
                 
                 showToast('Promotion created successfully!');
                 loadPromotions();
@@ -827,7 +910,12 @@
         // Update promotion
         async function updatePromotion(id, promotionData, imageFile) {
             try {
-                let updateData = { ...promotionData, updatedAt: new Date() };
+                let updateData = { 
+                    ...promotionData, 
+                    updatedAt: Timestamp.now(),
+                    startDate: Timestamp.fromDate(new Date(promotionData.startDate)),
+                    endDate: Timestamp.fromDate(new Date(promotionData.endDate))
+                };
                 
                 if (imageFile) {
                     const imagePath = `promotions/${Date.now()}_${imageFile.name}`;
@@ -868,7 +956,7 @@
                 const promotionRef = doc(db, 'promotions', id);
                 await updateDoc(promotionRef, { 
                     status: newStatus,
-                    updatedAt: new Date()
+                    updatedAt: Timestamp.now()
                 });
                 
                 showToast(`Promotion ${newStatus === 'paused' ? 'paused' : 'resumed'} successfully!`);
@@ -879,43 +967,58 @@
             }
         };
 
-        // Edit promotion
+        // Edit promotion - FIXED VERSION
         window.editPromotion = function(id) {
             const promotion = allPromotions.find(p => p.id === id);
-            if (!promotion) return;
+            if (!promotion) {
+                showToast('Promotion not found', 'error');
+                return;
+            }
             
-            // Populate edit form
-            document.getElementById('editPromoId').value = id;
-            document.getElementById('editPromoCode').value = promotion.code;
-            document.getElementById('editPromoName').value = promotion.name;
-            document.getElementById('editPromoDescription').value = promotion.description;
-            document.getElementById('editDiscountType').value = promotion.discountType;
-            document.getElementById('editDiscountValue').value = promotion.discountValue;
-            document.getElementById('editMinOrderValue').value = promotion.minOrderValue || 0;
-            document.getElementById('editUsageLimit').value = promotion.usageLimit;
-            
-            // Format dates for datetime-local input
-            document.getElementById('editStartDate').value = new Date(promotion.startDate).toISOString().slice(0, 16);
-            document.getElementById('editEndDate').value = new Date(promotion.endDate).toISOString().slice(0, 16);
-            
-            // Show modal
-            new bootstrap.Modal(document.getElementById('editPromotionModal')).show();
+            try {
+                // Populate edit form with current values
+                document.getElementById('editPromoId').value = id;
+                document.getElementById('editPromoCode').value = promotion.code || '';
+                document.getElementById('editPromoName').value = promotion.name || '';
+                document.getElementById('editPromoDescription').value = promotion.description || '';
+                document.getElementById('editDiscountType').value = promotion.discountType || 'percentage';
+                document.getElementById('editDiscountValue').value = promotion.discountValue || 0;
+                document.getElementById('editMinOrderValue').value = promotion.minOrderValue || 0;
+                document.getElementById('editUsageLimit').value = promotion.usageLimit || 1;
+                
+                // Handle date formatting for datetime-local inputs
+                document.getElementById('editStartDate').value = dateToInputFormat(promotion.startDate);
+                document.getElementById('editEndDate').value = dateToInputFormat(promotion.endDate);
+                
+                // Reset file input and validation
+                document.getElementById('editPromoImage').value = '';
+                const form = document.getElementById('editPromotionForm');
+                form.classList.remove('was-validated');
+                
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('editPromotionModal'));
+                modal.show();
+                
+            } catch (error) {
+                console.error('Error populating edit form:', error);
+                showToast('Error loading promotion data', 'error');
+            }
         };
 
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // Set default dates
+            // Set default dates for create form
             const now = new Date();
             const startDate = document.getElementById('startDate');
             const endDate = document.getElementById('endDate');
             
             if (startDate) {
-                startDate.value = now.toISOString().slice(0, 16);
+                startDate.value = dateToInputFormat(now);
             }
             
             if (endDate) {
                 const futureDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
-                endDate.value = futureDate.toISOString().slice(0, 16);
+                endDate.value = dateToInputFormat(futureDate);
             }
 
             // Load promotions on page load
@@ -976,7 +1079,7 @@
             }
         });
 
-        // Update promotion form handler
+        // Update promotion form handler - FIXED VERSION
         document.getElementById('updatePromotionBtn').addEventListener('click', async function() {
             const form = document.getElementById('editPromotionForm');
             const btn = this;
