@@ -8,6 +8,10 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;" id="toastContainer">
+    </div>
+
     <div class="container-fluid">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Customer Management</h1>
@@ -431,6 +435,11 @@
         height: 100%;
         object-fit: cover;
     }
+
+    /* Toast container styling */
+    .toast-container {
+        z-index: 9999 !important;
+    }
     </style>
 
     <!-- Bootstrap JS -->
@@ -485,22 +494,30 @@
 
         // Utility functions
         function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toastId = 'toast-' + Date.now();
+            
             const toast = document.createElement('div');
+            toast.id = toastId;
             toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
             toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
             toast.innerHTML = `
                 <div class="d-flex">
                     <div class="toast-body">${message}</div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
             `;
 
-            document.body.appendChild(toast);
-            const bsToast = new bootstrap.Toast(toast);
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { delay: 5000 });
             bsToast.show();
 
             toast.addEventListener('hidden.bs.toast', () => {
-                document.body.removeChild(toast);
+                if (toastContainer.contains(toast)) {
+                    toastContainer.removeChild(toast);
+                }
             });
         }
 
@@ -1024,12 +1041,12 @@
                 return;
             }
             
-            // Create mailto link (in a real application, you would use an email service)
-            const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
-            window.open(mailtoLink);
+            // Open Gmail compose with pre-filled data
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+            window.open(gmailUrl, '_blank');
             
             bootstrap.Modal.getInstance(document.getElementById('sendEmailModal')).hide();
-            showToast('Email client opened successfully!');
+            showToast('Gmail opened with pre-filled email!');
         };
 
         window.sendNewsletter = function() {
@@ -1045,13 +1062,40 @@
             }
             
             const subject = 'Newsletter from The Turmeric Indian Cuisine';
-            const message = 'Dear valued customer,\n\nThank you for being part of our family! Check out our latest offers and new menu items.\n\nBest regards,\nThe Turmeric Team';
+            const message = `Dear valued customer,
+
+Thank you for being part of our family! We're excited to share our latest updates with you.
+
+🍛 NEW MENU ITEMS:
+- Authentic Biryani varieties
+- Fresh seasonal curries
+- Special weekend dishes
+
+🎉 SPECIAL OFFERS:
+- 15% off on orders above $50
+- Free delivery on weekends
+- Loyalty points for regular customers
+
+📍 RESTAURANT UPDATES:
+- Extended hours: Now open until 11 PM
+- Online ordering available
+- Catering services for events
+
+We appreciate your continued support and look forward to serving you soon!
+
+Best regards,
+The Turmeric Indian Cuisine Team
+
+---
+Visit us: www.theturmericindian.com
+Call us: (555) 123-4567
+Follow us on social media for daily updates!`;
             
-            // Create mailto link for all customers
-            const mailtoLink = `mailto:?bcc=${emails.join(',')}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
-            window.open(mailtoLink);
+            // Open Gmail compose with newsletter content
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&bcc=${encodeURIComponent(emails.join(','))}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+            window.open(gmailUrl, '_blank');
             
-            showToast(`Newsletter prepared for ${emails.length} customers!`);
+            showToast(`Newsletter prepared for ${emails.length} customers in Gmail!`);
         };
 
         // Event listeners
