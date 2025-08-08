@@ -605,69 +605,6 @@
                     currentFilter = category;
                     filterMenuByCategory(category);
                 });
-
-        // Edit category form submission handler
-        const editCategoryForm = document.getElementById("editCategoryForm");
-        const editCategorySubmitBtn = document.getElementById("editCategorySubmitBtn");
-
-        editCategoryForm.addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-            // Validate form
-            if (!editCategoryForm.checkValidity()) {
-                e.stopPropagation();
-                editCategoryForm.classList.add('was-validated');
-                return;
-            }
-
-            // Show loading state
-            editCategorySubmitBtn.disabled = true;
-            editCategorySubmitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
-
-            const categoryId = document.getElementById("editCategoryId").value;
-            const categoryName = document.getElementById("editCategoryName").value.trim();
-            const imageFile = document.getElementById("editCategoryImageUpload").files[0];
-
-            try {
-                let updateData = {
-                    categoryName: categoryName,
-                    updatedAt: serverTimestamp()
-                };
-
-                // Upload new image if provided
-                if (imageFile) {
-                    const imageRef = ref(storage, `category-images/${Date.now()}_${imageFile.name}`);
-                    const uploadResult = await uploadBytes(imageRef, imageFile);
-                    updateData.imageUrl = await getDownloadURL(uploadResult.ref);
-                }
-
-                // Update document in Firestore
-                const categoryRef = doc(db, "category", categoryId);
-                await updateDoc(categoryRef, updateData);
-
-                console.log("Category updated successfully");
-                
-                // Show success message
-                alert("Category updated successfully!");
-                
-                // Reset form and hide modal
-                editCategoryForm.reset();
-                editCategoryForm.classList.remove('was-validated');
-                document.getElementById('editCategoryImagePreview').style.display = 'none';
-                bootstrap.Modal.getInstance(document.getElementById("editCategoryModal")).hide();
-                
-                // Reload data
-                loadData();
-
-            } catch (error) {
-                console.error("Error updating category: ", error);
-                alert("Failed to update category. Please try again.");
-            } finally {
-                // Reset button state
-                editCategorySubmitBtn.disabled = false;
-                editCategorySubmitBtn.innerHTML = 'Update Category';
-            }
-        });
             });
         }
 
@@ -912,6 +849,69 @@
                 // Reset button state
                 categorySubmitBtn.disabled = false;
                 categorySubmitBtn.innerHTML = 'Add Category';
+            }
+        });
+
+        // Edit category form submission handler
+        const editCategoryForm = document.getElementById("editCategoryForm");
+        const editCategorySubmitBtn = document.getElementById("editCategorySubmitBtn");
+
+        editCategoryForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            // Validate form
+            if (!editCategoryForm.checkValidity()) {
+                e.stopPropagation();
+                editCategoryForm.classList.add('was-validated');
+                return;
+            }
+
+            // Show loading state
+            editCategorySubmitBtn.disabled = true;
+            editCategorySubmitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+
+            const categoryId = document.getElementById("editCategoryId").value;
+            const categoryName = document.getElementById("editCategoryName").value.trim();
+            const imageFile = document.getElementById("editCategoryImageUpload").files[0];
+
+            try {
+                let updateData = {
+                    categoryName: categoryName,
+                    updatedAt: serverTimestamp()
+                };
+
+                // Upload new image if provided
+                if (imageFile) {
+                    const imageRef = ref(storage, `category-images/${Date.now()}_${imageFile.name}`);
+                    const uploadResult = await uploadBytes(imageRef, imageFile);
+                    updateData.imageUrl = await getDownloadURL(uploadResult.ref);
+                }
+
+                // Update document in Firestore
+                const categoryRef = doc(db, "category", categoryId);
+                await updateDoc(categoryRef, updateData);
+
+                console.log("Category updated successfully");
+                
+                // Show success message
+                alert("Category updated successfully!");
+                
+                // Reset form and hide modal
+                editCategoryForm.reset();
+                editCategoryForm.classList.remove('was-validated');
+                document.getElementById('editCategoryImagePreview').style.display = 'none';
+                bootstrap.Modal.getInstance(document.getElementById("editCategoryModal")).hide();
+                
+                // Reload data
+                loadData();
+
+            } catch (error) {
+                console.error("Error updating category: ", error);
+                alert("Failed to update category. Please try again.");
+            } finally {
+                // Reset button state
+                editCategorySubmitBtn.disabled = false;
+                editCategorySubmitBtn.innerHTML = 'Update Category';
             }
         });
 
@@ -1441,6 +1441,7 @@
                 alert("Failed to load item details");
             }
         }
+        
         async function editMenuItem(itemId) {
             try {
                 const itemDoc = await getDoc(doc(db, "menus", itemId));
