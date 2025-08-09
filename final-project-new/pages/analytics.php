@@ -1,10 +1,13 @@
 
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
         
         .stats-card {
             background: white;
@@ -108,9 +111,12 @@
             object-fit: cover;
             border-radius: 8px;
         }
+
+                
     </style>
 </head>
 <body>
+    <!-- Main Content -->
     <div class="container-fluid px-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Analytics Dashboard</h1>
@@ -125,7 +131,7 @@
         <div class="row mb-4">
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card">
-                    <div class="stats-number" id="totalRevenue"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="stats-number" id="totalRevenue"><i class="spinner-border spinner-border-sm"></i></div>
                     <div class="stats-label">Total Revenue</div>
                     <div class="stats-change text-success" id="revenueChange">
                         <i class="fas fa-arrow-up me-1"></i>Calculating...
@@ -135,7 +141,7 @@
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card success">
-                    <div class="stats-number" id="totalOrders"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="stats-number" id="totalOrders"><i class="spinner-border spinner-border-sm"></i></div>
                     <div class="stats-label">Total Orders</div>
                     <div class="stats-change text-success" id="ordersChange">
                         <i class="fas fa-arrow-up me-1"></i>Calculating...
@@ -145,7 +151,7 @@
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card warning">
-                    <div class="stats-number" id="avgOrderValue"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="stats-number" id="avgOrderValue"><i class="spinner-border spinner-border-sm"></i></div>
                     <div class="stats-label">Avg Order Value</div>
                     <div class="stats-change" id="aovChange">
                         <i class="fas fa-arrow-up me-1"></i>Calculating...
@@ -155,7 +161,7 @@
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card info">
-                    <div class="stats-number" id="activeCustomers"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="stats-number" id="activeCustomers"><i class="spinner-border spinner-border-sm"></i></div>
                     <div class="stats-label">Active Customers</div>
                     <div class="stats-change text-success" id="customersChange">
                         <i class="fas fa-arrow-up me-1"></i>Calculating...
@@ -304,6 +310,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Firebase Configuration -->
     <script type="module">
@@ -849,6 +858,20 @@
             }
         }
 
+        // Top bar functions - now accessible globally
+        window.markAllAsRead = function() {
+            document.getElementById('notificationCount').style.display = 'none';
+            console.log('All notifications marked as read');
+        };
+
+        window.logout = function() {
+            if (confirm('Are you sure you want to logout?')) {
+                console.log('User logged out');
+                // Add actual logout logic here
+                alert('Logout functionality would be implemented here');
+            }
+        };
+
         // Main dashboard initialization - runs only once on page load
         async function initializeDashboard() {
             try {
@@ -1033,32 +1056,18 @@
                 return;
             }
             
-            refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Refreshing...';
+            refreshButton.innerHTML = '<i class="spinner-border spinner-border-sm me-1"></i>Refreshing...';
             refreshButton.disabled = true;
             
             // Update connection status
             const statusIndicator = document.getElementById('connectionStatus');
             if (statusIndicator) {
-                statusIndicator.innerHTML = '<i class="fas fa-circle-notch fa-spin me-1"></i>Refreshing...';
+                statusIndicator.innerHTML = '<i class="spinner-border spinner-border-sm me-1"></i>Refreshing...';
                 statusIndicator.className = 'badge bg-warning';
             }
             
-            // Show spinners only when manually refreshing
-            const loadingElements = ['totalRevenue', 'totalOrders', 'avgOrderValue', 'activeCustomers', 'newCustomers', 'retentionRate', 'avgRating'];
-            loadingElements.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                }
-            });
-            
-            // Show spinner in top items
-            const topItemsLoading = document.getElementById('topItemsLoading');
-            const topItemsTable = document.getElementById('topItemsTable');
-            if (topItemsLoading && topItemsTable) {
-                topItemsLoading.style.display = 'flex';
-                topItemsTable.style.display = 'none';
-            }
+            // DON'T show spinners during manual refresh - keep existing values visible
+            // Users can see the refresh button spinner and connection status to know it's updating
             
             initializeDashboard().then(() => {
                 if (statusIndicator) {
@@ -1088,7 +1097,7 @@
             const statusIndicator = document.createElement('div');
             statusIndicator.innerHTML = `
                 <div id="connectionStatus" class="badge bg-secondary">
-                    <i class="fas fa-circle-notch fa-spin me-1"></i>Connecting...
+                    <i class="spinner-border spinner-border-sm me-1"></i>Connecting...
                 </div>
             `;
             header.appendChild(statusIndicator);
