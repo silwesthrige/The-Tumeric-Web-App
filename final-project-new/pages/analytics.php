@@ -1,399 +1,1165 @@
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Analytics Dashboard</h1>
-</div>
-
-<!-- Key Metrics -->
-<div class="row mb-4">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card">
-            <div class="stats-number">$1,24,750</div>
-            <div class="stats-label">Total Revenue</div>
-            <div class="stats-change text-success">
-                <i class="fas fa-arrow-up me-1"></i>+12.5%
-            </div>
-            <i class="fas fa-rupee-sign stats-icon"></i>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card success">
-            <div class="stats-number">1,247</div>
-            <div class="stats-label">Total Orders</div>
-            <div class="stats-change text-success">
-                <i class="fas fa-arrow-up me-1"></i>+8.2%
-            </div>
-            <i class="fas fa-shopping-cart stats-icon"></i>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card warning">
-            <div class="stats-number">$385</div>
-            <div class="stats-label">Avg Order Value</div>
-            <div class="stats-change text-danger">
-                <i class="fas fa-arrow-down me-1"></i>-2.1%
-            </div>
-            <i class="fas fa-chart-line stats-icon"></i>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card info">
-            <div class="stats-number">892</div>
-            <div class="stats-label">Active Customers</div>
-            <div class="stats-change text-success">
-                <i class="fas fa-arrow-up me-1"></i>+15.3%
-            </div>
-            <i class="fas fa-users stats-icon"></i>
-        </div>
-    </div>
-</div>
-
-<!-- Charts Row -->
-<div class="row mb-4">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-chart-area me-2"></i>Revenue Trend
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="revenueChart" style="height: 300px;"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-chart-pie me-2"></i>Order Status Distribution
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="orderStatusChart" style="height: 300px;"></canvas>
-                </div>
-                <div class="mt-3">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span><i class="fas fa-circle text-success me-2"></i>Delivered</span>
-                        <strong>68%</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span><i class="fas fa-circle text-primary me-2"></i>Preparing</span>
-                        <strong>18%</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span><i class="fas fa-circle text-warning me-2"></i>Pending</span>
-                        <strong>10%</strong>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span><i class="fas fa-circle text-danger me-2"></i>Cancelled</span>
-                        <strong>4%</strong>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Performance Metrics -->
-<div class="row mb-4">
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-utensils me-2"></i>Top Selling Items
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Orders</th>
-                                <th>Revenue</th>
-                                <th>Trend</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img src="https://images.pexels.com/photos/1893556/pexels-photo-1893556.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&fit=crop" 
-                                             alt="Biryani" class="rounded me-2" width="30" height="30">
-                                        <span>Chicken Biryani</span>
-                                    </div>
-                                </td>
-                                <td><strong>156</strong></td>
-                                <td><strong>₹31,200</strong></td>
-                                <td><span class="text-success"><i class="fas fa-arrow-up"></i> +12%</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img src="https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&fit=crop" 
-                                             alt="Pizza" class="rounded me-2" width="30" height="30">
-                                        <span>Pizza Margherita</span>
-                                    </div>
-                                </td>
-                                <td><strong>124</strong></td>
-                                <td><strong>₹39,680</strong></td>
-                                <td><span class="text-success"><i class="fas fa-arrow-up"></i> +8%</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img src="https://images.pexels.com/photos/1639562/pexels-photo-1639562.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&fit=crop" 
-                                             alt="Burger" class="rounded me-2" width="30" height="30">
-                                        <span>Burger Combo</span>
-                                    </div>
-                                </td>
-                                <td><strong>98</strong></td>
-                                <td><strong>₹27,440</strong></td>
-                                <td><span class="text-danger"><i class="fas fa-arrow-down"></i> -3%</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img src="https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&fit=crop" 
-                                             alt="Pasta" class="rounded me-2" width="30" height="30">
-                                        <span>Pasta Alfredo</span>
-                                    </div>
-                                </td>
-                                <td><strong>87</strong></td>
-                                <td><strong>₹21,750</strong></td>
-                                <td><span class="text-success"><i class="fas fa-arrow-up"></i> +15%</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-clock me-2"></i>Peak Hours Analysis
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="peakHoursChart" style="height: 250px;"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Customer Analytics -->
-<div class="row mb-4">
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-user-plus me-2"></i>Customer Acquisition
-                </h5>
-            </div>
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <h3 class="text-primary">156</h3>
-                    <p class="text-muted">New customers this month</p>
-                </div>
-                <div class="progress mb-3" style="height: 10px;">
-                    <div class="progress-bar bg-primary" style="width: 78%"></div>
-                </div>
-                <small class="text-muted">78% of monthly target achieved</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-redo me-2"></i>Customer Retention
-                </h5>
-            </div>
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <h3 class="text-success">72%</h3>
-                    <p class="text-muted">Returning customers</p>
-                </div>
-                <div class="progress mb-3" style="height: 10px;">
-                    <div class="progress-bar bg-success" style="width: 72%"></div>
-                </div>
-                <small class="text-muted">Above industry average (65%)</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-star me-2"></i>Customer Satisfaction
-                </h5>
-            </div>
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <h3 class="text-warning">4.8</h3>
-                    <p class="text-muted">Average rating</p>
-                </div>
-                <div class="d-flex justify-content-center mb-3">
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                </div>
-                <small class="text-muted">Based on 1,247 reviews</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Delivery Analytics -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-truck me-2"></i>Delivery Performance
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 text-center">
-                        <h4 class="text-primary">18 min</h4>
-                        <p class="text-muted">Average Delivery Time</p>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <h4 class="text-success">96.5%</h4>
-                        <p class="text-muted">On-Time Delivery Rate</p>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <h4 class="text-info">2.3 km</h4>
-                        <p class="text-muted">Average Distance</p>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <h4 class="text-warning">$25</h4>
-                        <p class="text-muted">Average Delivery Cost</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-.stats-change {
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin-top: 5px;
-}
-
-.chart-container canvas {
-    max-height: 300px;
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Revenue Chart
-    const revenueCtx = document.getElementById('revenueChart');
-    if (revenueCtx) {
-        const ctx = revenueCtx.getContext('2d');
-        
-        // Simple line chart simulation
-        revenueCtx.width = revenueCtx.offsetWidth;
-        revenueCtx.height = 300;
-        
-        ctx.strokeStyle = '#ff6b6b';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        
-        const revenuePoints = [
-            {x: 50, y: 250}, {x: 150, y: 200}, {x: 250, y: 180},
-            {x: 350, y: 160}, {x: 450, y: 140}, {x: 550, y: 100},
-            {x: 650, y: 80}
-        ];
-        
-        ctx.moveTo(revenuePoints[0].x, revenuePoints[0].y);
-        for (let i = 1; i < revenuePoints.length; i++) {
-            ctx.lineTo(revenuePoints[i].x, revenuePoints[i].y);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        ctx.stroke();
         
-        // Add labels
-        ctx.fillStyle = '#666';
-        ctx.font = '12px Arial';
-        ctx.fillText('Revenue trend over the last 7 days', 50, 30);
-    }
-    
-    // Order Status Pie Chart
-    const statusCtx = document.getElementById('orderStatusChart');
-    if (statusCtx) {
-        const ctx = statusCtx.getContext('2d');
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            border-left: 4px solid #007bff;
+            transition: transform 0.2s ease;
+        }
         
-        statusCtx.width = statusCtx.offsetWidth;
-        statusCtx.height = 300;
+        .stats-card:hover {
+            transform: translateY(-2px);
+        }
         
-        const centerX = statusCtx.width / 2;
-        const centerY = statusCtx.height / 2;
-        const radius = 80;
+        .stats-card.success {
+            border-left-color: #28a745;
+        }
         
-        const data = [
-            {label: 'Delivered', value: 68, color: '#28a745'},
-            {label: 'Preparing', value: 18, color: '#007bff'},
-            {label: 'Pending', value: 10, color: '#ffc107'},
-            {label: 'Cancelled', value: 4, color: '#dc3545'}
-        ];
+        .stats-card.warning {
+            border-left-color: #ffc107;
+        }
         
-        let currentAngle = 0;
+        .stats-card.info {
+            border-left-color: #17a2b8;
+        }
         
-        data.forEach(segment => {
-            const sliceAngle = (segment.value / 100) * 2 * Math.PI;
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .stats-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .stats-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .stats-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+            color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+        
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #eee;
+            border-radius: 15px 15px 0 0 !important;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #6c757d;
+        }
+        
+        .error {
+            color: #dc3545;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+        
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+        }
+        
+        .food-item-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Analytics Dashboard</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="refreshData()">
+                    <i class="fas fa-sync-alt me-1"></i>Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalRevenue"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="stats-label">Total Revenue</div>
+                    <div class="stats-change text-success" id="revenueChange">
+                        <i class="fas fa-arrow-up me-1"></i>Calculating...
+                    </div>
+                    <i class="fas fa-rupee-sign stats-icon"></i>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card success">
+                    <div class="stats-number" id="totalOrders"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="stats-label">Total Orders</div>
+                    <div class="stats-change text-success" id="ordersChange">
+                        <i class="fas fa-arrow-up me-1"></i>Calculating...
+                    </div>
+                    <i class="fas fa-shopping-cart stats-icon"></i>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card warning">
+                    <div class="stats-number" id="avgOrderValue"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="stats-label">Avg Order Value</div>
+                    <div class="stats-change" id="aovChange">
+                        <i class="fas fa-arrow-up me-1"></i>Calculating...
+                    </div>
+                    <i class="fas fa-chart-line stats-icon"></i>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card info">
+                    <div class="stats-number" id="activeCustomers"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="stats-label">Active Customers</div>
+                    <div class="stats-change text-success" id="customersChange">
+                        <i class="fas fa-arrow-up me-1"></i>Calculating...
+                    </div>
+                    <i class="fas fa-users stats-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-area me-2"></i>Revenue Trend
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-star me-2"></i>Average Ratings
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="ratingsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-utensils me-2"></i>Top Selling Items
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="loading" id="topItemsLoading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <div class="table-responsive" id="topItemsTable" style="display: none;">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Orders</th>
+                                        <th>Revenue</th>
+                                        <th>Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="topItemsBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-clock me-2"></i>Order Trends by Hour
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="hourlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Analytics -->
+        <div class="row mb-4">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-plus me-2"></i>Customer Acquisition
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <h3 class="text-primary" id="newCustomers"><i class="fas fa-spinner fa-spin"></i></h3>
+                            <p class="text-muted">New customers this month</p>
+                        </div>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-primary" id="newCustomersProgress" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted" id="acquisitionTarget"><i class="fas fa-spinner fa-spin"></i></small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-redo me-2"></i>Customer Retention
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <h3 class="text-success" id="retentionRate"><i class="fas fa-spinner fa-spin"></i></h3>
+                            <p class="text-muted">Returning customers</p>
+                        </div>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-success" id="retentionProgress" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted" id="retentionComparison"><i class="fas fa-spinner fa-spin"></i></small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-star me-2"></i>Customer Satisfaction
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <h3 class="text-warning" id="avgRating"><i class="fas fa-spinner fa-spin"></i></h3>
+                            <p class="text-muted">Average rating</p>
+                        </div>
+                        <div class="d-flex justify-content-center mb-3" id="starRating">
+                            <!-- Stars will be populated by JavaScript -->
+                        </div>
+                        <small class="text-muted" id="totalReviews"><i class="fas fa-spinner fa-spin"></i></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Configuration -->
+    <script type="module">
+        // Firebase configuration and initialization
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqvtp0IWvJFQgbVuj4NsSgQQDVtvwD1tY",
+            authDomain: "the-tumaric-indian-cusine.firebaseapp.com",
+            projectId: "the-tumaric-indian-cusine",
+            storageBucket: "the-tumaric-indian-cusine.firebasestorage.app",
+            messagingSenderId: "808473473804",
+            appId: "1:808473473804:web:2c7cf4c307f3a3d1a78f29",
+            measurementId: "G-S35W1JTW9L"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Global variables for charts
+        let revenueChart, ratingsChart, hourlyChart;
+
+        // Utility functions
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-IN').format(num);
+        }
+
+        function getDateDaysAgo(days) {
+            const date = new Date();
+            date.setDate(date.getDate() - days);
+            return date;
+        }
+
+        function showError(elementId, message) {
+            document.getElementById(elementId).innerHTML = `<div class="error">Error: ${message}</div>`;
+        }
+
+        // Data fetching functions with better error handling
+        async function fetchOrders() {
+            try {
+                console.log('Attempting to fetch orders...');
+                const ordersRef = collection(db, 'orders');
+                const snapshot = await getDocs(ordersRef);
+                console.log(`Fetched ${snapshot.docs.length} orders`);
+                
+                const orders = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    console.log('Order data sample:', data);
+                    return {
+                        id: doc.id,
+                        ...data,
+                        // Handle different timestamp formats
+                        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : 
+                                  data.createdAt ? new Date(data.createdAt) : new Date()
+                    };
+                });
+                
+                console.log('Processed orders:', orders.length);
+                return orders;
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                console.error('Error details:', error.message, error.code);
+                return [];
+            }
+        }
+
+        async function fetchUsers() {
+            try {
+                console.log('Attempting to fetch users...');
+                const usersRef = collection(db, 'users');
+                const snapshot = await getDocs(usersRef);
+                console.log(`Fetched ${snapshot.docs.length} users`);
+                
+                const users = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                console.log('Users sample:', users.slice(0, 2));
+                return users;
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                console.error('Error details:', error.message, error.code);
+                return [];
+            }
+        }
+
+        async function fetchMenus() {
+            try {
+                console.log('Attempting to fetch menus...');
+                const menusRef = collection(db, 'menus');
+                const snapshot = await getDocs(menusRef);
+                console.log(`Fetched ${snapshot.docs.length} menus`);
+                
+                const menus = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                console.log('Menus sample:', menus.slice(0, 2));
+                return menus;
+            } catch (error) {
+                console.error('Error fetching menus:', error);
+                console.error('Error details:', error.message, error.code);
+                return [];
+            }
+        }
+
+        async function fetchFeedbacks() {
+            try {
+                console.log('Attempting to fetch feedbacks...');
+                const feedbacksRef = collection(db, 'feedbacks');
+                const snapshot = await getDocs(feedbacksRef);
+                console.log(`Fetched ${snapshot.docs.length} feedbacks`);
+                
+                const feedbacks = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        ...data,
+                        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : 
+                                  data.createdAt ? new Date(data.createdAt) : new Date()
+                    };
+                });
+                
+                console.log('Feedbacks sample:', feedbacks.slice(0, 2));
+                return feedbacks;
+            } catch (error) {
+                console.error('Error fetching feedbacks:', error);
+                console.error('Error details:', error.message, error.code);
+                return [];
+            }
+        }
+
+        // Test Firebase connection
+        async function testFirebaseConnection() {
+            try {
+                console.log('Testing Firebase connection...');
+                console.log('Firebase app:', app);
+                console.log('Firestore instance:', db);
+                
+                // Try to fetch a single document to test connection
+                const testRef = collection(db, 'orders');
+                const testQuery = query(testRef, limit(1));
+                const testSnapshot = await getDocs(testQuery);
+                
+                console.log('Connection test successful. Document count:', testSnapshot.docs.length);
+                if (testSnapshot.docs.length > 0) {
+                    console.log('Sample document:', testSnapshot.docs[0].data());
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Firebase connection test failed:', error);
+                console.error('Error code:', error.code);
+                console.error('Error message:', error.message);
+                return false;
+            }
+        }
+
+        // Analytics calculations
+        function calculateKeyMetrics(orders, users) {
+            const now = new Date();
+            const thirtyDaysAgo = getDateDaysAgo(30);
+            const sixtyDaysAgo = getDateDaysAgo(60);
+
+            // Current month orders
+            const currentMonthOrders = orders.filter(order => order.createdAt >= thirtyDaysAgo);
+            const previousMonthOrders = orders.filter(order => 
+                order.createdAt >= sixtyDaysAgo && order.createdAt < thirtyDaysAgo
+            );
+
+            // Total revenue
+            const totalRevenue = currentMonthOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+            const previousRevenue = previousMonthOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+            const revenueChange = previousRevenue > 0 ? ((totalRevenue - previousRevenue) / previousRevenue * 100).toFixed(1) : 0;
+
+            // Total orders
+            const totalOrders = currentMonthOrders.length;
+            const previousOrdersCount = previousMonthOrders.length;
+            const ordersChange = previousOrdersCount > 0 ? ((totalOrders - previousOrdersCount) / previousOrdersCount * 100).toFixed(1) : 0;
+
+            // Average order value
+            const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+            const previousAvgOrderValue = previousOrdersCount > 0 ? previousRevenue / previousOrdersCount : 0;
+            const aovChange = previousAvgOrderValue > 0 ? ((avgOrderValue - previousAvgOrderValue) / previousAvgOrderValue * 100).toFixed(1) : 0;
+
+            // Active customers (customers who ordered in last 30 days)
+            const activeCustomers = new Set(currentMonthOrders.map(order => order.userId)).size;
+            const previousActiveCustomers = new Set(previousMonthOrders.map(order => order.userId)).size;
+            const customersChange = previousActiveCustomers > 0 ? ((activeCustomers - previousActiveCustomers) / previousActiveCustomers * 100).toFixed(1) : 0;
+
+            return {
+                totalRevenue,
+                revenueChange,
+                totalOrders,
+                ordersChange,
+                avgOrderValue,
+                aovChange,
+                activeCustomers,
+                customersChange
+            };
+        }
+
+        function calculateTopItems(orders, menus) {
+            const itemStats = {};
             
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
-            ctx.closePath();
-            ctx.fillStyle = segment.color;
-            ctx.fill();
+            orders.forEach(order => {
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        const foodId = item.foodId;
+                        if (!itemStats[foodId]) {
+                            itemStats[foodId] = {
+                                name: item.name || 'Unknown Item',
+                                orders: 0,
+                                revenue: 0,
+                                category: 'Unknown'
+                            };
+                        }
+                        itemStats[foodId].orders += item.qty || 1;
+                        itemStats[foodId].revenue += (item.price || 0) * (item.qty || 1);
+                    });
+                }
+            });
+
+            // Add menu details
+            menus.forEach(menu => {
+                if (itemStats[menu.foodId]) {
+                    itemStats[menu.foodId].category = menu.category || 'Unknown';
+                    itemStats[menu.foodId].imageUrl = menu.imageUrl;
+                    itemStats[menu.foodId].name = menu.foodName || itemStats[menu.foodId].name;
+                }
+            });
+
+            return Object.entries(itemStats)
+                .map(([foodId, stats]) => ({ foodId, ...stats }))
+                .sort((a, b) => b.revenue - a.revenue)
+                .slice(0, 5); // Show only top 5 items
+        }
+
+        function calculateHourlyTrends(orders) {
+            const hourlyData = Array(24).fill(0);
             
-            currentAngle += sliceAngle;
+            orders.forEach(order => {
+                const hour = order.createdAt.getHours();
+                hourlyData[hour]++;
+            });
+
+            return hourlyData;
+        }
+
+        function calculateCustomerMetrics(orders, users, feedbacks) {
+            const now = new Date();
+            const thirtyDaysAgo = getDateDaysAgo(30);
+            
+            // New customers this month
+            const newCustomers = users.filter(user => {
+                const firstOrder = orders
+                    .filter(order => order.userId === user.userId)
+                    .sort((a, b) => a.createdAt - b.createdAt)[0];
+                return firstOrder && firstOrder.createdAt >= thirtyDaysAgo;
+            }).length;
+
+            // Returning customers
+            const customerOrderCounts = {};
+            orders.forEach(order => {
+                if (order.userId) {
+                    customerOrderCounts[order.userId] = (customerOrderCounts[order.userId] || 0) + 1;
+                }
+            });
+
+            const returningCustomers = Object.values(customerOrderCounts).filter(count => count > 1).length;
+            const totalCustomersWithOrders = Object.keys(customerOrderCounts).length;
+            const retentionRate = totalCustomersWithOrders > 0 ? (returningCustomers / totalCustomersWithOrders * 100).toFixed(0) : 0;
+
+            // Average rating
+            const validRatings = feedbacks.filter(f => f.rating && f.rating > 0);
+            const avgRating = validRatings.length > 0 ? 
+                (validRatings.reduce((sum, f) => sum + f.rating, 0) / validRatings.length).toFixed(1) : '0.0';
+
+            return {
+                newCustomers,
+                retentionRate,
+                avgRating,
+                totalReviews: validRatings.length
+            };
+        }
+
+        // Chart creation functions
+        function createRevenueChart(orders) {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            // Get last 7 days data
+            const dailyRevenue = {};
+            for (let i = 6; i >= 0; i--) {
+                const date = getDateDaysAgo(i);
+                const dateStr = date.toISOString().split('T')[0];
+                dailyRevenue[dateStr] = 0;
+            }
+
+            orders.forEach(order => {
+                const dateStr = order.createdAt.toISOString().split('T')[0];
+                if (dailyRevenue.hasOwnProperty(dateStr)) {
+                    dailyRevenue[dateStr] += order.total || 0;
+                }
+            });
+
+            const labels = Object.keys(dailyRevenue).map(date => {
+                const d = new Date(date);
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+            const data = Object.values(dailyRevenue);
+
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+
+            revenueChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue',
+                        data: data,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createRatingsChart(feedbacks) {
+            const ctx = document.getElementById('ratingsChart').getContext('2d');
+            
+            const ratingCounts = [0, 0, 0, 0, 0]; // For ratings 1-5
+            feedbacks.forEach(feedback => {
+                if (feedback.rating && feedback.rating >= 1 && feedback.rating <= 5) {
+                    ratingCounts[feedback.rating - 1]++;
+                }
+            });
+
+            if (ratingsChart) {
+                ratingsChart.destroy();
+            }
+
+            ratingsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+                    datasets: [{
+                        data: ratingCounts,
+                        backgroundColor: [
+                            '#dc3545',
+                            '#fd7e14',
+                            '#ffc107',
+                            '#28a745',
+                            '#20c997'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createHourlyChart(orders) {
+            const ctx = document.getElementById('hourlyChart').getContext('2d');
+            
+            const hourlyData = calculateHourlyTrends(orders);
+            const labels = Array.from({length: 24}, (_, i) => {
+                const hour = i === 0 ? 12 : i > 12 ? i - 12 : i;
+                const period = i < 12 ? 'AM' : 'PM';
+                return `${hour}${period}`;
+            });
+
+            if (hourlyChart) {
+                hourlyChart.destroy();
+            }
+
+            hourlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Orders',
+                        data: hourlyData,
+                        backgroundColor: '#4ecdc4',
+                        borderColor: '#4ecdc4',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // UI update functions
+        function updateKeyMetrics(metrics) {
+            document.getElementById('totalRevenue').textContent = formatCurrency(metrics.totalRevenue);
+            document.getElementById('totalOrders').textContent = formatNumber(metrics.totalOrders);
+            document.getElementById('avgOrderValue').textContent = formatCurrency(metrics.avgOrderValue);
+            document.getElementById('activeCustomers').textContent = formatNumber(metrics.activeCustomers);
+
+            // Update changes
+            updateChangeIndicator('revenueChange', metrics.revenueChange);
+            updateChangeIndicator('ordersChange', metrics.ordersChange);
+            updateChangeIndicator('aovChange', metrics.aovChange);
+            updateChangeIndicator('customersChange', metrics.customersChange);
+        }
+
+        function updateChangeIndicator(elementId, change) {
+            const element = document.getElementById(elementId);
+            const isPositive = parseFloat(change) >= 0;
+            
+            element.className = `stats-change ${isPositive ? 'text-success' : 'text-danger'}`;
+            element.innerHTML = `
+                <i class="fas fa-arrow-${isPositive ? 'up' : 'down'} me-1"></i>
+                ${isPositive ? '+' : ''}${change}%
+            `;
+        }
+
+        function updateTopItems(topItems) {
+            const tbody = document.getElementById('topItemsBody');
+            const loading = document.getElementById('topItemsLoading');
+            const table = document.getElementById('topItemsTable');
+
+            tbody.innerHTML = '';
+            
+            if (topItems.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No data available</td></tr>';
+            } else {
+                topItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="${item.imageUrl || 'https://via.placeholder.com/40'}" 
+                                     alt="${item.name}" class="food-item-img me-2"
+                                     onerror="this.src='https://via.placeholder.com/40'">
+                                <span>${item.name}</span>
+                            </div>
+                        </td>
+                        <td><strong>${formatNumber(item.orders)}</strong></td>
+                        <td><strong>${formatCurrency(item.revenue)}</strong></td>
+                        <td><span class="badge bg-secondary">${item.category}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            loading.style.display = 'none';
+            table.style.display = 'block';
+        }
+
+        function updateCustomerMetrics(metrics) {
+            document.getElementById('newCustomers').textContent = formatNumber(metrics.newCustomers);
+            document.getElementById('retentionRate').textContent = `${metrics.retentionRate}%`;
+            document.getElementById('avgRating').textContent = metrics.avgRating;
+            document.getElementById('totalReviews').textContent = `Based on ${formatNumber(metrics.totalReviews)} reviews`;
+
+            // Update progress bars
+            const newCustomersTarget = 200; // Example target
+            const newCustomersProgress = Math.min((metrics.newCustomers / newCustomersTarget) * 100, 100);
+            document.getElementById('newCustomersProgress').style.width = `${newCustomersProgress}%`;
+            document.getElementById('acquisitionTarget').textContent = `${newCustomersProgress.toFixed(0)}% of monthly target (${newCustomersTarget}) achieved`;
+
+            document.getElementById('retentionProgress').style.width = `${metrics.retentionRate}%`;
+            const industryAverage = 65;
+            const comparison = metrics.retentionRate > industryAverage ? 'Above' : 'Below';
+            document.getElementById('retentionComparison').textContent = `${comparison} industry average (${industryAverage}%)`;
+
+            // Update star rating
+            updateStarRating(parseFloat(metrics.avgRating));
+        }
+
+        function updateStarRating(rating) {
+            const starContainer = document.getElementById('starRating');
+            starContainer.innerHTML = '';
+            
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('i');
+                star.className = i <= rating ? 'fas fa-star text-warning' : 'far fa-star text-warning';
+                starContainer.appendChild(star);
+            }
+        }
+
+        // Main dashboard initialization - runs only once on page load
+        async function initializeDashboard() {
+            try {
+                console.log('=== Starting Dashboard Initialization ===');
+                
+                // Test Firebase connection first
+                const connectionWorking = await testFirebaseConnection();
+                if (!connectionWorking) {
+                    throw new Error('Firebase connection failed');
+                }
+
+                // Fetch all data with individual error handling
+                console.log('=== Fetching Data ===');
+                
+                const orders = await fetchOrders();
+                console.log(`Orders loaded: ${orders.length}`);
+                
+                const users = await fetchUsers();
+                console.log(`Users loaded: ${users.length}`);
+                
+                const menus = await fetchMenus();
+                console.log(`Menus loaded: ${menus.length}`);
+                
+                const feedbacks = await fetchFeedbacks();
+                console.log(`Feedbacks loaded: ${feedbacks.length}`);
+
+                // Check if we have any data
+                if (orders.length === 0 && users.length === 0 && menus.length === 0 && feedbacks.length === 0) {
+                    console.warn('No data found in any collection');
+                    showNoDataMessage();
+                    return;
+                }
+
+                console.log('=== Calculating Metrics ===');
+                
+                // Calculate metrics with fallbacks
+                let keyMetrics, topItems, customerMetrics;
+                
+                try {
+                    keyMetrics = calculateKeyMetrics(orders, users);
+                    console.log('Key metrics calculated:', keyMetrics);
+                } catch (error) {
+                    console.error('Error calculating key metrics:', error);
+                    keyMetrics = {
+                        totalRevenue: 0,
+                        revenueChange: 0,
+                        totalOrders: orders.length || 0,
+                        ordersChange: 0,
+                        avgOrderValue: 0,
+                        aovChange: 0,
+                        activeCustomers: users.length || 0,
+                        customersChange: 0
+                    };
+                }
+
+                try {
+                    topItems = calculateTopItems(orders, menus);
+                    console.log('Top items calculated:', topItems.length);
+                } catch (error) {
+                    console.error('Error calculating top items:', error);
+                    topItems = [];
+                }
+
+                try {
+                    customerMetrics = calculateCustomerMetrics(orders, users, feedbacks);
+                    console.log('Customer metrics calculated:', customerMetrics);
+                } catch (error) {
+                    console.error('Error calculating customer metrics:', error);
+                    customerMetrics = {
+                        newCustomers: 0,
+                        retentionRate: 0,
+                        avgRating: '0.0',
+                        totalReviews: 0
+                    };
+                }
+
+                console.log('=== Updating UI ===');
+                
+                // Update UI
+                updateKeyMetrics(keyMetrics);
+                updateTopItems(topItems);
+                updateCustomerMetrics(customerMetrics);
+
+                console.log('=== Creating Charts ===');
+                
+                // Create charts with error handling
+                try {
+                    createRevenueChart(orders);
+                    console.log('Revenue chart created');
+                } catch (error) {
+                    console.error('Error creating revenue chart:', error);
+                }
+
+                try {
+                    createRatingsChart(feedbacks);
+                    console.log('Ratings chart created');
+                } catch (error) {
+                    console.error('Error creating ratings chart:', error);
+                }
+
+                try {
+                    createHourlyChart(orders);
+                    console.log('Hourly chart created');
+                } catch (error) {
+                    console.error('Error creating hourly chart:', error);
+                }
+
+                console.log('=== Dashboard initialized successfully ===');
+
+            } catch (error) {
+                console.error('=== Critical Error initializing dashboard ===', error);
+                
+                // Show detailed error information
+                showErrorState(error);
+            }
+        }
+
+        function showNoDataMessage() {
+            const errorElements = ['totalRevenue', 'totalOrders', 'avgOrderValue', 'activeCustomers', 'newCustomers', 'retentionRate', 'avgRating'];
+            errorElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = '<span class="text-muted">No Data</span>';
+                }
+            });
+
+            // Show message in top items table
+            document.getElementById('topItemsLoading').innerHTML = `
+                <div class="text-center p-4">
+                    <i class="fas fa-exclamation-triangle text-warning mb-2" style="font-size: 2rem;"></i>
+                    <h5>No Data Available</h5>
+                    <p class="text-muted">No data found in Firestore collections. Please check:</p>
+                    <ul class="text-start text-muted">
+                        <li>Database has data in collections: orders, users, menus, feedbacks</li>
+                        <li>Firestore security rules allow read access</li>
+                        <li>Firebase project configuration is correct</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        function showErrorState(error) {
+            const errorElements = ['totalRevenue', 'totalOrders', 'avgOrderValue', 'activeCustomers', 'newCustomers', 'retentionRate', 'avgRating'];
+            errorElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = '<span class="text-danger">Error</span>';
+                }
+            });
+
+            // Show detailed error in top items area
+            document.getElementById('topItemsLoading').innerHTML = `
+                <div class="text-center p-4">
+                    <i class="fas fa-exclamation-circle text-danger mb-2" style="font-size: 2rem;"></i>
+                    <h5>Connection Error</h5>
+                    <p class="text-muted">Failed to load data from Firebase:</p>
+                    <div class="alert alert-danger text-start">
+                        <strong>Error:</strong> ${error.message}<br>
+                        ${error.code ? `<strong>Code:</strong> ${error.code}` : ''}
+                    </div>
+                    <p class="text-muted small">Please check the browser console for detailed logs.</p>
+                </div>
+            `;
+
+            // Show error in charts
+            const chartContainers = document.querySelectorAll('.chart-container');
+            chartContainers.forEach(container => {
+                container.innerHTML = `<div class="error text-center p-4">
+                    <i class="fas fa-chart-line-down text-muted mb-2" style="font-size: 2rem;"></i>
+                    <p>Failed to load chart data</p>
+                </div>`;
+            });
+        }
+
+        // Enhanced refresh function - only runs when button is clicked
+        window.refreshData = function() {
+            const refreshButton = document.querySelector('[onclick="refreshData()"]');
+            const originalText = refreshButton.innerHTML;
+            
+            // Prevent multiple simultaneous refreshes
+            if (refreshButton.disabled) {
+                return;
+            }
+            
+            refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Refreshing...';
+            refreshButton.disabled = true;
+            
+            // Update connection status
+            const statusIndicator = document.getElementById('connectionStatus');
+            if (statusIndicator) {
+                statusIndicator.innerHTML = '<i class="fas fa-circle-notch fa-spin me-1"></i>Refreshing...';
+                statusIndicator.className = 'badge bg-warning';
+            }
+            
+            // Show spinners only when manually refreshing
+            const loadingElements = ['totalRevenue', 'totalOrders', 'avgOrderValue', 'activeCustomers', 'newCustomers', 'retentionRate', 'avgRating'];
+            loadingElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                }
+            });
+            
+            // Show spinner in top items
+            const topItemsLoading = document.getElementById('topItemsLoading');
+            const topItemsTable = document.getElementById('topItemsTable');
+            if (topItemsLoading && topItemsTable) {
+                topItemsLoading.style.display = 'flex';
+                topItemsTable.style.display = 'none';
+            }
+            
+            initializeDashboard().then(() => {
+                if (statusIndicator) {
+                    statusIndicator.innerHTML = '<i class="fas fa-check-circle me-1"></i>Updated';
+                    statusIndicator.className = 'badge bg-success';
+                }
+            }).catch((error) => {
+                if (statusIndicator) {
+                    statusIndicator.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Error';
+                    statusIndicator.className = 'badge bg-danger';
+                }
+                console.error('Refresh failed:', error);
+            }).finally(() => {
+                refreshButton.innerHTML = originalText;
+                refreshButton.disabled = false;
+            });
+        };
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== DOM Loaded - Starting Dashboard ===');
+            console.log('Current URL:', window.location.href);
+            console.log('Firebase config check:', firebaseConfig);
+            
+            // Add a connection status indicator
+            const header = document.querySelector('.d-flex.justify-content-between');
+            const statusIndicator = document.createElement('div');
+            statusIndicator.innerHTML = `
+                <div id="connectionStatus" class="badge bg-secondary">
+                    <i class="fas fa-circle-notch fa-spin me-1"></i>Connecting...
+                </div>
+            `;
+            header.appendChild(statusIndicator);
+            
+            initializeDashboard().then(() => {
+                document.getElementById('connectionStatus').innerHTML = 
+                    '<i class="fas fa-check-circle me-1"></i>Connected';
+                document.getElementById('connectionStatus').className = 'badge bg-success';
+            }).catch((error) => {
+                document.getElementById('connectionStatus').innerHTML = 
+                    '<i class="fas fa-exclamation-circle me-1"></i>Connection Failed';
+                document.getElementById('connectionStatus').className = 'badge bg-danger';
+                console.error('Dashboard initialization failed:', error);
+            });
         });
-    }
-    
-    // Peak Hours Chart
-    const peakCtx = document.getElementById('peakHoursChart');
-    if (peakCtx) {
-        const ctx = peakCtx.getContext('2d');
-        
-        peakCtx.width = peakCtx.offsetWidth;
-        peakCtx.height = 250;
-        
-        const hours = ['9AM', '12PM', '3PM', '6PM', '9PM'];
-        const orders = [20, 45, 30, 80, 65];
-        const barWidth = 40;
-        const spacing = 60;
-        
-        ctx.fillStyle = '#4ecdc4';
-        
-        orders.forEach((orderCount, index) => {
-            const barHeight = (orderCount / 100) * 150;
-            const x = 50 + index * spacing;
-            const y = 200 - barHeight;
-            
-            ctx.fillRect(x, y, barWidth, barHeight);
-            
-            // Add labels
-            ctx.fillStyle = '#666';
-            ctx.font = '12px Arial';
-            ctx.fillText(hours[index], x + 5, 220);
-            ctx.fillText(orderCount, x + 15, y - 5);
-            ctx.fillStyle = '#4ecdc4';
-        });
-    }
-});
-</script>
+
+        // Debug function - call this in browser console to check data
+        window.debugDashboard = async function() {
+            console.log('=== Debug Dashboard ===');
+            try {
+                const orders = await fetchOrders();
+                const users = await fetchUsers();
+                const menus = await fetchMenus();
+                const feedbacks = await fetchFeedbacks();
+                
+                console.log('Debug Results:');
+                console.log('Orders:', orders.length, orders.slice(0, 3));
+                console.log('Users:', users.length, users.slice(0, 3));
+                console.log('Menus:', menus.length, menus.slice(0, 3));
+                console.log('Feedbacks:', feedbacks.length, feedbacks.slice(0, 3));
+                
+                return { orders, users, menus, feedbacks };
+            } catch (error) {
+                console.error('Debug failed:', error);
+                return null;
+            }
+        };
+
+        // Test specific collection - call in console like: testCollection('orders')
+        window.testCollection = async function(collectionName) {
+            try {
+                console.log(`Testing collection: ${collectionName}`);
+                const ref = collection(db, collectionName);
+                const snapshot = await getDocs(ref);
+                console.log(`${collectionName} collection:`, snapshot.docs.length, 'documents');
+                
+                if (snapshot.docs.length > 0) {
+                    console.log('Sample documents:');
+                    snapshot.docs.slice(0, 3).forEach((doc, index) => {
+                        console.log(`Document ${index + 1}:`, { id: doc.id, data: doc.data() });
+                    });
+                }
+                
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error(`Error testing ${collectionName}:`, error);
+                return null;
+            }
+        };
+
+        // Remove auto-refresh to prevent values from resetting
+        // Auto-refresh can be enabled by uncommenting the line below:
+        // setInterval(() => { console.log('Auto-refreshing dashboard...'); initializeDashboard(); }, 5 * 60 * 1000);
+
+    </script>
+</body>
+</html>
