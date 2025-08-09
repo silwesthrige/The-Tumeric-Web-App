@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings</title>
+    <title>Restaurant Settings</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -34,6 +34,13 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
         .upload-area {
             border: 2px dashed #dee2e6;
             border-radius: 8px;
@@ -60,44 +67,41 @@
             object-fit: cover;
         }
 
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .header-section {
-            padding: 1rem 0;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
+            z-index: 9999;
         }
 
-        .header-title {
-            margin: 0;
-            flex-shrink: 0;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            align-items: center;
+        .loading-spinner {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 mb-0">Processing...</p>
+        </div>
+    </div>
+
     <div class="container-fluid">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">Settings</h1>
+            <h1 class="h2">Restaurant Settings</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
                 <button type="button" class="btn btn-sm btn-success" id="saveAllBtn">
                     <i class="fas fa-save me-1"></i>Save All Changes
@@ -111,10 +115,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="nav flex-column nav-pills" id="settings-tab" role="tablist">
-                            <button class="nav-link active" id="general-tab" data-bs-toggle="pill" data-bs-target="#general" type="button" role="tab">
-                                <i class="fas fa-cog me-2"></i>General Settings
-                            </button>
-                            <button class="nav-link" id="restaurant-tab" data-bs-toggle="pill" data-bs-target="#restaurant" type="button" role="tab">
+                            <button class="nav-link active" id="restaurant-tab" data-bs-toggle="pill" data-bs-target="#restaurant" type="button" role="tab">
                                 <i class="fas fa-store me-2"></i>Restaurant Info
                             </button>
                             <button class="nav-link" id="users-tab" data-bs-toggle="pill" data-bs-target="#users" type="button" role="tab">
@@ -126,15 +127,6 @@
                             <button class="nav-link" id="delivery-tab" data-bs-toggle="pill" data-bs-target="#delivery" type="button" role="tab">
                                 <i class="fas fa-truck me-2"></i>Delivery Settings
                             </button>
-                            <button class="nav-link" id="notifications-tab" data-bs-toggle="pill" data-bs-target="#notifications" type="button" role="tab">
-                                <i class="fas fa-bell me-2"></i>Notifications
-                            </button>
-                            <button class="nav-link" id="security-tab" data-bs-toggle="pill" data-bs-target="#security" type="button" role="tab">
-                                <i class="fas fa-shield-alt me-2"></i>Security
-                            </button>
-                            <button class="nav-link" id="backup-tab" data-bs-toggle="pill" data-bs-target="#backup" type="button" role="tab">
-                                <i class="fas fa-database me-2"></i>Backup & Restore
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -142,111 +134,60 @@
             
             <div class="col-lg-9">
                 <div class="tab-content" id="settings-tabContent">
-                    <!-- General Settings -->
-                    <div class="tab-pane fade show active" id="general" role="tabpanel">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">General Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <form>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label for="timezone" class="form-label">Timezone</label>
-                                            <select class="form-select" id="timezone">
-                                                <option value="Asia/Kolkata" selected>Asia/Kolkata (IST)</option>
-                                                <option value="UTC">UTC</option>
-                                                <option value="America/New_York">America/New_York (EST)</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="currency" class="form-label">Currency</label>
-                                            <select class="form-select" id="currency">
-                                                <option value="INR" selected>Indian Rupee (₹)</option>
-                                                <option value="USD">US Dollar ($)</option>
-                                                <option value="LKR">Sri Lankan Rupees (Rs)</option>
-                                                <option value="EUR">Euro (€)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label for="dateFormat" class="form-label">Date Format</label>
-                                            <select class="form-select" id="dateFormat">
-                                                <option value="DD/MM/YYYY" selected>DD/MM/YYYY</option>
-                                                <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                                                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="language" class="form-label">Language</label>
-                                            <select class="form-select" id="language">
-                                                <option value="en" selected>English</option>
-                                                <option value="si">Sinhala</option>
-                                                <option value="hi">Hindi</option>
-                                                <option value="es">Spanish</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="maintenanceMode">
-                                            <label class="form-check-label" for="maintenanceMode">
-                                                Maintenance Mode
-                                            </label>
-                                            <div class="form-text">Enable this to temporarily disable online ordering</div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
                     
                     <!-- Restaurant Info -->
-                    <div class="tab-pane fade" id="restaurant" role="tabpanel">
+                    <div class="tab-pane fade show active" id="restaurant" role="tabpanel">
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="card-title mb-0">Restaurant Information</h5>
                             </div>
                             <div class="card-body">
-                                <form>
+                                <form id="restaurantForm">
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="restaurantName" class="form-label">Restaurant Name</label>
-                                            <input type="text" class="form-control" id="restaurantName" value="The Turmeric Indian Cuisine">
+                                            <input type="text" class="form-control" id="restaurantName" name="restaurantName" value="The Turmeric Indian Cuisine">
                                         </div>
                                         <div class="col-md-6">
                                             <label for="restaurantPhone" class="form-label">Phone Number</label>
-                                            <input type="tel" class="form-control" id="restaurantPhone" value="+91 9876543210">
+                                            <input type="tel" class="form-control" id="restaurantPhone" name="restaurantPhone" value="+91 9876543210">
                                         </div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="restaurantAddress" class="form-label">Address</label>
-                                        <textarea class="form-control" id="restaurantAddress" rows="3">123 Main Street, Downtown, City - 400001</textarea>
+                                        <textarea class="form-control" id="restaurantAddress" name="restaurantAddress" rows="3">123 Main Street, Downtown, City - 400001</textarea>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="restaurantEmail" class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="restaurantEmail" value="info@turmericindian.com">
+                                            <input type="email" class="form-control" id="restaurantEmail" name="restaurantEmail" value="info@turmericindian.com">
                                         </div>
                                         <div class="col-md-6">
                                             <label for="restaurantWebsite" class="form-label">Website</label>
-                                            <input type="url" class="form-control" id="restaurantWebsite" value="https://turmericindian.com">
+                                            <input type="url" class="form-control" id="restaurantWebsite" name="restaurantWebsite" value="https://turmericindian.com">
                                         </div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="restaurantDescription" class="form-label">Description</label>
-                                        <textarea class="form-control" id="restaurantDescription" rows="4">We serve the finest Indian cuisine with authentic flavors and fresh ingredients. Our chefs bring traditional recipes with a modern twist.</textarea>
+                                        <textarea class="form-control" id="restaurantDescription" name="restaurantDescription" rows="4">We serve the finest Indian cuisine with authentic flavors and fresh ingredients. Our chefs bring traditional recipes with a modern twist.</textarea>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="openingTime" class="form-label">Opening Time</label>
-                                            <input type="time" class="form-control" id="openingTime" value="10:00">
+                                            <input type="time" class="form-control" id="openingTime" name="openingTime" value="10:00">
                                         </div>
                                         <div class="col-md-6">
                                             <label for="closingTime" class="form-label">Closing Time</label>
-                                            <input type="time" class="form-control" id="closingTime" value="23:00">
+                                            <input type="time" class="form-control" id="closingTime" name="closingTime" value="23:00">
                                         </div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-1"></i>Save Restaurant Info
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" id="loadRestaurantBtn">
+                                            <i class="fas fa-sync me-1"></i>Reload
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -299,7 +240,7 @@
                                 <h5 class="card-title mb-0">Payment Settings</h5>
                             </div>
                             <div class="card-body">
-                                <form>
+                                <form id="paymentForm">
                                     <h6>Payment Methods</h6>
                                     <div class="row mb-4">
                                         <div class="col-md-6">
@@ -319,29 +260,13 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <h6>Payment Gateway Configuration</h6>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label for="razorpayKey" class="form-label">Razorpay Key ID</label>
-                                            <input type="text" class="form-control" id="razorpayKey" placeholder="rzp_test_xxxxxxxxxx">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="razorpaySecret" class="form-label">Razorpay Secret</label>
-                                            <input type="password" class="form-control" id="razorpaySecret" placeholder="Enter secret key">
-                                        </div>
-                                    </div>
-                                    
-                                    <h6 class="mt-4">Tax Settings</h6>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label for="gstRate" class="form-label">GST Rate (%)</label>
-                                            <input type="number" class="form-control" id="gstRate" value="18" step="0.01">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="serviceCharge" class="form-label">Service Charge (%)</label>
-                                            <input type="number" class="form-control" id="serviceCharge" value="5" step="0.01">
-                                        </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-1"></i>Save Payment Settings
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" id="loadPaymentBtn">
+                                            <i class="fas fa-sync me-1"></i>Reload
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -355,139 +280,46 @@
                                 <h5 class="card-title mb-0">Delivery Settings</h5>
                             </div>
                             <div class="card-body">
-                                <form>
+                                <form id="deliveryForm">
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="deliveryRadius" class="form-label">Delivery Radius (km)</label>
-                                            <input type="number" class="form-control" id="deliveryRadius" value="10">
+                                            <input type="number" class="form-control" id="deliveryRadius" name="deliveryRadius" value="10">
                                         </div>
                                         <div class="col-md-6">
                                             <label for="minOrderValue" class="form-label">Minimum Order Value (₹)</label>
-                                            <input type="number" class="form-control" id="minOrderValue" value="200">
+                                            <input type="number" class="form-control" id="minOrderValue" name="minOrderValue" value="200">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="deliveryCharge" class="form-label">Delivery Charge (₹)</label>
-                                            <input type="number" class="form-control" id="deliveryCharge" value="30">
+                                            <input type="number" class="form-control" id="deliveryCharge" name="deliveryCharge" value="30">
                                         </div>
                                         <div class="col-md-6">
                                             <label for="freeDeliveryAbove" class="form-label">Free Delivery Above (₹)</label>
-                                            <input type="number" class="form-control" id="freeDeliveryAbove" value="500">
+                                            <input type="number" class="form-control" id="freeDeliveryAbove" name="freeDeliveryAbove" value="500">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="avgDeliveryTime" class="form-label">Average Delivery Time (minutes)</label>
-                                            <input type="number" class="form-control" id="avgDeliveryTime" value="30">
+                                            <input type="number" class="form-control" id="avgDeliveryTime" name="avgDeliveryTime" value="30">
                                         </div>
                                         <div class="col-md-6">
                                             <label for="maxDeliveryTime" class="form-label">Maximum Delivery Time (minutes)</label>
-                                            <input type="number" class="form-control" id="maxDeliveryTime" value="60">
+                                            <input type="number" class="form-control" id="maxDeliveryTime" name="maxDeliveryTime" value="60">
                                         </div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-1"></i>Save Delivery Settings
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" id="loadDeliveryBtn">
+                                            <i class="fas fa-sync me-1"></i>Reload
+                                        </button>
                                     </div>
                                 </form>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Notifications -->
-                    <div class="tab-pane fade" id="notifications" role="tabpanel">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Notification Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <form>
-                                    <h6>Email Notifications</h6>
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="emailNewOrder" checked>
-                                            <label class="form-check-label" for="emailNewOrder">
-                                                New Order Notifications
-                                            </label>
-                                        </div>
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="emailLowStock" checked>
-                                            <label class="form-check-label" for="emailLowStock">
-                                                Low Stock Alerts
-                                            </label>
-                                        </div>
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="emailDailyReport">
-                                            <label class="form-check-label" for="emailDailyReport">
-                                                Daily Sales Report
-                                            </label>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Security -->
-                    <div class="tab-pane fade" id="security" role="tabpanel">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Security Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <form>
-                                    <h6>Password Policy</h6>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label for="minPasswordLength" class="form-label">Minimum Password Length</label>
-                                            <input type="number" class="form-control" id="minPasswordLength" value="8">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="passwordExpiry" class="form-label">Password Expiry (days)</label>
-                                            <input type="number" class="form-control" id="passwordExpiry" value="90">
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Backup & Restore -->
-                    <div class="tab-pane fade" id="backup" role="tabpanel">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Backup & Restore</h5>
-                            </div>
-                            <div class="card-body">
-                                <h6>Automatic Backup</h6>
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="autoBackup" checked>
-                                            <label class="form-check-label" for="autoBackup">
-                                                Enable Automatic Backup
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="backupFrequency" class="form-label">Backup Frequency</label>
-                                        <select class="form-select" id="backupFrequency">
-                                            <option value="daily" selected>Daily</option>
-                                            <option value="weekly">Weekly</option>
-                                            <option value="monthly">Monthly</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <h6>Manual Backup</h6>
-                                <div class="d-flex gap-2 mb-4">
-                                    <button type="button" class="btn btn-primary" id="createBackupBtn">
-                                        <i class="fas fa-download me-1"></i>Create Backup
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary">
-                                        <i class="fas fa-database me-1"></i>Database Only
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary">
-                                        <i class="fas fa-images me-1"></i>Files Only
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -630,135 +462,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     
-    <script>
-        let allUsers = [];
-
-        // Image upload functionality for users
-        function setupUserImageUpload(uploadAreaId, fileInputId, previewId) {
-            const uploadArea = document.getElementById(uploadAreaId);
-            const fileInput = document.getElementById(fileInputId);
-            const preview = document.getElementById(previewId);
-
-            if (!uploadArea || !fileInput || !preview) return;
-
-            // Drag and drop functionality
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
-
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleUserFileSelect(files[0], preview);
-                    fileInput.files = files;
-                }
-            });
-
-            // Click to upload
-            uploadArea.addEventListener('click', (e) => {
-                if (e.target.tagName !== 'BUTTON') {
-                    fileInput.click();
-                }
-            });
-
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    handleUserFileSelect(e.target.files[0], preview);
-                }
-            });
-        }
-
-        function handleUserFileSelect(file, preview) {
-            if (file && file.type.startsWith('image/')) {
-                if (file.size > 2 * 1024 * 1024) { // 2MB limit
-                    alert('File size must be less than 2MB');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Initialize image upload for both user modals
-        document.addEventListener('DOMContentLoaded', function() {
-            setupUserImageUpload('userUploadArea', 'userImageUpload', 'userImagePreview');
-            setupUserImageUpload('editUserUploadArea', 'editUserImageUpload', 'editUserImagePreview');
-        });
-
-        // Save all settings functionality
-        document.getElementById('saveAllBtn').addEventListener('click', function() {
-            const settings = {};
-            
-            // Get all form inputs
-            document.querySelectorAll('input, select, textarea').forEach(input => {
-                if (input.type === 'checkbox') {
-                    settings[input.id] = input.checked;
-                } else {
-                    settings[input.id] = input.value;
-                }
-            });
-            
-            // Simulate saving
-            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
-            this.disabled = true;
-            
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-check me-1"></i>Saved!';
-                
-                setTimeout(() => {
-                    this.innerHTML = '<i class="fas fa-save me-1"></i>Save All Changes';
-                    this.disabled = false;
-                    showNotification('Settings saved successfully!', 'success');
-                }, 1000);
-            }, 2000);
-        });
-
-        // Backup functionality
-        document.getElementById('createBackupBtn')?.addEventListener('click', function() {
-            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating Backup...';
-            this.disabled = true;
-            
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-download me-1"></i>Create Backup';
-                this.disabled = false;
-                showNotification('Backup created successfully!', 'success');
-            }, 3000);
-        });
-
-        // Show notification function
-        function showNotification(message, type = 'info') {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.className = `alert alert-${type === 'success' ? 'success' : 'info'} alert-dismissible fade show position-fixed`;
-            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-            notification.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Auto remove after 3 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 3000);
-        }
-    </script>
-
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
@@ -772,7 +475,8 @@
             updateDoc, 
             deleteDoc,
             getDoc,
-            serverTimestamp 
+            serverTimestamp,
+            setDoc
         } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
         import { 
             getStorage, 
@@ -798,154 +502,166 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        // Make functions globally available
-        window.loadUsers = loadUsers;
-        window.deleteUser = deleteUser;
-        window.editUser = editUser;
+        // Global variables
+        let allUsers = [];
 
-        // Add user form submission handler
-        const addUserForm = document.getElementById("addUserForm");
-        const addUserBtn = document.getElementById("addUserBtn");
+        // Utility functions
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
 
-        addUserForm.addEventListener("submit", async function (e) {
-            e.preventDefault();
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
 
-            // Validate form
-            if (!addUserForm.checkValidity()) {
-                e.stopPropagation();
-                addUserForm.classList.add('was-validated');
-                return;
-            }
-
-            // Show loading state
-            addUserBtn.disabled = true;
-            addUserBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding User...';
-
-            const username = document.getElementById("userName").value.trim();
-            const email = document.getElementById("userEmail").value.trim();
-            const password = document.getElementById("userPassword").value.trim();
-            const role = document.getElementById("userRole").value;
-            const imageFile = document.getElementById("userImageUpload").files[0];
-
-            try {
-                let imageUrl = "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop";
-
-                // Upload image if provided
-                if (imageFile) {
-                    const imageRef = ref(storage, `user-images/${Date.now()}_${imageFile.name}`);
-                    const uploadResult = await uploadBytes(imageRef, imageFile);
-                    imageUrl = await getDownloadURL(uploadResult.ref);
+        function showNotification(message, type = 'success') {
+            const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
+            const notification = document.createElement('div');
+            notification.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 10000; min-width: 300px;';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
                 }
+            }, 5000);
+        }
 
-                // Add user document to Firestore
-                const docRef = await addDoc(collection(db, "userManage"), {
-                    username: username,
-                    email: email,
-                    password: password, // Note: In production, passwords should be hashed
-                    role: role,
-                    imageUrl: imageUrl,
-                    createdAt: serverTimestamp(),
-                    isActive: true
-                });
-
-                console.log("User added with ID: ", docRef.id);
-                
-                // Show success message
-                alert("User added successfully!");
-                
-                // Reset form and hide modal
-                addUserForm.reset();
-                addUserForm.classList.remove('was-validated');
-                document.getElementById('userImagePreview').style.display = 'none';
-                bootstrap.Modal.getInstance(document.getElementById("addUserModal")).hide();
-                
-                // Reload users
-                loadUsers();
-
-            } catch (error) {
-                console.error("Error adding user: ", error);
-                alert("Failed to add user. Please try again.");
-            } finally {
-                // Reset button state
-                addUserBtn.disabled = false;
-                addUserBtn.innerHTML = 'Add User';
-            }
-        });
-
-        // Edit user form submission handler
-        const editUserForm = document.getElementById("editUserForm");
-        const editUserBtn = document.getElementById("editUserBtn");
-
-        editUserForm.addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-            // Validate form
-            if (!editUserForm.checkValidity()) {
-                e.stopPropagation();
-                editUserForm.classList.add('was-validated');
-                return;
-            }
-
-            // Show loading state
-            editUserBtn.disabled = true;
-            editUserBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
-
-            const userId = document.getElementById("editUserId").value;
-            const username = document.getElementById("editUserName").value.trim();
-            const email = document.getElementById("editUserEmail").value.trim();
-            const password = document.getElementById("editUserPassword").value.trim();
-            const role = document.getElementById("editUserRole").value;
-            const imageFile = document.getElementById("editUserImageUpload").files[0];
-
+        // Restaurant Info Functions
+        async function saveRestaurantInfo(formData) {
             try {
-                let updateData = {
-                    username: username,
-                    email: email,
-                    role: role,
+                showLoading();
+                const restaurantData = {
+                    name: formData.restaurantName,
+                    phone: formData.restaurantPhone,
+                    address: formData.restaurantAddress,
+                    email: formData.restaurantEmail,
+                    website: formData.restaurantWebsite,
+                    description: formData.restaurantDescription,
+                    openingTime: formData.openingTime,
+                    closingTime: formData.closingTime,
                     updatedAt: serverTimestamp()
                 };
 
-                // Add password to update data only if provided
-                if (password) {
-                    updateData.password = password;
-                }
-
-                // Upload new image if provided
-                if (imageFile) {
-                    const imageRef = ref(storage, `user-images/${Date.now()}_${imageFile.name}`);
-                    const uploadResult = await uploadBytes(imageRef, imageFile);
-                    updateData.imageUrl = await getDownloadURL(uploadResult.ref);
-                }
-
-                // Update user document in Firestore
-                const userRef = doc(db, "userManage", userId);
-                await updateDoc(userRef, updateData);
-
-                console.log("User updated successfully");
-                
-                // Show success message
-                alert("User updated successfully!");
-                
-                // Reset form and hide modal
-                editUserForm.reset();
-                editUserForm.classList.remove('was-validated');
-                document.getElementById('editUserImagePreview').style.display = 'none';
-                bootstrap.Modal.getInstance(document.getElementById("editUserModal")).hide();
-                
-                // Reload users
-                loadUsers();
-
+                await setDoc(doc(db, "settings", "restaurant"), restaurantData);
+                showNotification('Restaurant information saved successfully!');
             } catch (error) {
-                console.error("Error updating user: ", error);
-                alert("Failed to update user. Please try again.");
+                console.error("Error saving restaurant info:", error);
+                showNotification('Error saving restaurant information!', 'error');
             } finally {
-                // Reset button state
-                editUserBtn.disabled = false;
-                editUserBtn.innerHTML = 'Update User';
+                hideLoading();
             }
-        });
+        }
 
-        // Function to load users from Firestore
+        async function loadRestaurantInfo() {
+            try {
+                const docRef = doc(db, "settings", "restaurant");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('restaurantName').value = data.name || '';
+                    document.getElementById('restaurantPhone').value = data.phone || '';
+                    document.getElementById('restaurantAddress').value = data.address || '';
+                    document.getElementById('restaurantEmail').value = data.email || '';
+                    document.getElementById('restaurantWebsite').value = data.website || '';
+                    document.getElementById('restaurantDescription').value = data.description || '';
+                    document.getElementById('openingTime').value = data.openingTime || '10:00';
+                    document.getElementById('closingTime').value = data.closingTime || '23:00';
+                }
+            } catch (error) {
+                console.error("Error loading restaurant info:", error);
+                showNotification('Error loading restaurant information!', 'error');
+            }
+        }
+
+        // Payment Settings Functions
+        async function savePaymentSettings(formData) {
+            try {
+                showLoading();
+                const paymentData = {
+                    cashOnDelivery: formData.cashOnDelivery,
+                    onlinePayment: formData.onlinePayment,
+                    updatedAt: serverTimestamp()
+                };
+
+                await setDoc(doc(db, "settings", "payment"), paymentData);
+                showNotification('Payment settings saved successfully!');
+            } catch (error) {
+                console.error("Error saving payment settings:", error);
+                showNotification('Error saving payment settings!', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadPaymentSettings() {
+            try {
+                const docRef = doc(db, "settings", "payment");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('cashOnDelivery').checked = data.cashOnDelivery !== false;
+                    document.getElementById('onlinePayment').checked = data.onlinePayment !== false;
+                }
+            } catch (error) {
+                console.error("Error loading payment settings:", error);
+                showNotification('Error loading payment settings!', 'error');
+            }
+        }
+
+        // Delivery Settings Functions
+        async function saveDeliverySettings(formData) {
+            try {
+                showLoading();
+                const deliveryData = {
+                    deliveryRadius: parseFloat(formData.deliveryRadius) || 10,
+                    minOrderValue: parseFloat(formData.minOrderValue) || 200,
+                    deliveryCharge: parseFloat(formData.deliveryCharge) || 30,
+                    freeDeliveryAbove: parseFloat(formData.freeDeliveryAbove) || 500,
+                    avgDeliveryTime: parseInt(formData.avgDeliveryTime) || 30,
+                    maxDeliveryTime: parseInt(formData.maxDeliveryTime) || 60,
+                    updatedAt: serverTimestamp()
+                };
+
+                await setDoc(doc(db, "settings", "delivery"), deliveryData);
+                showNotification('Delivery settings saved successfully!');
+            } catch (error) {
+                console.error("Error saving delivery settings:", error);
+                showNotification('Error saving delivery settings!', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadDeliverySettings() {
+            try {
+                const docRef = doc(db, "settings", "delivery");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('deliveryRadius').value = data.deliveryRadius || 10;
+                    document.getElementById('minOrderValue').value = data.minOrderValue || 200;
+                    document.getElementById('deliveryCharge').value = data.deliveryCharge || 30;
+                    document.getElementById('freeDeliveryAbove').value = data.freeDeliveryAbove || 500;
+                    document.getElementById('avgDeliveryTime').value = data.avgDeliveryTime || 30;
+                    document.getElementById('maxDeliveryTime').value = data.maxDeliveryTime || 60;
+                }
+            } catch (error) {
+                console.error("Error loading delivery settings:", error);
+                showNotification('Error loading delivery settings!', 'error');
+            }
+        }
+
+        // User Management Functions
         async function loadUsers() {
             const loadingIndicator = document.getElementById('usersLoadingIndicator');
             const tableBody = document.getElementById('usersTableBody');
@@ -992,7 +708,6 @@
             }
         }
 
-        // Function to create user table row
         function createUserRow(id, user) {
             const row = document.createElement('tr');
             const createdDate = user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
@@ -1021,68 +736,329 @@
             return row;
         }
 
-        // Function to delete user
         async function deleteUser(userId) {
             if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
                 return;
             }
 
             try {
+                showLoading();
                 await deleteDoc(doc(db, "userManage", userId));
-                console.log("User successfully deleted!");
-                
-                // Remove from allUsers array
                 allUsers = allUsers.filter(user => user.id !== userId);
-                
-                loadUsers(); // Reload the list
-                alert("User deleted successfully!");
+                loadUsers();
+                showNotification("User deleted successfully!");
             } catch (error) {
                 console.error("Error removing user: ", error);
-                alert("Failed to delete user");
+                showNotification("Failed to delete user", 'error');
+            } finally {
+                hideLoading();
             }
         }
 
-        // Function to edit user
         async function editUser(userId) {
             try {
                 const userDoc = await getDoc(doc(db, "userManage", userId));
                 if (userDoc.exists()) {
                     const user = userDoc.data();
                     
-                    // Populate edit form
                     document.getElementById('editUserId').value = userId;
                     document.getElementById('editUserName').value = user.username;
                     document.getElementById('editUserEmail').value = user.email;
-                    document.getElementById('editUserPassword').value = ''; // Don't pre-fill password
+                    document.getElementById('editUserPassword').value = '';
                     document.getElementById('editUserRole').value = user.role;
                     
-                    // Show current image
                     const currentImage = document.getElementById('editCurrentUserImage');
                     currentImage.src = user.imageUrl || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200&h=150&fit=crop';
                     currentImage.style.display = 'block';
                     
-                    // Hide preview and reset file input
                     document.getElementById('editUserImagePreview').style.display = 'none';
                     document.getElementById('editUserImageUpload').value = '';
                     
-                    // Show modal
                     const editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
                     editModal.show();
                 } else {
-                    alert("User not found!");
+                    showNotification("User not found!", 'error');
                 }
             } catch (error) {
                 console.error("Error loading user for edit: ", error);
-                alert("Failed to load user details");
+                showNotification("Failed to load user details", 'error');
             }
         }
 
-        // Load users when page loads and when users tab is clicked
+        // Image upload functionality
+        function setupUserImageUpload(uploadAreaId, fileInputId, previewId) {
+            const uploadArea = document.getElementById(uploadAreaId);
+            const fileInput = document.getElementById(fileInputId);
+            const preview = document.getElementById(previewId);
+
+            if (!uploadArea || !fileInput || !preview) return;
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleUserFileSelect(files[0], preview);
+                    fileInput.files = files;
+                }
+            });
+
+            uploadArea.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'BUTTON') {
+                    fileInput.click();
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleUserFileSelect(e.target.files[0], preview);
+                }
+            });
+        }
+
+        function handleUserFileSelect(file, preview) {
+            if (file && file.type.startsWith('image/')) {
+                if (file.size > 2 * 1024 * 1024) {
+                    showNotification('File size must be less than 2MB', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Form Event Listeners
+        document.getElementById('restaurantForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            await saveRestaurantInfo(data);
+        });
+
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = {
+                cashOnDelivery: document.getElementById('cashOnDelivery').checked,
+                onlinePayment: document.getElementById('onlinePayment').checked
+            };
+            await savePaymentSettings(formData);
+        });
+
+        document.getElementById('deliveryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            await saveDeliverySettings(data);
+        });
+
+        // Add user form submission
+        document.getElementById("addUserForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            const addUserBtn = document.getElementById("addUserBtn");
+            addUserBtn.disabled = true;
+            addUserBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding User...';
+
+            const username = document.getElementById("userName").value.trim();
+            const email = document.getElementById("userEmail").value.trim();
+            const password = document.getElementById("userPassword").value.trim();
+            const role = document.getElementById("userRole").value;
+            const imageFile = document.getElementById("userImageUpload").files[0];
+
+            try {
+                let imageUrl = "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop";
+
+                if (imageFile) {
+                    const imageRef = ref(storage, `user-images/${Date.now()}_${imageFile.name}`);
+                    const uploadResult = await uploadBytes(imageRef, imageFile);
+                    imageUrl = await getDownloadURL(uploadResult.ref);
+                }
+
+                const docRef = await addDoc(collection(db, "userManage"), {
+                    username: username,
+                    email: email,
+                    password: password,
+                    role: role,
+                    imageUrl: imageUrl,
+                    createdAt: serverTimestamp(),
+                    isActive: true
+                });
+
+                showNotification("User added successfully!");
+                
+                this.reset();
+                this.classList.remove('was-validated');
+                document.getElementById('userImagePreview').style.display = 'none';
+                bootstrap.Modal.getInstance(document.getElementById("addUserModal")).hide();
+                
+                loadUsers();
+
+            } catch (error) {
+                console.error("Error adding user: ", error);
+                showNotification("Failed to add user. Please try again.", 'error');
+            } finally {
+                addUserBtn.disabled = false;
+                addUserBtn.innerHTML = 'Add User';
+            }
+        });
+
+        // Edit user form submission
+        document.getElementById("editUserForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            const editUserBtn = document.getElementById("editUserBtn");
+            editUserBtn.disabled = true;
+            editUserBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+
+            const userId = document.getElementById("editUserId").value;
+            const username = document.getElementById("editUserName").value.trim();
+            const email = document.getElementById("editUserEmail").value.trim();
+            const password = document.getElementById("editUserPassword").value.trim();
+            const role = document.getElementById("editUserRole").value;
+            const imageFile = document.getElementById("editUserImageUpload").files[0];
+
+            try {
+                let updateData = {
+                    username: username,
+                    email: email,
+                    role: role,
+                    updatedAt: serverTimestamp()
+                };
+
+                if (password) {
+                    updateData.password = password;
+                }
+
+                if (imageFile) {
+                    const imageRef = ref(storage, `user-images/${Date.now()}_${imageFile.name}`);
+                    const uploadResult = await uploadBytes(imageRef, imageFile);
+                    updateData.imageUrl = await getDownloadURL(uploadResult.ref);
+                }
+
+                const userRef = doc(db, "userManage", userId);
+                await updateDoc(userRef, updateData);
+
+                showNotification("User updated successfully!");
+                
+                this.reset();
+                this.classList.remove('was-validated');
+                document.getElementById('editUserImagePreview').style.display = 'none';
+                bootstrap.Modal.getInstance(document.getElementById("editUserModal")).hide();
+                
+                loadUsers();
+
+            } catch (error) {
+                console.error("Error updating user: ", error);
+                showNotification("Failed to update user. Please try again.", 'error');
+            } finally {
+                editUserBtn.disabled = false;
+                editUserBtn.innerHTML = 'Update User';
+            }
+        });
+
+        // Save all settings button
+        document.getElementById('saveAllBtn').addEventListener('click', async function() {
+            try {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+                this.disabled = true;
+
+                // Get all form data
+                const restaurantData = {
+                    restaurantName: document.getElementById('restaurantName').value,
+                    restaurantPhone: document.getElementById('restaurantPhone').value,
+                    restaurantAddress: document.getElementById('restaurantAddress').value,
+                    restaurantEmail: document.getElementById('restaurantEmail').value,
+                    restaurantWebsite: document.getElementById('restaurantWebsite').value,
+                    restaurantDescription: document.getElementById('restaurantDescription').value,
+                    openingTime: document.getElementById('openingTime').value,
+                    closingTime: document.getElementById('closingTime').value
+                };
+
+                const paymentData = {
+                    cashOnDelivery: document.getElementById('cashOnDelivery').checked,
+                    onlinePayment: document.getElementById('onlinePayment').checked
+                };
+
+                const deliveryData = {
+                    deliveryRadius: document.getElementById('deliveryRadius').value,
+                    minOrderValue: document.getElementById('minOrderValue').value,
+                    deliveryCharge: document.getElementById('deliveryCharge').value,
+                    freeDeliveryAbove: document.getElementById('freeDeliveryAbove').value,
+                    avgDeliveryTime: document.getElementById('avgDeliveryTime').value,
+                    maxDeliveryTime: document.getElementById('maxDeliveryTime').value
+                };
+
+                // Save all settings
+                await Promise.all([
+                    saveRestaurantInfo(restaurantData),
+                    savePaymentSettings(paymentData),
+                    saveDeliverySettings(deliveryData)
+                ]);
+
+                this.innerHTML = '<i class="fas fa-check me-1"></i>Saved!';
+                
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-save me-1"></i>Save All Changes';
+                    this.disabled = false;
+                }, 2000);
+
+            } catch (error) {
+                console.error('Error saving all settings:', error);
+                showNotification('Error saving some settings!', 'error');
+                this.innerHTML = '<i class="fas fa-save me-1"></i>Save All Changes';
+                this.disabled = false;
+            }
+        });
+
+        // Load buttons
+        document.getElementById('loadRestaurantBtn').addEventListener('click', loadRestaurantInfo);
+        document.getElementById('loadPaymentBtn').addEventListener('click', loadPaymentSettings);
+        document.getElementById('loadDeliveryBtn').addEventListener('click', loadDeliverySettings);
+
+        // Make functions globally available
+        window.loadUsers = loadUsers;
+        window.deleteUser = deleteUser;
+        window.editUser = editUser;
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            setupUserImageUpload('userUploadArea', 'userImageUpload', 'userImagePreview');
+            setupUserImageUpload('editUserUploadArea', 'editUserImageUpload', 'editUserImagePreview');
+            
+            // Load all settings
+            loadRestaurantInfo();
+            loadPaymentSettings();
+            loadDeliverySettings();
             loadUsers();
         });
 
-        // Reload users when users tab is clicked
+        // Load users when users tab is clicked
         document.getElementById('users-tab').addEventListener('click', function() {
             loadUsers();
         });
