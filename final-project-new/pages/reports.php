@@ -1,512 +1,1289 @@
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Reports & Analytics</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#generateReportModal">
-            <i class="fas fa-plus me-1"></i>Generate Report
-        </button>
-    </div>
-</div>
 
-<!-- Quick Report Cards -->
-<div class="row mb-4">
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card report-card" data-report="sales">
-            <div class="card-body text-center">
-                <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
-                <h5 class="card-title">Sales Report</h5>
-                <p class="card-text">Revenue, orders, and trends</p>
-                <button class="btn btn-primary btn-sm">Generate</button>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card report-card" data-report="inventory">
-            <div class="card-body text-center">
-                <i class="fas fa-boxes fa-3x text-success mb-3"></i>
-                <h5 class="card-title">Inventory Report</h5>
-                <p class="card-text">Stock levels and usage</p>
-                <button class="btn btn-success btn-sm">Generate</button>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card report-card" data-report="customer">
-            <div class="card-body text-center">
-                <i class="fas fa-users fa-3x text-info mb-3"></i>
-                <h5 class="card-title">Customer Report</h5>
-                <p class="card-text">Customer analytics and behavior</p>
-                <button class="btn btn-info btn-sm">Generate</button>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card report-card" data-report="financial">
-            <div class="card-body text-center">
-                <i class="fas fa-rupee-sign fa-3x text-warning mb-3"></i>
-                <h5 class="card-title">Financial Report</h5>
-                <p class="card-text">Profit, expenses, and taxes</p>
-                <button class="btn btn-warning btn-sm">Generate</button>
-            </div>
-        </div>
-    </div>
-</div>
+    <style>
+        .report-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .report-preview {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            background: white;
+        }
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Notification container -->
+        <div id="notificationContainer"></div>
 
-<!-- Recent Reports -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="card-title mb-0">
-            <i class="fas fa-history me-2"></i>Recent Reports
-        </h5>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Report Name</th>
-                        <th>Type</th>
-                        <th>Date Range</th>
-                        <th>Generated</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <div>
-                                <strong>Monthly Sales Summary</strong><br>
-                                <small class="text-muted">December 2024 sales analysis</small>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-primary">Sales</span></td>
-                        <td>Dec 1 - Dec 31, 2024</td>
-                        <td>
-                            <div>
-                                <strong>Today, 10:30 AM</strong><br>
-                                <small class="text-muted">by Admin User</small>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-success">Ready</span></td>
-                        <td>
-                            <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-primary">
-                                    <i class="fas fa-download"></i>
-                                </button>
-                                <button class="btn btn-outline-info">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-outline-secondary">
-                                    <i class="fas fa-share"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>
-                                <strong>Customer Behavior Analysis</strong><br>
-                                <small class="text-muted">Q4 customer insights</small>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-info">Customer</span></td>
-                        <td>Oct 1 - Dec 31, 2024</td>
-                        <td>
-                            <div>
-                                <strong>Yesterday, 3:45 PM</strong><br>
-                                <small class="text-muted">by Admin User</small>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-success">Ready</span></td>
-                        <td>
-                            <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-primary">
-                                    <i class="fas fa-download"></i>
-                                </button>
-                                <button class="btn btn-outline-info">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-outline-secondary">
-                                    <i class="fas fa-share"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>
-                                <strong>Inventory Status Report</strong><br>
-                                <small class="text-muted">Current stock levels</small>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-success">Inventory</span></td>
-                        <td>Real-time</td>
-                        <td>
-                            <div>
-                                <strong>2 days ago, 9:15 AM</strong><br>
-                                <small class="text-muted">by Kitchen Manager</small>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-warning">Processing</span></td>
-                        <td>
-                            <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-secondary" disabled>
-                                    <i class="fas fa-clock"></i>
-                                </button>
-                                <button class="btn btn-outline-danger">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Report Dashboard -->
-<div class="row">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-chart-area me-2"></i>Sales Performance Overview
-                </h5>
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Reports & Analytics</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#generateReportModal">
+                    <i class="fas fa-plus me-1"></i>Generate Report
+                </button>
             </div>
-            <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-md-3 text-center">
-                        <h4 class="text-primary">₹1,24,750</h4>
-                        <p class="text-muted">Total Revenue</p>
-                        <small class="text-success"><i class="fas fa-arrow-up"></i> +12.5%</small>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <h4 class="text-success">1,247</h4>
-                        <p class="text-muted">Total Orders</p>
-                        <small class="text-success"><i class="fas fa-arrow-up"></i> +8.2%</small>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <h4 class="text-warning">₹385</h4>
-                        <p class="text-muted">Avg Order Value</p>
-                        <small class="text-danger"><i class="fas fa-arrow-down"></i> -2.1%</small>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <h4 class="text-info">96.5%</h4>
-                        <p class="text-muted">Order Success Rate</p>
-                        <small class="text-success"><i class="fas fa-arrow-up"></i> +1.2%</small>
+        </div>
+
+        <!-- Quick Report Cards -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card report-card" data-report="sales">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Sales Report</h5>
+                        <p class="card-text">Revenue, orders, and trends</p>
+                        <button class="btn btn-primary btn-sm">Generate</button>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="salesOverviewChart" style="height: 300px;"></canvas>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card report-card" data-report="inventory">
+                    <div class="card-body text-center">
+                        <i class="fas fa-boxes fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Menu Analysis</h5>
+                        <p class="card-text">Menu items performance</p>
+                        <button class="btn btn-success btn-sm">Generate</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card report-card" data-report="customer">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-3x text-info mb-3"></i>
+                        <h5 class="card-title">Customer Report</h5>
+                        <p class="card-text">Customer analytics and behavior</p>
+                        <button class="btn btn-info btn-sm">Generate</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card report-card" data-report="feedback">
+                    <div class="card-body text-center">
+                        <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Feedback Report</h5>
+                        <p class="card-text">Customer feedback analysis</p>
+                        <button class="btn btn-warning btn-sm">Generate</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col-lg-4">
+
+        <!-- Recent Reports -->
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-trophy me-2"></i>Top Performing Items
+                    <i class="fas fa-history me-2"></i>Recent Reports
                 </h5>
             </div>
             <div class="card-body">
-                <div class="top-item mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <div class="rank-badge me-3">1</div>
-                            <div>
-                                <strong>Chicken Biryani</strong><br>
-                                <small class="text-muted">156 orders</small>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Report Name</th>
+                                <th>Type</th>
+                                <th>Date Range</th>
+                                <th>Generated</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTable">
+                            <!-- Reports will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Report Modal -->
+        <div class="modal fade" id="generateReportModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Generate Custom Report</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="reportForm" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="reportType" class="form-label">Report Type</label>
+                                <select class="form-select" id="reportType" required>
+                                    <option value="">Select Report Type</option>
+                                    <option value="sales">Sales Report</option>
+                                    <option value="inventory">Menu Analysis Report</option>
+                                    <option value="customer">Customer Report</option>
+                                    <option value="feedback">Feedback Report</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="text-end">
-                            <strong>₹31,200</strong><br>
-                            <small class="text-success">+12%</small>
+                            <div class="mb-3">
+                                <label for="reportName" class="form-label">Report Name</label>
+                                <input type="text" class="form-control" id="reportName" placeholder="e.g., Monthly Sales Summary" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="startDate" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="startDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="endDate" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="endDate" required>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="loading-spinner" id="loadingSpinner">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Generating report...</p>
                         </div>
                     </div>
-                </div>
-                <div class="top-item mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <div class="rank-badge me-3">2</div>
-                            <div>
-                                <strong>Pizza Margherita</strong><br>
-                                <small class="text-muted">124 orders</small>
-                            </div>
-                        </div>
-                        <div class="text-end">
-                            <strong>₹39,680</strong><br>
-                            <small class="text-success">+8%</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="top-item mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <div class="rank-badge me-3">3</div>
-                            <div>
-                                <strong>Burger Combo</strong><br>
-                                <small class="text-muted">98 orders</small>
-                            </div>
-                        </div>
-                        <div class="text-end">
-                            <strong>₹27,440</strong><br>
-                            <small class="text-danger">-3%</small>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="generateReport()">Generate PDF Report</button>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-clock me-2"></i>Peak Hours
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="peak-hour mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span>12:00 PM - 2:00 PM</span>
-                        <div>
-                            <strong>245 orders</strong>
-                            <div class="progress mt-1" style="height: 5px; width: 100px;">
-                                <div class="progress-bar bg-danger" style="width: 100%"></div>
-                            </div>
+
+        <!-- Report Preview Modal -->
+        <div class="modal fade" id="reportPreviewModal" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="previewTitle">Report Preview</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="report-preview" id="reportPreview">
+                            <!-- Report content will be displayed here -->
                         </div>
                     </div>
-                </div>
-                <div class="peak-hour mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span>7:00 PM - 9:00 PM</span>
-                        <div>
-                            <strong>198 orders</strong>
-                            <div class="progress mt-1" style="height: 5px; width: 100px;">
-                                <div class="progress-bar bg-warning" style="width: 80%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="peak-hour mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span>6:00 PM - 8:00 PM</span>
-                        <div>
-                            <strong>156 orders</strong>
-                            <div class="progress mt-1" style="height: 5px; width: 100px;">
-                                <div class="progress-bar bg-primary" style="width: 65%"></div>
-                            </div>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="downloadPreviewBtn">Download PDF</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Generate Report Modal -->
-<div class="modal fade" id="generateReportModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Generate Custom Report</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form class="needs-validation" novalidate>
-                    <div class="mb-3">
-                        <label for="reportType" class="form-label">Report Type</label>
-                        <select class="form-select" id="reportType" required>
-                            <option value="">Select Report Type</option>
-                            <option value="sales">Sales Report</option>
-                            <option value="inventory">Inventory Report</option>
-                            <option value="customer">Customer Report</option>
-                            <option value="financial">Financial Report</option>
-                            <option value="delivery">Delivery Performance</option>
-                            <option value="menu">Menu Analysis</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="reportName" class="form-label">Report Name</label>
-                        <input type="text" class="form-control" id="reportName" placeholder="e.g., Monthly Sales Summary" required>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="startDate" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" id="startDate" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="endDate" class="form-label">End Date</label>
-                            <input type="date" class="form-control" id="endDate" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Include Sections</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="includeCharts" checked>
-                            <label class="form-check-label" for="includeCharts">Charts and Graphs</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="includeDetails" checked>
-                            <label class="form-check-label" for="includeDetails">Detailed Data</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="includeComparison">
-                            <label class="form-check-label" for="includeComparison">Period Comparison</label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="reportFormat" class="form-label">Export Format</label>
-                        <select class="form-select" id="reportFormat" required>
-                            <option value="pdf">PDF</option>
-                            <option value="excel">Excel</option>
-                            <option value="csv">CSV</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="generateReport()">Generate Report</button>
-            </div>
-        </div>
-    </div>
-</div>
+    <!-- Include Firebase and required libraries -->
+    <script type="module">
+        // Firebase configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where, orderBy, limit, Timestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-<style>
-.report-card {
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.report-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-}
-
-.rank-badge {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.top-item {
-    padding: 10px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.top-item:hover {
-    background-color: #f8f9fa;
-}
-
-.peak-hour {
-    padding: 8px 0;
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Sales overview chart
-    const salesCtx = document.getElementById('salesOverviewChart');
-    if (salesCtx) {
-        const ctx = salesCtx.getContext('2d');
-        
-        salesCtx.width = salesCtx.offsetWidth;
-        salesCtx.height = 300;
-        
-        // Draw a simple area chart
-        ctx.fillStyle = 'rgba(255, 107, 107, 0.1)';
-        ctx.strokeStyle = '#ff6b6b';
-        ctx.lineWidth = 3;
-        
-        const points = [
-            {x: 50, y: 250}, {x: 150, y: 200}, {x: 250, y: 180},
-            {x: 350, y: 160}, {x: 450, y: 140}, {x: 550, y: 100},
-            {x: 650, y: 80}
-        ];
-        
-        // Fill area
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, 280);
-        points.forEach(point => ctx.lineTo(point.x, point.y));
-        ctx.lineTo(points[points.length - 1].x, 280);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Draw line
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (let i = 1; i < points.length; i++) {
-            ctx.lineTo(points[i].x, points[i].y);
-        }
-        ctx.stroke();
-        
-        // Add labels
-        ctx.fillStyle = '#666';
-        ctx.font = '12px Arial';
-        ctx.fillText('Sales trend over the last 7 days', 50, 30);
-    }
-    
-    // Set default dates
-    const today = new Date();
-    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-    
-    document.getElementById('startDate').value = lastMonth.toISOString().split('T')[0];
-    document.getElementById('endDate').value = today.toISOString().split('T')[0];
-});
-
-function generateReport() {
-    const reportType = document.getElementById('reportType').value;
-    const reportName = document.getElementById('reportName').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const format = document.getElementById('reportFormat').value;
-    
-    if (!reportType || !reportName || !startDate || !endDate) {
-        showNotification('Please fill in all required fields', 'warning');
-        return;
-    }
-    
-    // Close modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('generateReportModal'));
-    modal.hide();
-    
-    // Show loading notification
-    showNotification('Report generation started. You will be notified when it\'s ready.', 'info');
-    
-    // Simulate report generation
-    setTimeout(() => {
-        showNotification(`${reportName} has been generated successfully!`, 'success');
-    }, 3000);
-}
-
-// Report card click handlers
-document.querySelectorAll('.report-card').forEach(card => {
-    card.addEventListener('click', function() {
-        const reportType = this.dataset.report;
-        document.getElementById('reportType').value = reportType;
-        
-        // Set default name based on type
-        const reportNames = {
-            sales: 'Sales Performance Report',
-            inventory: 'Inventory Status Report',
-            customer: 'Customer Analytics Report',
-            financial: 'Financial Summary Report'
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqvtp0IWvJFQgbVuj4NsSgQQDVtvwD1tY",
+            authDomain: "the-tumaric-indian-cusine.firebaseapp.com",
+            projectId: "the-tumaric-indian-cusine",
+            storageBucket: "the-tumaric-indian-cusine.firebasestorage.app",
+            messagingSenderId: "808473473804",
+            appId: "1:808473473804:web:2c7cf4c307f3a3d1a78f29",
+            measurementId: "G-S35W1JTW9L"
         };
-        
-        document.getElementById('reportName').value = reportNames[reportType] || '';
-        
-        // Open modal
-        const modal = new bootstrap.Modal(document.getElementById('generateReportModal'));
-        modal.show();
-    });
-});
-</script>
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make db available globally
+        window.db = db;
+        window.dbModules = { collection, getDocs, query, where, orderBy, limit, Timestamp };
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            loadRecentReports();
+            
+            // Make functions globally available for testing
+            window.testDeleteFunction = function() {
+                console.log('Delete function is available');
+                deleteReport('test');
+            };
+        });
+
+        function initializePage() {
+            // Set default dates
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            
+            document.getElementById('startDate').value = lastMonth.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+        }
+
+        function loadRecentReports() {
+            const recentReports = JSON.parse(localStorage.getItem('generatedReports') || '[]');
+            const tbody = document.getElementById('reportsTable');
+            
+            if (recentReports.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No reports generated yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = recentReports.map(report => `
+                <tr>
+                    <td>
+                        <div>
+                            <strong>${report.name}</strong><br>
+                            <small class="text-muted">${report.description}</small>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-${getReportBadgeColor(report.type)}">${getReportTypeLabel(report.type)}</span></td>
+                    <td>${formatDateRange(report.startDate, report.endDate)}</td>
+                    <td>
+                        <div>
+                            <strong>${new Date(report.generatedAt).toLocaleString()}</strong><br>
+                            <small class="text-muted">by Admin User</small>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-success">Ready</span></td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary" onclick="downloadReport('${report.id}')">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="btn btn-outline-info" onclick="viewReport('${report.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="shareReport('${report.id}')">
+                                <i class="fas fa-share"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getReportBadgeColor(type) {
+            const colors = {
+                sales: 'primary',
+                inventory: 'success',
+                customer: 'info',
+                feedback: 'warning'
+            };
+            return colors[type] || 'secondary';
+        }
+
+        function getReportTypeLabel(type) {
+            const labels = {
+                sales: 'Sales',
+                inventory: 'Menu',
+                customer: 'Customer',
+                feedback: 'Feedback'
+            };
+            return labels[type] || type;
+        }
+
+        function formatDateRange(startDate, endDate) {
+            const start = new Date(startDate).toLocaleDateString();
+            const end = new Date(endDate).toLocaleDateString();
+            return `${start} - ${end}`;
+        }
+
+        // Make functions globally available
+        window.loadRecentReports = loadRecentReports;
+        window.getReportBadgeColor = getReportBadgeColor;
+        window.getReportTypeLabel = getReportTypeLabel;
+        window.formatDateRange = formatDateRange;
+        window.downloadReport = downloadReport;
+        window.viewReport = viewReport;
+        window.shareReport = shareReport;
+        window.deleteReport = deleteReport;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script>
+        // Report generation and management functions
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const alertClass = type === 'success' ? 'alert-success' : 
+                              type === 'warning' ? 'alert-warning' : 
+                              type === 'danger' ? 'alert-danger' : 'alert-info';
+            
+            const notification = document.createElement('div');
+            notification.className = `alert ${alertClass} alert-dismissible fade show notification`;
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        async function generateReport() {
+            const reportType = document.getElementById('reportType').value;
+            const reportName = document.getElementById('reportName').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!reportType || !reportName || !startDate || !endDate) {
+                showNotification('Please fill in all required fields', 'warning');
+                return;
+            }
+
+            // Show loading spinner
+            document.getElementById('loadingSpinner').style.display = 'block';
+            document.querySelector('.modal-footer').style.display = 'none';
+            
+            try {
+                const reportData = await fetchReportData(reportType, startDate, endDate);
+                const reportContent = generateReportContent(reportType, reportData, reportName, startDate, endDate);
+                
+                // Save report to localStorage
+                const report = {
+                    id: Date.now().toString(),
+                    name: reportName,
+                    type: reportType,
+                    startDate: startDate,
+                    endDate: endDate,
+                    generatedAt: new Date().toISOString(),
+                    content: reportContent,
+                    description: getReportDescription(reportType)
+                };
+                
+                const reports = JSON.parse(localStorage.getItem('generatedReports') || '[]');
+                reports.unshift(report);
+                localStorage.setItem('generatedReports', JSON.stringify(reports.slice(0, 10))); // Keep only last 10 reports
+                
+                // Generate and download PDF
+                generatePDF(reportContent, reportName);
+                
+                // Close modal and refresh reports list
+                const modal = bootstrap.Modal.getInstance(document.getElementById('generateReportModal'));
+                modal.hide();
+                
+                loadRecentReports();
+                showNotification(`${reportName} has been generated successfully!`, 'success');
+                
+            } catch (error) {
+                console.error('Error generating report:', error);
+                showNotification('Error generating report. Please try again.', 'danger');
+            } finally {
+                // Hide loading spinner
+                document.getElementById('loadingSpinner').style.display = 'none';
+                document.querySelector('.modal-footer').style.display = 'flex';
+            }
+        }
+
+        async function fetchReportData(reportType, startDate, endDate) {
+            const { collection, getDocs, query, where, orderBy, Timestamp } = window.dbModules;
+            const db = window.db;
+            
+            const startTimestamp = Timestamp.fromDate(new Date(startDate));
+            const endTimestamp = Timestamp.fromDate(new Date(endDate + 'T23:59:59'));
+            
+            let data = {};
+            
+            try {
+                switch (reportType) {
+                    case 'sales':
+                        // Fetch orders data
+                        const ordersQuery = query(
+                            collection(db, 'orders'),
+                            where('createdAt', '>=', startTimestamp),
+                            where('createdAt', '<=', endTimestamp),
+                            orderBy('createdAt', 'desc')
+                        );
+                        const ordersSnapshot = await getDocs(ordersQuery);
+                        data.orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        
+                        // Fetch menu data for item details
+                        const menusSnapshot = await getDocs(collection(db, 'menus'));
+                        data.menus = menusSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        break;
+                        
+                    case 'inventory':
+                        // Fetch menu data
+                        const menuSnapshot = await getDocs(collection(db, 'menus'));
+                        data.menus = menuSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        
+                        // Fetch orders for menu analysis
+                        const menuOrdersQuery = query(
+                            collection(db, 'orders'),
+                            where('createdAt', '>=', startTimestamp),
+                            where('createdAt', '<=', endTimestamp)
+                        );
+                        const menuOrdersSnapshot = await getDocs(menuOrdersQuery);
+                        data.orders = menuOrdersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        break;
+                        
+                    case 'customer':
+                        // Fetch users data
+                        const usersSnapshot = await getDocs(collection(db, 'users'));
+                        data.users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        
+                        // Fetch orders for customer analysis
+                        const customerOrdersQuery = query(
+                            collection(db, 'orders'),
+                            where('createdAt', '>=', startTimestamp),
+                            where('createdAt', '<=', endTimestamp)
+                        );
+                        const customerOrdersSnapshot = await getDocs(customerOrdersQuery);
+                        data.orders = customerOrdersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        break;
+                        
+                    case 'feedback':
+                        // Fetch feedback data
+                        const feedbackQuery = query(
+                            collection(db, 'feedbacks'),
+                            where('createdAt', '>=', startTimestamp),
+                            where('createdAt', '<=', endTimestamp),
+                            orderBy('createdAt', 'desc')
+                        );
+                        const feedbackSnapshot = await getDocs(feedbackQuery);
+                        data.feedbacks = feedbackSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        
+                        // Fetch users for feedback analysis
+                        const feedbackUsersSnapshot = await getDocs(collection(db, 'users'));
+                        data.users = feedbackUsersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        break;
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                throw error;
+            }
+            
+            return data;
+        }
+
+        function generateReportContent(reportType, data, reportName, startDate, endDate) {
+            switch (reportType) {
+                case 'sales':
+                    return generateSalesReport(data, reportName, startDate, endDate);
+                case 'inventory':
+                    return generateMenuReport(data, reportName, startDate, endDate);
+                case 'customer':
+                    return generateCustomerReport(data, reportName, startDate, endDate);
+                case 'feedback':
+                    return generateFeedbackReport(data, reportName, startDate, endDate);
+                default:
+                    return '<p>Report type not supported</p>';
+            }
+        }
+
+        function generateSalesReport(data, reportName, startDate, endDate) {
+            const orders = data.orders || [];
+            const menus = data.menus || [];
+            
+            // Calculate metrics
+            const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+            const totalOrders = orders.length;
+            const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+            
+            // Status distribution
+            const statusCounts = orders.reduce((acc, order) => {
+                acc[order.status] = (acc[order.status] || 0) + 1;
+                return acc;
+            }, {});
+            
+            // Popular items
+            const itemCounts = {};
+            orders.forEach(order => {
+                if (order.items) {
+                    order.items.forEach(item => {
+                        itemCounts[item.name] = (itemCounts[item.name] || 0) + item.qty;
+                    });
+                }
+            });
+            
+            const popularItems = Object.entries(itemCounts)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10);
+
+            return `
+                <div class="report-content">
+                    <h2>${reportName}</h2>
+                    <p><strong>Period:</strong> ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}</p>
+                    <hr>
+                    
+                    <h3>Sales Summary</h3>
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-primary">₹${totalRevenue.toLocaleString()}</h4>
+                                    <p class="text-muted">Total Revenue</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-success">${totalOrders}</h4>
+                                    <p class="text-muted">Total Orders</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-warning">₹${Math.round(avgOrderValue)}</h4>
+                                    <p class="text-muted">Avg Order Value</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-info">${((statusCounts.delivered || 0) / totalOrders * 100).toFixed(1)}%</h4>
+                                    <p class="text-muted">Success Rate</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3>Order Status Distribution</h3>
+                    <div class="mb-4">
+                        ${Object.entries(statusCounts).map(([status, count]) => `
+                            <div class="d-flex justify-content-between">
+                                <span>${status.charAt(0).toUpperCase() + status.slice(1)}:</span>
+                                <strong>${count}</strong>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <h3>Top Selling Items</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Item Name</th>
+                                <th>Quantity Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${popularItems.map(([name, qty], index) => `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${name}</td>
+                                    <td>${qty}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <h3>Recent Orders</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${orders.slice(0, 20).map(order => `
+                                <tr>
+                                    <td>${order.orderId || 'N/A'}</td>
+                                    <td>${order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : 'N/A'}</td>
+                                    <td>₹${order.total || 0}</td>
+                                    <td><span class="badge bg-secondary">${order.status || 'N/A'}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function generateMenuReport(data, reportName, startDate, endDate) {
+            const menus = data.menus || [];
+            const orders = data.orders || [];
+            
+            // Calculate item performance
+            const itemStats = {};
+            orders.forEach(order => {
+                if (order.items) {
+                    order.items.forEach(item => {
+                        if (!itemStats[item.foodId]) {
+                            itemStats[item.foodId] = {
+                                name: item.name,
+                                totalSold: 0,
+                                totalRevenue: 0
+                            };
+                        }
+                        itemStats[item.foodId].totalSold += item.qty;
+                        itemStats[item.foodId].totalRevenue += item.price * item.qty;
+                    });
+                }
+            });
+
+            return `
+                <div class="report-content">
+                    <h2>${reportName}</h2>
+                    <p><strong>Period:</strong> ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}</p>
+                    <hr>
+                    
+                    <h3>Menu Overview</h3>
+                    <p><strong>Total Menu Items:</strong> ${menus.length}</p>
+                    <p><strong>Active Items:</strong> ${menus.filter(item => item.status === 'active').length}</p>
+                    <p><strong>Inactive Items:</strong> ${menus.filter(item => item.status !== 'active').length}</p>
+                    
+                    <h3>Items by Category</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Item Count</th>
+                                <th>Avg Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Object.entries(menus.reduce((acc, item) => {
+                                if (!acc[item.category]) {
+                                    acc[item.category] = { count: 0, totalPrice: 0 };
+                                }
+                                acc[item.category].count++;
+                                acc[item.category].totalPrice += item.price || 0;
+                                return acc;
+                            }, {})).map(([category, stats]) => `
+                                <tr>
+                                    <td>${category}</td>
+                                    <td>${stats.count}</td>
+                                    <td>₹${Math.round(stats.totalPrice / stats.count)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <h3>Item Performance (Sales Period)</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Units Sold</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Object.entries(itemStats)
+                                .sort(([,a], [,b]) => b.totalSold - a.totalSold)
+                                .slice(0, 20)
+                                .map(([foodId, stats]) => `
+                                <tr>
+                                    <td>${stats.name}</td>
+                                    <td>${stats.totalSold}</td>
+                                    <td>₹${stats.totalRevenue.toLocaleString()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <h3>All Menu Items</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Cook Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${menus.map(item => `
+                                <tr>
+                                    <td>${item.foodName || 'N/A'}</td>
+                                    <td>${item.category || 'N/A'}</td>
+                                    <td>₹${item.price || 0}</td>
+                                    <td><span class="badge bg-${item.status === 'active' ? 'success' : 'secondary'}">${item.status || 'N/A'}</span></td>
+                                    <td>${item.cookedTime || 'N/A'} min</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function generateCustomerReport(data, reportName, startDate, endDate) {
+            const users = data.users || [];
+            const orders = data.orders || [];
+            
+            // Calculate customer metrics
+            const customerOrders = orders.reduce((acc, order) => {
+                if (!acc[order.userId]) {
+                    acc[order.userId] = [];
+                }
+                acc[order.userId].push(order);
+                return acc;
+            }, {});
+            
+            const customerStats = Object.entries(customerOrders).map(([userId, userOrders]) => {
+                const user = users.find(u => u.userId === userId) || {};
+                const totalSpent = userOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+                return {
+                    userId,
+                    name: user.name || 'Unknown',
+                    email: user.email || 'N/A',
+                    phone: user.phone || 'N/A',
+                    orderCount: userOrders.length,
+                    totalSpent,
+                    avgOrderValue: totalSpent / userOrders.length
+                };
+            }).sort((a, b) => b.totalSpent - a.totalSpent);
+
+            return `
+                <div class="report-content">
+                    <h2>${reportName}</h2>
+                    <p><strong>Period:</strong> ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}</p>
+                    <hr>
+                    
+                    <h3>Customer Overview</h3>
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-primary">${users.length}</h4>
+                                    <p class="text-muted">Total Customers</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-success">${Object.keys(customerOrders).length}</h4>
+                                    <p class="text-muted">Active Customers</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-warning">${customerStats.length > 0 ? (customerStats.reduce((sum, c) => sum + c.orderCount, 0) / customerStats.length).toFixed(1) : 0}</h4>
+                                    <p class="text-muted">Avg Orders per Customer</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-info">₹${customerStats.length > 0 ? Math.round(customerStats.reduce((sum, c) => sum + c.avgOrderValue, 0) / customerStats.length) : 0}</h4>
+                                    <p class="text-muted">Avg Customer Value</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3>Top Customers (by Revenue)</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Customer Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Orders</th>
+                                <th>Total Spent</th>
+                                <th>Avg Order</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${customerStats.slice(0, 20).map((customer, index) => `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${customer.name}</td>
+                                    <td>${customer.email}</td>
+                                    <td>${customer.phone}</td>
+                                    <td>${customer.orderCount}</td>
+                                    <td>₹${customer.totalSpent.toLocaleString()}</td>
+                                    <td>₹${Math.round(customer.avgOrderValue)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <h3>Customer Registration Summary</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th>Favorite Foods</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${users.slice(0, 50).map(user => `
+                                <tr>
+                                    <td>${user.name || 'N/A'}</td>
+                                    <td>${user.email || 'N/A'}</td>
+                                    <td>${user.phone || 'N/A'}</td>
+                                    <td>${user.address || 'N/A'}</td>
+                                    <td>${Array.isArray(user.favFoods) ? user.favFoods.length : 0} items</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function generateFeedbackReport(data, reportName, startDate, endDate) {
+            const feedbacks = data.feedbacks || [];
+            const users = data.users || [];
+            
+            // Calculate feedback metrics
+            const avgRating = feedbacks.length > 0 ? 
+                feedbacks.reduce((sum, feedback) => sum + (feedback.rating || 0), 0) / feedbacks.length : 0;
+            
+            const ratingDistribution = feedbacks.reduce((acc, feedback) => {
+                const rating = Math.floor(feedback.rating || 0);
+                acc[rating] = (acc[rating] || 0) + 1;
+                return acc;
+            }, {});
+            
+            const categoryFeedback = feedbacks.reduce((acc, feedback) => {
+                feedback.categories?.forEach(category => {
+                    if (!acc[category]) {
+                        acc[category] = { count: 0, totalRating: 0 };
+                    }
+                    acc[category].count++;
+                    acc[category].totalRating += feedback.rating || 0;
+                });
+                return acc;
+            }, {});
+
+            return `
+                <div class="report-content">
+                    <h2>${reportName}</h2>
+                    <p><strong>Period:</strong> ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}</p>
+                    <hr>
+                    
+                    <h3>Feedback Summary</h3>
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-primary">${feedbacks.length}</h4>
+                                    <p class="text-muted">Total Feedback</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-success">${avgRating.toFixed(1)} ⭐</h4>
+                                    <p class="text-muted">Average Rating</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-warning">${feedbacks.filter(f => !f.isAnonymous).length}</h4>
+                                    <p class="text-muted">Named Reviews</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-info">${feedbacks.filter(f => f.isAnonymous).length}</h4>
+                                    <p class="text-muted">Anonymous Reviews</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3>Rating Distribution</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Rating</th>
+                                <th>Count</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${[5, 4, 3, 2, 1].map(rating => {
+                                const count = ratingDistribution[rating] || 0;
+                                const percentage = feedbacks.length > 0 ? (count / feedbacks.length * 100).toFixed(1) : 0;
+                                return `
+                                    <tr>
+                                        <td>${rating} Star${rating !== 1 ? 's' : ''}</td>
+                                        <td>${count}</td>
+                                        <td>${percentage}%</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <h3>Feedback by Category</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Count</th>
+                                <th>Avg Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Object.entries(categoryFeedback).map(([category, stats]) => `
+                                <tr>
+                                    <td>${category}</td>
+                                    <td>${stats.count}</td>
+                                    <td>${(stats.totalRating / stats.count).toFixed(1)} ⭐</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <h3>Recent Feedback</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Rating</th>
+                                <th>Categories</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${feedbacks.slice(0, 20).map(feedback => {
+                                const user = users.find(u => u.userId === feedback.userId) || {};
+                                return `
+                                    <tr>
+                                        <td>${feedback.createdAt?.toDate ? feedback.createdAt.toDate().toLocaleDateString() : 'N/A'}</td>
+                                        <td>${feedback.isAnonymous ? 'Anonymous' : (user.name || 'Unknown')}</td>
+                                        <td>${feedback.rating || 0} ⭐</td>
+                                        <td>${Array.isArray(feedback.categories) ? feedback.categories.join(', ') : 'N/A'}</td>
+                                        <td>${feedback.comment || 'No comment'}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function generatePDF(content, reportName) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // PDF styling
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const margin = 20;
+            const maxWidth = pageWidth - (margin * 2);
+            let currentY = margin;
+            
+            // Parse HTML content for PDF
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            
+            // Helper function to add new page if needed
+            function checkPageBreak(height = 10) {
+                if (currentY + height > pageHeight - margin) {
+                    doc.addPage();
+                    currentY = margin;
+                    return true;
+                }
+                return false;
+            }
+            
+            // Helper function to add text with word wrapping
+            function addWrappedText(text, fontSize = 10, isBold = false, isHeader = false) {
+                doc.setFontSize(fontSize);
+                if (isBold) doc.setFont(undefined, 'bold');
+                else doc.setFont(undefined, 'normal');
+                
+                if (isHeader) {
+                    checkPageBreak(15);
+                    doc.setTextColor(40, 40, 40);
+                } else {
+                    doc.setTextColor(60, 60, 60);
+                }
+                
+                const lines = doc.splitTextToSize(text, maxWidth);
+                lines.forEach(line => {
+                    checkPageBreak(fontSize * 0.4);
+                    doc.text(line, margin, currentY);
+                    currentY += fontSize * 0.4;
+                });
+                
+                currentY += isHeader ? 8 : 4;
+            }
+            
+            // Extract content sections
+            const titleElement = tempDiv.querySelector('h2');
+            const title = titleElement ? titleElement.textContent : reportName;
+            
+            // Add title
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(0, 0, 0);
+            doc.text(title, margin, currentY);
+            currentY += 15;
+            
+            // Add period info
+            const periodText = tempDiv.querySelector('p').textContent;
+            addWrappedText(periodText, 12, false);
+            
+            // Add a line separator
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margin, currentY, pageWidth - margin, currentY);
+            currentY += 10;
+            
+            // Process sections
+            const sections = tempDiv.querySelectorAll('h3');
+            sections.forEach(section => {
+                const sectionTitle = section.textContent;
+                addWrappedText(sectionTitle, 14, true, true);
+                
+                // Get content after this section
+                let nextElement = section.nextElementSibling;
+                while (nextElement && nextElement.tagName !== 'H3') {
+                    if (nextElement.tagName === 'P') {
+                        addWrappedText(nextElement.textContent, 10);
+                    } else if (nextElement.tagName === 'DIV' && nextElement.className.includes('row')) {
+                        // Handle summary cards
+                        const cards = nextElement.querySelectorAll('.card-body');
+                        cards.forEach((card, index) => {
+                            const value = card.querySelector('h4') ? card.querySelector('h4').textContent : '';
+                            const label = card.querySelector('p') ? card.querySelector('p').textContent : '';
+                            addWrappedText(`${label}: ${value}`, 10, true);
+                        });
+                        currentY += 5;
+                    } else if (nextElement.tagName === 'TABLE') {
+                        // Handle tables
+                        checkPageBreak(20);
+                        
+                        const headers = Array.from(nextElement.querySelectorAll('thead th')).map(th => th.textContent);
+                        const rows = Array.from(nextElement.querySelectorAll('tbody tr')).map(tr => 
+                            Array.from(tr.querySelectorAll('td')).map(td => td.textContent.replace(/\s+/g, ' ').trim())
+                        );
+                        
+                        if (headers.length > 0 && rows.length > 0) {
+                            // Calculate column widths
+                            const colWidth = maxWidth / headers.length;
+                            
+                            // Table headers
+                            doc.setFillColor(240, 240, 240);
+                            doc.rect(margin, currentY - 5, maxWidth, 8, 'F');
+                            
+                            doc.setFontSize(9);
+                            doc.setFont(undefined, 'bold');
+                            doc.setTextColor(0, 0, 0);
+                            
+                            headers.forEach((header, i) => {
+                                const x = margin + (i * colWidth);
+                                doc.text(header, x + 2, currentY);
+                            });
+                            currentY += 10;
+                            
+                            // Table rows
+                            doc.setFont(undefined, 'normal');
+                            doc.setFontSize(8);
+                            doc.setTextColor(60, 60, 60);
+                            
+                            rows.slice(0, 25).forEach((row, rowIndex) => { // Limit rows to prevent overcrowding
+                                checkPageBreak(6);
+                                
+                                if (rowIndex % 2 === 1) {
+                                    doc.setFillColor(250, 250, 250);
+                                    doc.rect(margin, currentY - 4, maxWidth, 6, 'F');
+                                }
+                                
+                                row.forEach((cell, i) => {
+                                    const x = margin + (i * colWidth);
+                                    const cellText = cell.length > 25 ? cell.substring(0, 25) + '...' : cell;
+                                    doc.text(cellText, x + 2, currentY);
+                                });
+                                currentY += 6;
+                            });
+                            
+                            if (rows.length > 25) {
+                                addWrappedText(`... and ${rows.length - 25} more rows`, 8, false);
+                            }
+                            
+                            currentY += 10;
+                        }
+                    }
+                    nextElement = nextElement.nextElementSibling;
+                }
+            });
+            
+            // Add footer
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(150, 150, 150);
+                doc.text(`Generated on ${new Date().toLocaleDateString()} - Page ${i} of ${totalPages}`, margin, pageHeight - 10);
+                doc.text('The Turmeric Indian Cuisine - Admin Dashboard', pageWidth - margin - 50, pageHeight - 10);
+            }
+            
+            // Download the PDF
+            const fileName = `${reportName.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+        }
+
+        function getReportDescription(reportType) {
+            const descriptions = {
+                sales: 'Comprehensive sales analysis with revenue and order metrics',
+                inventory: 'Menu performance and item analysis report',
+                customer: 'Customer behavior and analytics insights',
+                feedback: 'Customer feedback and rating analysis'
+            };
+            return descriptions[reportType] || 'Custom report analysis';
+        }
+
+        function downloadReport(reportId) {
+            const reports = JSON.parse(localStorage.getItem('generatedReports') || '[]');
+            const report = reports.find(r => r.id === reportId);
+            
+            if (report) {
+                generatePDF(report.content, report.name);
+                showNotification('Report downloaded successfully!', 'success');
+            } else {
+                showNotification('Report not found', 'danger');
+            }
+        }
+
+        function viewReport(reportId) {
+            const reports = JSON.parse(localStorage.getItem('generatedReports') || '[]');
+            const report = reports.find(r => r.id === reportId);
+            
+            if (report) {
+                document.getElementById('previewTitle').textContent = report.name;
+                document.getElementById('reportPreview').innerHTML = report.content;
+                document.getElementById('downloadPreviewBtn').onclick = () => downloadReport(reportId);
+                
+                const modal = new bootstrap.Modal(document.getElementById('reportPreviewModal'));
+                modal.show();
+            } else {
+                showNotification('Report not found', 'danger');
+            }
+        }
+
+        function downloadReport(reportId) {
+            const reports = JSON.parse(localStorage.getItem('generatedReports') || '[]');
+            const report = reports.find(r => r.id === reportId);
+            
+            if (report) {
+                generatePDF(report.content, report.name);
+                showNotification('Report downloaded successfully!', 'success');
+            } else {
+                showNotification('Report not found', 'danger');
+            }
+        }
+
+        function viewReport(reportId) {
+            const reports = JSON.parse(localStorage.getItem('generatedReports') || '[]');
+            const report = reports.find(r => r.id === reportId);
+            
+            if (report) {
+                document.getElementById('previewTitle').textContent = report.name;
+                document.getElementById('reportPreview').innerHTML = report.content;
+                document.getElementById('downloadPreviewBtn').onclick = () => downloadReport(reportId);
+                
+                const modal = new bootstrap.Modal(document.getElementById('reportPreviewModal'));
+                modal.show();
+            } else {
+                showNotification('Report not found', 'danger');
+            }
+        }
+
+        function shareReport(reportId) {
+            // Simple share functionality - could be extended to email, etc.
+            const reports = JSON.parse(localStorage.getItem('generatedReports') || '[]');
+            const report = reports.find(r => r.id === reportId);
+            
+            if (report && navigator.share) {
+                navigator.share({
+                    title: report.name,
+                    text: `Check out this ${report.type} report: ${report.name}`,
+                    url: window.location.href
+                }).catch(() => {
+                    // Fallback: copy link to clipboard
+                    navigator.clipboard.writeText(window.location.href);
+                    showNotification('Report link copied to clipboard!', 'info');
+                });
+            } else {
+                // Fallback: copy link to clipboard
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(window.location.href);
+                    showNotification('Report link copied to clipboard!', 'info');
+                } else {
+                    showNotification('Share functionality not supported', 'warning');
+                }
+            }
+        }
+
+        function deleteReport(reportId) {
+            if (confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
+                const reports = JSON.parse(localStorage.getItem('generatedReports') || '[]');
+                const updatedReports = reports.filter(r => r.id !== reportId);
+                localStorage.setItem('generatedReports', JSON.stringify(updatedReports));
+                
+                loadRecentReports();
+                showNotification('Report deleted successfully!', 'success');
+            }
+        }
+
+        // Report card click handlers
+        document.querySelectorAll('.report-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const reportType = this.dataset.report;
+                document.getElementById('reportType').value = reportType;
+                
+                // Set default name based on type
+                const reportNames = {
+                    sales: 'Sales Performance Report',
+                    inventory: 'Menu Analysis Report',
+                    customer: 'Customer Analytics Report',
+                    feedback: 'Feedback Analysis Report'
+                };
+                
+                document.getElementById('reportName').value = reportNames[reportType] || '';
+                
+                // Open modal
+                const modal = new bootstrap.Modal(document.getElementById('generateReportModal'));
+                modal.show();
+            });
+        });
+
+        // Form reset on modal close
+        document.getElementById('generateReportModal').addEventListener('hidden.bs.modal', function() {
+            document.getElementById('reportForm').reset();
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.querySelector('.modal-footer').style.display = 'flex';
+        });
+    </script>
+</body>
+</html>
