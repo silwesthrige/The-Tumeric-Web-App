@@ -1,31 +1,190 @@
 
     <style>
-        .report-card {
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .stats-card {
+            background: #fff;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        .report-card:hover {
+        
+        .stats-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
-        .report-preview {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 20px;
-            background: white;
+        
+        .stats-card.primary {
+            border-left: 4px solid #0d6efd;
         }
+        
+        .stats-card.success {
+            border-left: 4px solid #198754;
+        }
+        
+        .stats-card.info {
+            border-left: 4px solid #0dcaf0;
+        }
+        
+        .stats-card.warning {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .stats-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2.5rem;
+            color: #dee2e6;
+        }
+        
+        .report-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        .report-description {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 1.25rem 1.5rem;
+            border-radius: 0.75rem 0.75rem 0 0 !important;
+        }
+        
+        .card-title {
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+            background-color: #f8f9fa;
+        }
+        
+        .btn-toolbar .btn {
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+        
         .loading-spinner {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 2rem;
         }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0d6efd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 9999;
             min-width: 300px;
+        }
+        
+        .report-preview {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            background: #fff;
+        }
+        
+        .badge {
+            font-weight: 500;
+        }
+        
+        .btn-group-sm .btn {
+            border-radius: 0.375rem;
+        }
+        
+        .generate-btn {
+            background: #fff;
+            border: 2px solid transparent;
+            color: #0d6efd;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .generate-btn:hover {
+            background: #0d6efd;
+            color: #fff;
+            border-color: #0d6efd;
+        }
+        
+        .stats-card.primary .generate-btn:hover {
+            background: #0d6efd;
+            border-color: #0d6efd;
+        }
+        
+        .stats-card.success .generate-btn {
+            color: #198754;
+        }
+        
+        .stats-card.success .generate-btn:hover {
+            background: #198754;
+            border-color: #198754;
+        }
+        
+        .stats-card.info .generate-btn {
+            color: #0dcaf0;
+        }
+        
+        .stats-card.info .generate-btn:hover {
+            background: #0dcaf0;
+            border-color: #0dcaf0;
+        }
+        
+        .stats-card.warning .generate-btn {
+            color: #ffc107;
+        }
+        
+        .stats-card.warning .generate-btn:hover {
+            background: #ffc107;
+            border-color: #ffc107;
+            color: #000;
         }
     </style>
 </head>
@@ -34,10 +193,11 @@
         <!-- Notification container -->
         <div id="notificationContainer"></div>
 
+        <!-- Header -->
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Reports & Analytics</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
-                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#generateReportModal">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#generateReportModal">
                     <i class="fas fa-plus me-1"></i>Generate Report
                 </button>
             </div>
@@ -45,72 +205,68 @@
 
         <!-- Quick Report Cards -->
         <div class="row mb-4">
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="card report-card" data-report="sales">
-                    <div class="card-body text-center">
-                        <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Sales Report</h5>
-                        <p class="card-text">Revenue, orders, and trends</p>
-                        <button class="btn btn-primary btn-sm">Generate</button>
-                    </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card primary" data-report="sales">
+                    <div class="report-title">Sales Report</div>
+                    <div class="report-description">Revenue, orders, and trends</div>
+                    <button class="generate-btn">Generate</button>
+                    <i class="fas fa-chart-line stats-icon"></i>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="card report-card" data-report="inventory">
-                    <div class="card-body text-center">
-                        <i class="fas fa-boxes fa-3x text-success mb-3"></i>
-                        <h5 class="card-title">Menu Analysis</h5>
-                        <p class="card-text">Menu items performance</p>
-                        <button class="btn btn-success btn-sm">Generate</button>
-                    </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card success" data-report="inventory">
+                    <div class="report-title">Menu Analysis</div>
+                    <div class="report-description">Menu items performance</div>
+                    <button class="generate-btn">Generate</button>
+                    <i class="fas fa-boxes stats-icon"></i>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="card report-card" data-report="customer">
-                    <div class="card-body text-center">
-                        <i class="fas fa-users fa-3x text-info mb-3"></i>
-                        <h5 class="card-title">Customer Report</h5>
-                        <p class="card-text">Customer analytics and behavior</p>
-                        <button class="btn btn-info btn-sm">Generate</button>
-                    </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card info" data-report="customer">
+                    <div class="report-title">Customer Report</div>
+                    <div class="report-description">Customer analytics and behavior</div>
+                    <button class="generate-btn">Generate</button>
+                    <i class="fas fa-users stats-icon"></i>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="card report-card" data-report="feedback">
-                    <div class="card-body text-center">
-                        <i class="fas fa-star fa-3x text-warning mb-3"></i>
-                        <h5 class="card-title">Feedback Report</h5>
-                        <p class="card-text">Customer feedback analysis</p>
-                        <button class="btn btn-warning btn-sm">Generate</button>
-                    </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card warning" data-report="feedback">
+                    <div class="report-title">Feedback Report</div>
+                    <div class="report-description">Customer feedback analysis</div>
+                    <button class="generate-btn">Generate</button>
+                    <i class="fas fa-star stats-icon"></i>
                 </div>
             </div>
         </div>
 
         <!-- Recent Reports -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-history me-2"></i>Recent Reports
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Report Name</th>
-                                <th>Type</th>
-                                <th>Date Range</th>
-                                <th>Generated</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportsTable">
-                            <!-- Reports will be populated here -->
-                        </tbody>
-                    </table>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-history me-2"></i>Recent Reports
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Report Name</th>
+                                        <th>Type</th>
+                                        <th>Date Range</th>
+                                        <th>Generated</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportsTable">
+                                    <!-- Reports will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -151,9 +307,7 @@
                             </div>
                         </form>
                         <div class="loading-spinner" id="loadingSpinner">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
+                            <div class="loading"></div>
                             <p class="mt-2">Generating report...</p>
                         </div>
                     </div>
@@ -1191,34 +1345,6 @@
             }
         }
 
-        function downloadReport(reportId) {
-            const reports = JSON.parse(localStorage.getItem('generatedReports') || '[]');
-            const report = reports.find(r => r.id === reportId);
-            
-            if (report) {
-                generatePDF(report.content, report.name);
-                showNotification('Report downloaded successfully!', 'success');
-            } else {
-                showNotification('Report not found', 'danger');
-            }
-        }
-
-        function viewReport(reportId) {
-            const reports = JSON.parse(localStorage.getItem('generatedReports') || '[]');
-            const report = reports.find(r => r.id === reportId);
-            
-            if (report) {
-                document.getElementById('previewTitle').textContent = report.name;
-                document.getElementById('reportPreview').innerHTML = report.content;
-                document.getElementById('downloadPreviewBtn').onclick = () => downloadReport(reportId);
-                
-                const modal = new bootstrap.Modal(document.getElementById('reportPreviewModal'));
-                modal.show();
-            } else {
-                showNotification('Report not found', 'danger');
-            }
-        }
-
         function shareReport(reportId) {
             // Simple share functionality - could be extended to email, etc.
             const reports = JSON.parse(localStorage.getItem('generatedReports') || '[]');
@@ -1257,7 +1383,7 @@
         }
 
         // Report card click handlers
-        document.querySelectorAll('.report-card').forEach(card => {
+        document.querySelectorAll('.stats-card').forEach(card => {
             card.addEventListener('click', function() {
                 const reportType = this.dataset.report;
                 document.getElementById('reportType').value = reportType;
