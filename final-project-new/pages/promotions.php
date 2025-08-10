@@ -1,4 +1,361 @@
 
+    <style>
+        /* Dashboard UI Styles */
+        .stats-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .stats-card.success {
+            border-left: 4px solid #198754;
+        }
+        
+        .stats-card.warning {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .stats-card.info {
+            border-left: 4px solid #0dcaf0;
+        }
+        
+        .stats-card:not(.success):not(.warning):not(.info) {
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stats-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+        
+        .stats-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: #dee2e6;
+        }
+        
+        .card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0.75rem 1.25rem;
+        }
+        
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .promotion-card {
+            transition: all 0.3s ease;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        .promotion-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .promotion-card .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 700;
+        }
+
+        .progress {
+            background-color: rgba(0,0,0,0.1);
+            height: 0.25rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0d6efd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .table {
+            color: #5a5c69;
+        }
+
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 800;
+            color: #5a5c69;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            background-color: #f8f9fa;
+        }
+
+        .table td {
+            border-top: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.025);
+        }
+
+        .btn {
+            font-weight: 400;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8125rem;
+            border-radius: 0.375rem;
+        }
+
+        .badge {
+            font-weight: 700;
+            font-size: 0.65rem;
+            border-radius: 10rem;
+            padding: 0.25em 0.6em;
+        }
+
+        .text-xs {
+            font-size: 0.7rem;
+        }
+
+        .border-bottom {
+            border-bottom: 1px solid #dee2e6 !important;
+        }
+
+        .h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            line-height: 1.2;
+            color: #5a5c69;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+
+        .form-control {
+            border: 1px solid #ced4da;
+            border-radius: 0.5rem;
+            color: #495057;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .form-select {
+            border: 1px solid #ced4da;
+            border-radius: 0.5rem;
+            color: #495057;
+        }
+
+        .form-label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.875rem;
+        }
+
+        .btn-group .btn {
+            border-color: #ced4da;
+        }
+
+        .btn-outline-primary {
+            color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: #fff;
+        }
+
+        .btn-outline-warning {
+            color: #ffc107;
+            border-color: #ffc107;
+        }
+
+        .btn-outline-warning:hover {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #000;
+        }
+
+        .btn-outline-danger {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: #fff;
+        }
+
+        .btn-outline-success {
+            color: #198754;
+            border-color: #198754;
+        }
+
+        .btn-outline-success:hover {
+            background-color: #198754;
+            border-color: #198754;
+            color: #fff;
+        }
+
+        .btn-outline-info {
+            color: #0dcaf0;
+            border-color: #0dcaf0;
+        }
+
+        .btn-outline-info:hover {
+            background-color: #0dcaf0;
+            border-color: #0dcaf0;
+            color: #000;
+        }
+
+        .btn-outline-secondary {
+            color: #6c757d;
+            border-color: #ced4da;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: #fff;
+        }
+
+        .btn-outline-secondary.active {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: #fff;
+        }
+
+        code {
+            background-color: #f8f9fa;
+            color: #e83e8c;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        .container-fluid {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        .border-left-success {
+            border-left: 4px solid #198754 !important;
+        }
+
+        .text-gray-900 {
+            color: #3a3b45 !important;
+        }
+
+        .text-gray-600 {
+            color: #5a5c69 !important;
+        }
+
+        .font-weight-bold {
+            font-weight: 700 !important;
+        }
+
+        .bg-light {
+            background-color: #f8f9fa !important;
+        }
+
+        .badge-success {
+            background-color: #198754 !important;
+        }
+
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            padding: 1rem;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 0.375rem;
+            margin: 0.5rem 0;
+        }
+
+        /* Enhanced hover effects */
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+
+        /* Loading states */
+        .stats-loading {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .table-loading {
+            text-align: center;
+            padding: 2rem;
+        }
+    </style>
+</head>
 <body>
     <div class="container-fluid">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -12,40 +369,44 @@
 
         <!-- Promotion Stats -->
         <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card stats-card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">Total Promotions</h5>
-                        <h2 class="text-primary" id="totalPromotionsCount">-</h2>
-                        <small class="text-muted">All time created</small>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalPromotionsCount">
+                        <div class="loading"></div>
                     </div>
+                    <div class="stats-label">Total Promotions</div>
+                    <small class="text-muted d-block">All time created</small>
+                    <i class="fas fa-tags stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card success text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-success">Most Used Promo</h5>
-                        <h2 class="text-success" id="mostUsedPromo">-</h2>
-                        <small class="text-muted">Highest redemptions</small>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card success">
+                    <div class="stats-number" id="mostUsedPromo">
+                        <div class="loading"></div>
                     </div>
+                    <div class="stats-label">Most Used Promo</div>
+                    <small class="text-muted d-block">Highest redemptions</small>
+                    <i class="fas fa-fire stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card warning text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-warning">Avg. Discount</h5>
-                        <h2 class="text-warning" id="avgDiscount">-</h2>
-                        <small class="text-muted">Average value offered</small>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card warning">
+                    <div class="stats-number" id="avgDiscount">
+                        <div class="loading"></div>
                     </div>
+                    <div class="stats-label">Avg. Discount</div>
+                    <small class="text-muted d-block">Average value offered</small>
+                    <i class="fas fa-percentage stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card info text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-info">Expiring Soon</h5>
-                        <h2 class="text-info" id="expiringSoon">-</h2>
-                        <small class="text-muted">Next 7 days</small>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card info">
+                    <div class="stats-number" id="expiringSoon">
+                        <div class="loading"></div>
                     </div>
+                    <div class="stats-label">Expiring Soon</div>
+                    <small class="text-muted d-block">Next 7 days</small>
+                    <i class="fas fa-clock stats-icon"></i>
                 </div>
             </div>
         </div>
@@ -59,7 +420,10 @@
             </div>
             <div class="card-body">
                 <div class="row" id="activePromotionsContainer">
-                    <!-- Active promotions will be loaded here -->
+                    <div class="col-12 stats-loading">
+                        <div class="loading"></div>
+                        <p class="mt-2">Loading active promotions...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -99,7 +463,12 @@
                             </tr>
                         </thead>
                         <tbody id="promotionsTableBody">
-                            <!-- Promotions will be loaded here -->
+                            <tr>
+                                <td colspan="8" class="table-loading">
+                                    <div class="loading"></div>
+                                    <p class="mt-2">Loading promotions...</p>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -267,245 +636,6 @@
             </div>
         </div>
     </div>
-
-    <style>
-    .promotion-card {
-        transition: all 0.3s ease;
-    }
-
-    .promotion-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    }
-
-    .progress {
-        background-color: rgba(0,0,0,0.1);
-    }
-
-    .loading {
-        opacity: 0.6;
-        pointer-events: none;
-    }
-
-    /* Enhanced UI Styles */
-    .card {
-        border: 1px solid #e3e6f0;
-        border-radius: 0.35rem;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    }
-
-    .card-header {
-        background-color: #f8f9fc;
-        border-bottom: 1px solid #e3e6f0;
-        padding: 0.75rem 1.25rem;
-    }
-
-    .card-body {
-        padding: 1.25rem;
-    }
-
-    .table {
-        color: #5a5c69;
-    }
-
-    .table thead th {
-        vertical-align: bottom;
-        border-bottom: 2px solid #e3e6f0;
-        font-weight: 800;
-        color: #5a5c69;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05rem;
-    }
-
-    .table td {
-        border-top: 1px solid #e3e6f0;
-        vertical-align: middle;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 0, 0, 0.025);
-    }
-
-    .btn {
-        font-weight: 400;
-        border-radius: 0.35rem;
-        font-size: 0.875rem;
-    }
-
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8125rem;
-        border-radius: 0.2rem;
-    }
-
-    .badge {
-        font-weight: 700;
-        font-size: 0.65rem;
-        border-radius: 10rem;
-        padding: 0.25em 0.6em;
-    }
-
-    .text-xs {
-        font-size: 0.7rem;
-    }
-
-    .border-bottom {
-        border-bottom: 1px solid #e3e6f0 !important;
-    }
-
-    .h2 {
-        font-size: 2rem;
-        font-weight: 400;
-        line-height: 1.2;
-        color: #5a5c69;
-    }
-
-    .text-muted {
-        color: #858796 !important;
-    }
-
-    .modal-header {
-        border-bottom: 1px solid #e3e6f0;
-        background-color: #f8f9fc;
-    }
-
-    .modal-footer {
-        border-top: 1px solid #e3e6f0;
-        background-color: #f8f9fc;
-    }
-
-    .form-control {
-        border: 1px solid #d1d3e2;
-        border-radius: 0.35rem;
-        color: #6e707e;
-    }
-
-    .form-control:focus {
-        border-color: #bac8f3;
-        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-    }
-
-    .form-select {
-        border: 1px solid #d1d3e2;
-        border-radius: 0.35rem;
-        color: #6e707e;
-    }
-
-    .form-label {
-        margin-bottom: 0.5rem;
-        font-weight: 700;
-        color: #5a5c69;
-        font-size: 0.875rem;
-    }
-
-    .btn-group .btn {
-        border-color: #d1d3e2;
-    }
-
-    .btn-outline-primary {
-        color: #4e73df;
-        border-color: #4e73df;
-    }
-
-    .btn-outline-primary:hover {
-        background-color: #4e73df;
-        border-color: #4e73df;
-    }
-
-    .btn-outline-warning {
-        color: #f6c23e;
-        border-color: #f6c23e;
-    }
-
-    .btn-outline-warning:hover {
-        background-color: #f6c23e;
-        border-color: #f6c23e;
-    }
-
-    .btn-outline-danger {
-        color: #e74a3b;
-        border-color: #e74a3b;
-    }
-
-    .btn-outline-danger:hover {
-        background-color: #e74a3b;
-        border-color: #e74a3b;
-    }
-
-    .btn-outline-success {
-        color: #1cc88a;
-        border-color: #1cc88a;
-    }
-
-    .btn-outline-success:hover {
-        background-color: #1cc88a;
-        border-color: #1cc88a;
-    }
-
-    .btn-outline-info {
-        color: #36b9cc;
-        border-color: #36b9cc;
-    }
-
-    .btn-outline-info:hover {
-        background-color: #36b9cc;
-        border-color: #36b9cc;
-    }
-
-    .btn-outline-secondary {
-        color: #858796;
-        border-color: #d1d3e2;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #858796;
-        border-color: #858796;
-    }
-
-    .btn-outline-secondary.active {
-        background-color: #858796;
-        border-color: #858796;
-        color: #fff;
-    }
-
-    code {
-        background-color: #f8f9fc;
-        color: #e83e8c;
-        padding: 0.2rem 0.4rem;
-        border-radius: 0.2rem;
-        font-size: 0.875rem;
-    }
-
-    .container-fluid {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-    }
-
-    .promotion-card .card-header {
-        font-weight: 700;
-    }
-
-    .promotion-card .progress {
-        height: 0.25rem;
-    }
-
-    .stats-card {
-        border-left: 0.25rem solid #4e73df;
-    }
-
-    .stats-card.success {
-        border-left-color: #1cc88a;
-    }
-
-    .stats-card.warning {
-        border-left-color: #f6c23e;
-    }
-
-    .stats-card.info {
-        border-left-color: #36b9cc;
-    }
-    </style>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -694,7 +824,25 @@
             } catch (error) {
                 console.error('Error loading promotions:', error);
                 showToast('Error loading promotions', 'error');
+                showErrorState();
             }
+        }
+
+        // Show error state in loading areas
+        function showErrorState() {
+            // Update stats cards
+            document.getElementById('totalPromotionsCount').innerHTML = '<span class="text-danger">Error</span>';
+            document.getElementById('mostUsedPromo').innerHTML = '<span class="text-danger">Error</span>';
+            document.getElementById('avgDiscount').innerHTML = '<span class="text-danger">Error</span>';
+            document.getElementById('expiringSoon').innerHTML = '<span class="text-danger">Error</span>';
+            
+            // Update active promotions
+            document.getElementById('activePromotionsContainer').innerHTML = 
+                '<div class="col-12 text-center text-danger">Error loading promotions</div>';
+            
+            // Update table
+            document.getElementById('promotionsTableBody').innerHTML = 
+                '<tr><td colspan="8" class="text-center text-danger">Error loading promotions</td></tr>';
         }
 
         // Update promotions display

@@ -11,41 +11,41 @@
         </div>
 
         <!-- Staff Stats -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card stats-card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">Total Staff</h5>
-                        <h2 class="text-primary" id="totalStaff">-</h2>
-                        <small class="text-muted">Active employees</small>
+        <div class="row">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalStaff">
+                        <div class="loading"></div>
                     </div>
+                    <div class="stats-label">Active employees</div>
+                    <i class="fas fa-users stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card success text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-success">On Duty</h5>
-                        <h2 class="text-success" id="onDutyStaff">-</h2>
-                        <small class="text-muted">Currently working</small>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card success">
+                    <div class="stats-number" id="onDutyStaff">
+                        <div class="loading"></div>
                     </div>
+                    <div class="stats-label">Currently working</div>
+                    <i class="fas fa-user-check stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card warning text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-warning">On Break</h5>
-                        <h2 class="text-warning" id="onBreakStaff">-</h2>
-                        <small class="text-muted">Break time</small>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card warning">
+                    <div class="stats-number" id="onBreakStaff">
+                        <div class="loading"></div>
                     </div>
+                    <div class="stats-label">Break time</div>
+                    <i class="fas fa-coffee stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card info text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-danger">Off Duty</h5>
-                        <h2 class="text-danger" id="offDutyStaff">-</h2>
-                        <small class="text-muted">Not scheduled</small>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card info">
+                    <div class="stats-number" id="offDutyStaff">
+                        <div class="loading"></div>
                     </div>
+                    <div class="stats-label">Not scheduled</div>
+                    <i class="fas fa-user-times stats-icon"></i>
                 </div>
             </div>
         </div>
@@ -161,12 +161,23 @@
                         </thead>
                         <tbody id="staffTableBody">
                             <!-- Staff will be loaded here -->
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    <div class="loading-container">
+                                        <div class="loading"></div>
+                                        <p class="mt-2 text-muted">Loading staff members...</p>
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Toast container for positioning -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
 
     <!-- Add Staff Modal -->
     <div class="modal fade" id="addStaffModal" tabindex="-1">
@@ -357,208 +368,280 @@
     </div>
 
     <style>
-    /* Toast container for positioning */
-    .toast-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1055;
-    }
-    
-    .card {
-        border: 1px solid #e3e6f0;
-        border-radius: 0.35rem;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    }
+        /* Stats Cards Styling - Matching Dashboard */
+        .stats-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .stats-card.success {
+            border-left: 4px solid #198754;
+        }
+        
+        .stats-card.warning {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .stats-card.info {
+            border-left: 4px solid #0dcaf0;
+        }
+        
+        .stats-card:not(.success):not(.warning):not(.info) {
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stats-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+        
+        .stats-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: #dee2e6;
+        }
 
-    .card-header {
-        background-color: #f8f9fc;
-        border-bottom: 1px solid #e3e6f0;
-        padding: 0.75rem 1.25rem;
-    }
+        /* Loading Spinner - Matching Dashboard */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0d6efd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-    .card-body {
-        padding: 1.25rem;
-    }
+        .loading-container {
+            padding: 2rem;
+        }
 
-    .table {
-        color: #5a5c69;
-    }
+        /* Card Styling - Matching Dashboard */
+        .card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
 
-    .table thead th {
-        vertical-align: bottom;
-        border-bottom: 2px solid #e3e6f0;
-        font-weight: 800;
-        color: #5a5c69;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05rem;
-    }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0.75rem 1.25rem;
+        }
 
-    .table td {
-        border-top: 1px solid #e3e6f0;
-        vertical-align: middle;
-    }
+        .card-body {
+            padding: 1.25rem;
+        }
 
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 0, 0, 0.025);
-    }
+        .table {
+            color: #5a5c69;
+        }
 
-    .btn {
-        font-weight: 400;
-        border-radius: 0.35rem;
-        font-size: 0.875rem;
-    }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 800;
+            color: #5a5c69;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
 
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8125rem;
-        border-radius: 0.2rem;
-    }
+        .table td {
+            border-top: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
 
-    .badge {
-        font-weight: 700;
-        font-size: 0.65rem;
-        border-radius: 10rem;
-        padding: 0.25em 0.6em;
-    }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.025);
+        }
 
-    .border-bottom {
-        border-bottom: 1px solid #e3e6f0 !important;
-    }
+        .btn {
+            font-weight: 400;
+            border-radius: 0.35rem;
+            font-size: 0.875rem;
+        }
 
-    .h2 {
-        font-size: 2rem;
-        font-weight: 400;
-        line-height: 1.2;
-        color: #5a5c69;
-    }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8125rem;
+            border-radius: 0.2rem;
+        }
 
-    .text-muted {
-        color: #858796 !important;
-    }
+        .badge {
+            font-weight: 700;
+            font-size: 0.65rem;
+            border-radius: 10rem;
+            padding: 0.25em 0.6em;
+        }
 
-    .modal-header {
-        border-bottom: 1px solid #e3e6f0;
-        background-color: #f8f9fc;
-    }
+        .border-bottom {
+            border-bottom: 1px solid #dee2e6 !important;
+        }
 
-    .modal-footer {
-        border-top: 1px solid #e3e6f0;
-        background-color: #f8f9fc;
-    }
+        .h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            line-height: 1.2;
+            color: #5a5c69;
+        }
 
-    .form-control {
-        border: 1px solid #d1d3e2;
-        border-radius: 0.35rem;
-        color: #6e707e;
-    }
+        .text-muted {
+            color: #858796 !important;
+        }
 
-    .form-control:focus {
-        border-color: #bac8f3;
-        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-    }
+        .modal-header {
+            border-bottom: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
 
-    .form-select {
-        border: 1px solid #d1d3e2;
-        border-radius: 0.35rem;
-        color: #6e707e;
-    }
+        .modal-footer {
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
 
-    .form-label {
-        margin-bottom: 0.5rem;
-        font-weight: 700;
-        color: #5a5c69;
-        font-size: 0.875rem;
-    }
+        .form-control {
+            border: 1px solid #d1d3e2;
+            border-radius: 0.35rem;
+            color: #6e707e;
+        }
 
-    .container-fluid {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-    }
+        .form-control:focus {
+            border-color: #bac8f3;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
 
-    .stats-card {
-        border-left: 0.25rem solid #4e73df;
-    }
+        .form-select {
+            border: 1px solid #d1d3e2;
+            border-radius: 0.35rem;
+            color: #6e707e;
+        }
 
-    .stats-card.success {
-        border-left-color: #1cc88a;
-    }
+        .form-label {
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: #5a5c69;
+            font-size: 0.875rem;
+        }
 
-    .stats-card.warning {
-        border-left-color: #f6c23e;
-    }
+        .container-fluid {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
 
-    .stats-card.info {
-        border-left-color: #36b9cc;
-    }
+        .btn-outline-secondary.active {
+            background-color: #858796;
+            border-color: #858796;
+            color: #fff;
+        }
 
-    .btn-outline-secondary.active {
-        background-color: #858796;
-        border-color: #858796;
-        color: #fff;
-    }
+        .department-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
 
-    .department-card {
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
+        .department-card:hover {
+            transform: translateY(-5px);
+        }
 
-    .department-card:hover {
-        transform: translateY(-5px);
-    }
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
 
-    .avatar-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 14px;
-    }
+        .avatar-circle-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+        }
 
-    .avatar-circle-large {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 24px;
-    }
+        .status-buttons {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 5px;
+        }
 
-    .status-buttons {
-        display: flex;
-        gap: 3px;
-        margin-bottom: 5px;
-    }
+        .status-btn {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 32px;
+        }
 
-    .status-btn {
-        padding: 4px 8px;
-        font-size: 0.75rem;
-        border-radius: 4px;
-        border: 1px solid transparent;
-        cursor: pointer;
-        transition: all 0.2s;
-        min-width: 32px;
-    }
+        .status-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.8;
+        }
 
-    .status-btn:hover {
-        transform: scale(1.05);
-        opacity: 0.8;
-    }
+        .status-btn.active {
+            border: 2px solid #000;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
 
-    .status-btn.active {
-        border: 2px solid #000;
-        box-shadow: 0 0 5px rgba(0,0,0,0.3);
-    }
+        /* Error Message Styling */
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            padding: 1rem;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 0.375rem;
+            margin: 0.5rem 0;
+        }
+
+        /* Department Cards from original */
+        .department-card .card {
+            transition: all 0.3s ease;
+        }
+
+        .department-card:hover .card {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        /* Card title styling */
+        .card-title {
+            font-weight: 600;
+            color: #5a5c69;
+        }
     </style>
 
     <!-- Bootstrap JS -->
@@ -607,7 +690,8 @@
             let toastContainer = document.querySelector('.toast-container');
             if (!toastContainer) {
                 toastContainer = document.createElement('div');
-                toastContainer.className = 'toast-container';
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '1055';
                 document.body.appendChild(toastContainer);
             }
 
@@ -697,6 +781,15 @@
             return `EMP${String(nextEmployeeId++).padStart(3, '0')}`;
         }
 
+        function showError(message) {
+            const errorHtml = `<div class="error-message">${message}</div>`;
+            document.querySelectorAll('.stats-number').forEach(el => {
+                if (el.querySelector('.loading')) {
+                    el.innerHTML = 'Error';
+                }
+            });
+        }
+
         // Load staff from Firestore
         async function loadStaff() {
             try {
@@ -726,12 +819,29 @@
             } catch (error) {
                 console.error('Error loading staff:', error);
                 showToast('Error loading staff', 'error');
+                showError('Failed to load staff data');
             }
         }
 
         // Update staff display
         function updateStaffDisplay() {
             const tbody = document.getElementById('staffTableBody');
+            
+            if (allStaff.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="fas fa-users fa-3x mb-3 text-muted"></i>
+                            <p>No staff members found</p>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                                <i class="fas fa-plus me-1"></i>Add First Staff Member
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
             tbody.innerHTML = '';
             
             allStaff.forEach(staff => {
@@ -905,10 +1015,6 @@
                     deleteStaff(staffId);
                 });
             });
-        }
-
-        function setupEventListeners() {
-            // This function is kept for any other general event listeners
         }
 
         // Update staff status

@@ -1,4 +1,8 @@
 
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
+
     <div class="container-fluid">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Customer Management</h1>
@@ -15,47 +19,107 @@
         </div>
 
         <!-- Customer Stats -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card stats-card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">Total Customers</h5>
-                        <h2 class="text-primary" id="totalCustomers">-</h2>
-                        <small class="text-muted" id="customerGrowth">Loading...</small>
+        <div class="row">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalCustomers">
+                        <div class="loading"></div>
                     </div>
+                    <div class="stats-label">Total Customers</div>
+                    <small class="text-muted" id="customerGrowth">Loading...</small>
+                    <i class="fas fa-users stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card success text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-success">Active Customers</h5>
-                        <h2 class="text-success" id="activeCustomers">-</h2>
-                        <small class="text-muted">Ordered this month</small>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card success">
+                    <div class="stats-number" id="activeCustomers">
+                        <div class="loading"></div>
                     </div>
+                    <div class="stats-label">Active Customers</div>
+                    <small class="text-muted">Ordered this month</small>
+                    <i class="fas fa-user-check stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card warning text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-warning">New Customers</h5>
-                        <h2 class="text-warning" id="newCustomers">-</h2>
-                        <small class="text-muted">This month</small>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card warning">
+                    <div class="stats-number" id="newCustomers">
+                        <div class="loading"></div>
                     </div>
+                    <div class="stats-label">New Customers</div>
+                    <small class="text-muted">This month</small>
+                    <i class="fas fa-user-plus stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card info text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-info">Avg Order Value</h5>
-                        <h2 class="text-info" id="avgOrderValue">-</h2>
-                        <small class="text-muted">Per customer</small>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card info">
+                    <div class="stats-number" id="avgOrderValue">
+                        <div class="loading"></div>
+                    </div>
+                    <div class="stats-label">Avg Order Value</div>
+                    <small class="text-muted">Per customer</small>
+                    <i class="fas fa-dollar-sign stats-icon"></i>
+                </div>
+            </div>
+        </div></div>
+
+        <!-- Customer Filters -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-filter me-2"></i>Filters
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="dateFilter" class="form-label">Registration Date</label>
+                        <input type="date" class="form-control" id="dateFilter">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="customerSearch" class="form-label">Search</label>
+                        <input type="text" class="form-control" id="customerSearch" placeholder="Search customers...">
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Customers Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-users me-2"></i>Customer List
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="customersTable">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Contact</th>
+                                <th>Location</th>
+                                <th>Orders</th>
+                                <th>Total Spent</th>
+                                <th>Last Order</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <!-- Customers will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
         <!-- Customer Filters -->
         <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-filter me-2"></i>Filters
+                </h5>
+            </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
@@ -256,177 +320,220 @@
     </div>
 
     <style>
-    .card {
-        border: 1px solid #e3e6f0;
-        border-radius: 0.35rem;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    }
+        .stats-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .stats-card.success {
+            border-left: 4px solid #198754;
+        }
+        
+        .stats-card.warning {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .stats-card.info {
+            border-left: 4px solid #0dcaf0;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stats-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+        
+        .stats-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: #dee2e6;
+        }
 
-    .card-header {
-        background-color: #f8f9fc;
-        border-bottom: 1px solid #e3e6f0;
-        padding: 0.75rem 1.25rem;
-    }
+        .card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
 
-    .card-body {
-        padding: 1.25rem;
-    }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0.75rem 1.25rem;
+        }
 
-    .table {
-        color: #5a5c69;
-    }
+        .card-body {
+            padding: 1.25rem;
+        }
 
-    .table thead th {
-        vertical-align: bottom;
-        border-bottom: 2px solid #e3e6f0;
-        font-weight: 800;
-        color: #5a5c69;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05rem;
-    }
+        .table {
+            color: #5a5c69;
+        }
 
-    .table td {
-        border-top: 1px solid #e3e6f0;
-        vertical-align: middle;
-    }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 800;
+            color: #5a5c69;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
 
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 0, 0, 0.025);
-    }
+        .table td {
+            border-top: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
 
-    .btn {
-        font-weight: 400;
-        border-radius: 0.35rem;
-        font-size: 0.875rem;
-    }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.025);
+        }
 
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8125rem;
-        border-radius: 0.2rem;
-    }
+        .btn {
+            font-weight: 400;
+            border-radius: 0.35rem;
+            font-size: 0.875rem;
+        }
 
-    .badge {
-        font-weight: 700;
-        font-size: 0.65rem;
-        border-radius: 10rem;
-        padding: 0.25em 0.6em;
-    }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8125rem;
+            border-radius: 0.2rem;
+        }
 
-    .border-bottom {
-        border-bottom: 1px solid #e3e6f0 !important;
-    }
+        .badge {
+            font-weight: 700;
+            font-size: 0.65rem;
+            border-radius: 10rem;
+            padding: 0.25em 0.6em;
+        }
 
-    .h2 {
-        font-size: 2rem;
-        font-weight: 400;
-        line-height: 1.2;
-        color: #5a5c69;
-    }
+        .border-bottom {
+            border-bottom: 1px solid #dee2e6 !important;
+        }
 
-    .text-muted {
-        color: #858796 !important;
-    }
+        .h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            line-height: 1.2;
+            color: #5a5c69;
+        }
 
-    .modal-header {
-        border-bottom: 1px solid #e3e6f0;
-        background-color: #f8f9fc;
-    }
+        .text-muted {
+            color: #858796 !important;
+        }
 
-    .modal-footer {
-        border-top: 1px solid #e3e6f0;
-        background-color: #f8f9fc;
-    }
+        .modal-header {
+            border-bottom: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
 
-    .form-control {
-        border: 1px solid #d1d3e2;
-        border-radius: 0.35rem;
-        color: #6e707e;
-    }
+        .modal-footer {
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
 
-    .form-control:focus {
-        border-color: #bac8f3;
-        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-    }
+        .form-control {
+            border: 1px solid #d1d3e2;
+            border-radius: 0.35rem;
+            color: #6e707e;
+        }
 
-    .form-select {
-        border: 1px solid #d1d3e2;
-        border-radius: 0.35rem;
-        color: #6e707e;
-    }
+        .form-control:focus {
+            border-color: #bac8f3;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
 
-    .form-label {
-        margin-bottom: 0.5rem;
-        font-weight: 700;
-        color: #5a5c69;
-        font-size: 0.875rem;
-    }
+        .form-select {
+            border: 1px solid #d1d3e2;
+            border-radius: 0.35rem;
+            color: #6e707e;
+        }
 
-    .container-fluid {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-    }
+        .form-label {
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: #5a5c69;
+            font-size: 0.875rem;
+        }
 
-    .stats-card {
-        border-left: 0.25rem solid #4e73df;
-    }
+        .container-fluid {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
 
-    .stats-card.success {
-        border-left-color: #1cc88a;
-    }
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .stats-card.warning {
-        border-left-color: #f6c23e;
-    }
+        .avatar-circle-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .stats-card.info {
-        border-left-color: #36b9cc;
-    }
+        .avatar-circle img, .avatar-circle-large img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-    .avatar-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 14px;
-        position: relative;
-        overflow: hidden;
-    }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0d6efd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-    .avatar-circle-large {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 24px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .avatar-circle img, .avatar-circle-large img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    /* Toast container styling */
-    .toast-container {
-        z-index: 9999 !important;
-    }
+        /* Toast container styling */
+        .toast-container {
+            z-index: 9999 !important;
+        }
     </style>
 
     <!-- Bootstrap JS -->

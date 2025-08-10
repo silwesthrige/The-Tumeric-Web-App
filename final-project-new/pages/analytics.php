@@ -8,7 +8,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        
         .stats-card {
             background: white;
             border-radius: 15px;
@@ -112,7 +111,11 @@
             border-radius: 8px;
         }
 
-                
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.15em;
+        }
     </style>
 </head>
 <body>
@@ -260,13 +263,13 @@
                     </div>
                     <div class="card-body text-center">
                         <div class="mb-3">
-                            <h3 class="text-primary" id="newCustomers"><i class="fas fa-spinner fa-spin"></i></h3>
+                            <h3 class="text-primary" id="newCustomers"><i class="spinner-border spinner-border-sm"></i></h3>
                             <p class="text-muted">New customers this month</p>
                         </div>
                         <div class="progress mb-3" style="height: 10px;">
                             <div class="progress-bar bg-primary" id="newCustomersProgress" style="width: 0%"></div>
                         </div>
-                        <small class="text-muted" id="acquisitionTarget"><i class="fas fa-spinner fa-spin"></i></small>
+                        <small class="text-muted" id="acquisitionTarget"><i class="spinner-border spinner-border-sm"></i></small>
                     </div>
                 </div>
             </div>
@@ -279,13 +282,13 @@
                     </div>
                     <div class="card-body text-center">
                         <div class="mb-3">
-                            <h3 class="text-success" id="retentionRate"><i class="fas fa-spinner fa-spin"></i></h3>
+                            <h3 class="text-success" id="retentionRate"><i class="spinner-border spinner-border-sm"></i></h3>
                             <p class="text-muted">Returning customers</p>
                         </div>
                         <div class="progress mb-3" style="height: 10px;">
                             <div class="progress-bar bg-success" id="retentionProgress" style="width: 0%"></div>
                         </div>
-                        <small class="text-muted" id="retentionComparison"><i class="fas fa-spinner fa-spin"></i></small>
+                        <small class="text-muted" id="retentionComparison"><i class="spinner-border spinner-border-sm"></i></small>
                     </div>
                 </div>
             </div>
@@ -298,13 +301,13 @@
                     </div>
                     <div class="card-body text-center">
                         <div class="mb-3">
-                            <h3 class="text-warning" id="avgRating"><i class="fas fa-spinner fa-spin"></i></h3>
+                            <h3 class="text-warning" id="avgRating"><i class="spinner-border spinner-border-sm"></i></h3>
                             <p class="text-muted">Average rating</p>
                         </div>
                         <div class="d-flex justify-content-center mb-3" id="starRating">
                             <!-- Stars will be populated by JavaScript -->
                         </div>
-                        <small class="text-muted" id="totalReviews"><i class="fas fa-spinner fa-spin"></i></small>
+                        <small class="text-muted" id="totalReviews"><i class="spinner-border spinner-border-sm"></i></small>
                     </div>
                 </div>
             </div>
@@ -857,20 +860,6 @@
                 starContainer.appendChild(star);
             }
         }
-
-        // Top bar functions - now accessible globally
-        window.markAllAsRead = function() {
-            document.getElementById('notificationCount').style.display = 'none';
-            console.log('All notifications marked as read');
-        };
-
-        window.logout = function() {
-            if (confirm('Are you sure you want to logout?')) {
-                console.log('User logged out');
-                // Add actual logout logic here
-                alert('Logout functionality would be implemented here');
-            }
-        };
 
         // Main dashboard initialization - runs only once on page load
         async function initializeDashboard() {

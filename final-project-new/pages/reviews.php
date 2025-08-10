@@ -1,7 +1,75 @@
 
     <style>
+        .stats-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .stats-card.success {
+            border-left: 4px solid #198754;
+        }
+        
+        .stats-card.warning {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .stats-card.info {
+            border-left: 4px solid #0dcaf0;
+        }
+        
+        .stats-card:not(.success):not(.warning):not(.info) {
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stats-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+        
+        .stats-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: #dee2e6;
+        }
+        
+        .card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0.75rem 1.25rem;
+        }
+
         .review-item {
             transition: all 0.3s ease;
+            border-left: 0;
+            border-right: 0;
+            border-top: 0;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0.75rem 0;
+        }
+
+        .review-item:last-child {
+            border-bottom: 0;
         }
 
         .review-item:hover {
@@ -14,10 +82,6 @@
 
         .rating i {
             font-size: 14px;
-        }
-
-        .admin-response {
-            border-left: 4px solid #007bff;
         }
 
         .avatar-circle {
@@ -38,10 +102,18 @@
         }
 
         .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0d6efd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .spinner-border {
@@ -49,24 +121,11 @@
             height: 3rem;
         }
 
-        .trend-chart {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-radius: 10px;
+        .loading-container {
             display: flex;
-            align-items: center;
             justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .trend-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            align-items: center;
+            height: 200px;
         }
 
         .no-reviews {
@@ -76,41 +135,76 @@
         }
 
         .error-message {
+            color: #dc3545;
+            text-align: center;
+            padding: 1rem;
             background-color: #f8d7da;
             border: 1px solid #f5c6cb;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
+            border-radius: 0.375rem;
+            margin: 0.5rem 0;
         }
 
         .success-message {
+            color: #0f5132;
+            text-align: center;
+            padding: 1rem;
             background-color: #d1edff;
             border: 1px solid #bee5eb;
-            color: #0c5460;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
+            border-radius: 0.375rem;
+            margin: 0.5rem 0;
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid py-4">
+    <div class="container-fluid">
         <!-- Header -->
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Reviews & Ratings</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
-                <button type="button" class="btn btn-sm btn-primary" onclick="refreshData()">
-                    <i class="fas fa-sync-alt me-1"></i>Refresh
-                </button>
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Review Stats -->
         <div class="row mb-4" id="statsRow">
-            <div class="loading">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card warning">
+                    <div class="stats-number" id="averageRatingCard">
+                        <div class="loading"></div>
+                    </div>
+                    <div class="stats-label">Average Rating</div>
+                    <i class="fas fa-star stats-icon"></i>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalReviewsCard">
+                        <div class="loading"></div>
+                    </div>
+                    <div class="stats-label">Total Reviews</div>
+                    <i class="fas fa-comments stats-icon"></i>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card success">
+                    <div class="stats-number" id="positiveReviewsCard">
+                        <div class="loading"></div>
+                    </div>
+                    <div class="stats-label">Positive Reviews</div>
+                    <i class="fas fa-thumbs-up stats-icon"></i>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card info">
+                    <div class="stats-number" id="anonymousReviewsCard">
+                        <div class="loading"></div>
+                    </div>
+                    <div class="stats-label">Anonymous Reviews</div>
+                    <i class="fas fa-user-secret stats-icon"></i>
                 </div>
             </div>
         </div>
@@ -125,7 +219,11 @@
                         </h5>
                     </div>
                     <div class="card-body" id="ratingDistribution">
-                        <!-- Distribution will be populated here -->
+                        <div class="loading-container">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -133,6 +231,11 @@
 
         <!-- Review Filters -->
         <div class="card mb-4" id="filtersCard" style="display: none;">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-filter me-2"></i>Filter Reviews
+                </h5>
+            </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
@@ -179,7 +282,11 @@
                 </h5>
             </div>
             <div class="card-body" id="reviewsList">
-                <!-- Reviews will be populated here -->
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading reviews...</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -318,50 +425,36 @@
             const oneWeekAgo = new Date();
             oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
             const recentReviews = allFeedbacks.filter(f => f.createdAt >= oneWeekAgo).length;
+            const anonymousReviews = allFeedbacks.filter(f => f.isAnonymous).length;
 
-            const statsHTML = `
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title text-warning">Average Rating</h5>
-                            <h2 class="text-warning">${averageRating}</h2>
-                            <div class="mb-2">
-                                ${generateStarRating(parseFloat(averageRating))}
-                            </div>
-                            <small class="text-muted">Based on ${totalReviews} reviews</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title text-primary">Total Reviews</h5>
-                            <h2 class="text-primary">${totalReviews}</h2>
-                            <small class="text-muted">+${recentReviews} this week</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title text-success">Positive Reviews</h5>
-                            <h2 class="text-success">${positivePercentage}%</h2>
-                            <small class="text-muted">4-5 star ratings</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h5 class="card-title text-info">Anonymous Reviews</h5>
-                            <h2 class="text-info">${allFeedbacks.filter(f => f.isAnonymous).length}</h2>
-                            <small class="text-muted">Anonymous feedback</small>
-                        </div>
-                    </div>
+            // Update stat cards with dashboard-style design
+            document.getElementById('averageRatingCard').innerHTML = `
+                ${averageRating}
+                <div style="font-size: 0.8rem; margin-top: 0.25rem;">
+                    ${generateStarRating(parseFloat(averageRating), 12)}
                 </div>
             `;
-
-            document.getElementById('statsRow').innerHTML = statsHTML;
+            
+            document.getElementById('totalReviewsCard').innerHTML = `
+                ${totalReviews.toLocaleString()}
+                <div style="font-size: 0.8rem; margin-top: 0.25rem; color: #6c757d;">
+                    +${recentReviews} this week
+                </div>
+            `;
+            
+            document.getElementById('positiveReviewsCard').innerHTML = `
+                ${positivePercentage}%
+                <div style="font-size: 0.8rem; margin-top: 0.25rem; color: #6c757d;">
+                    4-5 star ratings
+                </div>
+            `;
+            
+            document.getElementById('anonymousReviewsCard').innerHTML = `
+                ${anonymousReviews}
+                <div style="font-size: 0.8rem; margin-top: 0.25rem; color: #6c757d;">
+                    Anonymous feedback
+                </div>
+            `;
         }
 
         // Generate star rating HTML
@@ -435,7 +528,7 @@
                 return;
             }
 
-            let reviewsHTML = '';
+            let reviewsHTML = '<div class="list-group list-group-flush">';
             
             filteredFeedbacks.forEach(feedback => {
                 const user = users[feedback.userId] || { name: 'Unknown User', email: 'No email' };
@@ -448,7 +541,7 @@
                     : 'General';
 
                 reviewsHTML += `
-                    <div class="review-item border-bottom pb-4 mb-4">
+                    <div class="review-item">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div class="d-flex align-items-center">
                                 <div class="avatar-circle me-3">${userInitials}</div>
@@ -476,6 +569,7 @@
                 `;
             });
 
+            reviewsHTML += '</div>';
             reviewsList.innerHTML = reviewsHTML;
         }
 
@@ -528,7 +622,7 @@
                             break;
                         case 'month':
                             const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-                            if (feedbackDate < oneMonthAgo) return false;
+                            if (feedbackDate < oneWeekAgo) return false;
                             break;
                     }
                 }
@@ -616,36 +710,64 @@
 
         // Refresh data
         window.refreshData = async function() {
-            document.getElementById('statsRow').innerHTML = `
-                <div class="loading">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+            try {
+                // Show loading state on all stat cards
+                document.getElementById('averageRatingCard').innerHTML = '<div class="loading"></div>';
+                document.getElementById('totalReviewsCard').innerHTML = '<div class="loading"></div>';
+                document.getElementById('positiveReviewsCard').innerHTML = '<div class="loading"></div>';
+                document.getElementById('anonymousReviewsCard').innerHTML = '<div class="loading"></div>';
+                
+                // Show loading in charts and reviews
+                document.getElementById('ratingDistribution').innerHTML = `
+                    <div class="loading-container">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
-                </div>
-            `;
-            
-            await initDashboard();
-            showSuccess('Data refreshed successfully!');
+                `;
+                
+                document.getElementById('reviewsList').innerHTML = `
+                    <div class="loading-container">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading reviews...</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Hide cards during refresh
+                document.getElementById('filtersCard').style.display = 'none';
+                document.getElementById('reviewsCard').style.display = 'none';
+                document.getElementById('chartsRow').style.display = 'none';
+                
+                // Reload data
+                await Promise.all([loadUsers(), loadFeedbacks()]);
+                renderStats();
+                renderRatingDistribution();
+                renderReviews();
+                
+                // Show content
+                document.getElementById('filtersCard').style.display = 'block';
+                document.getElementById('reviewsCard').style.display = 'block';
+                document.getElementById('chartsRow').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                // Reset to error state
+                document.getElementById('averageRatingCard').innerHTML = 'Error';
+                document.getElementById('totalReviewsCard').innerHTML = 'Error';
+                document.getElementById('positiveReviewsCard').innerHTML = 'Error';
+                document.getElementById('anonymousReviewsCard').innerHTML = 'Error';
+            }
         };
 
         // Show error message
         function showError(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${message}`;
-            document.body.insertBefore(errorDiv, document.body.firstChild);
-            
-            setTimeout(() => errorDiv.remove(), 5000);
+            console.error('Error:', message);
         }
 
-        // Show success message
+        // Show success message  
         function showSuccess(message) {
-            const successDiv = document.createElement('div');
-            successDiv.className = 'success-message';
-            successDiv.innerHTML = `<i class="fas fa-check-circle me-2"></i>${message}`;
-            document.body.insertBefore(successDiv, document.body.firstChild);
-            
-            setTimeout(() => successDiv.remove(), 3000);
+            console.log('Success:', message);
         }
 
         // Initialize dashboard when page loads

@@ -1,4 +1,187 @@
 
+    <style>
+        .stats-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .stats-card.success {
+            border-left: 4px solid #198754;
+        }
+        
+        .stats-card.warning {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .stats-card.info {
+            border-left: 4px solid #0dcaf0;
+        }
+        
+        .stats-card:not(.success):not(.warning):not(.info) {
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stats-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+        
+        .stats-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: #dee2e6;
+        }
+        
+        .card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0.75rem 1.25rem;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0d6efd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            padding: 1rem;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 0.375rem;
+            margin: 0.5rem 0;
+        }
+
+        .order-item {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background-color: #f8f9fa;
+        }
+
+        .table {
+            color: #495057;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            background-color: #f8f9fa;
+        }
+
+        .table td {
+            border-top: 1px solid #dee2e6;
+            vertical-align: middle;
+            padding: 0.75rem;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.025);
+        }
+
+        .btn-group .btn {
+            border-radius: 0.375rem;
+        }
+
+        .btn-group .btn:not(:first-child) {
+            margin-left: 0.25rem;
+        }
+
+        .badge {
+            font-weight: 600;
+            font-size: 0.75rem;
+            border-radius: 0.5rem;
+            padding: 0.35em 0.65em;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+
+        .form-control, .form-select {
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            color: #495057;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .form-label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.875rem;
+        }
+
+        .container-fluid {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        .btn-outline-secondary.active {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: #fff;
+        }
+
+        .h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            line-height: 1.2;
+            color: #495057;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+    </style>
+</head>
 <body>
     <div class="container-fluid">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -12,40 +195,32 @@
 
         <!-- Order Stats -->
         <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card stats-card warning text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-warning">Pending</h5>
-                        <h2 class="text-warning" id="pendingCount">-</h2>
-                        <small class="text-muted">Awaiting confirmation</small>
-                    </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card warning">
+                    <div class="stats-number" id="pendingCount">-</div>
+                    <div class="stats-label">Pending Orders</div>
+                    <i class="fas fa-clock stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">Preparing</h5>
-                        <h2 class="text-primary" id="preparingCount">-</h2>
-                        <small class="text-muted">In kitchen</small>
-                    </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="preparingCount">-</div>
+                    <div class="stats-label">Preparing Orders</div>
+                    <i class="fas fa-utensils stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card info text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-info">Out for Delivery</h5>
-                        <h2 class="text-info" id="deliveryCount">-</h2>
-                        <small class="text-muted">On the way</small>
-                    </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card info">
+                    <div class="stats-number" id="deliveryCount">-</div>
+                    <div class="stats-label">Out for Delivery</div>
+                    <i class="fas fa-truck stats-icon"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stats-card success text-center">
-                    <div class="card-body">
-                        <h5 class="card-title text-success">Delivered</h5>
-                        <h2 class="text-success" id="deliveredCount">-</h2>
-                        <small class="text-muted">Completed today</small>
-                    </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card success">
+                    <div class="stats-number" id="deliveredCount">-</div>
+                    <div class="stats-label">Delivered Today</div>
+                    <i class="fas fa-check-circle stats-icon"></i>
                 </div>
             </div>
         </div>
@@ -234,152 +409,8 @@
         </div>
     </div>
 
-    <style>
-    .card {
-        border: 1px solid #e3e6f0;
-        border-radius: 0.35rem;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    }
-
-    .card-header {
-        background-color: #f8f9fc;
-        border-bottom: 1px solid #e3e6f0;
-        padding: 0.75rem 1.25rem;
-    }
-
-    .card-body {
-        padding: 1.25rem;
-    }
-
-    .table {
-        color: #5a5c69;
-    }
-
-    .table thead th {
-        vertical-align: bottom;
-        border-bottom: 2px solid #e3e6f0;
-        font-weight: 800;
-        color: #5a5c69;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05rem;
-    }
-
-    .table td {
-        border-top: 1px solid #e3e6f0;
-        vertical-align: middle;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 0, 0, 0.025);
-    }
-
-    .btn {
-        font-weight: 400;
-        border-radius: 0.35rem;
-        font-size: 0.875rem;
-    }
-
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8125rem;
-        border-radius: 0.2rem;
-    }
-
-    .badge {
-        font-weight: 700;
-        font-size: 0.65rem;
-        border-radius: 10rem;
-        padding: 0.25em 0.6em;
-    }
-
-    .border-bottom {
-        border-bottom: 1px solid #e3e6f0 !important;
-    }
-
-    .h2 {
-        font-size: 2rem;
-        font-weight: 400;
-        line-height: 1.2;
-        color: #5a5c69;
-    }
-
-    .text-muted {
-        color: #858796 !important;
-    }
-
-    .modal-header {
-        border-bottom: 1px solid #e3e6f0;
-        background-color: #f8f9fc;
-    }
-
-    .modal-footer {
-        border-top: 1px solid #e3e6f0;
-        background-color: #f8f9fc;
-    }
-
-    .form-control {
-        border: 1px solid #d1d3e2;
-        border-radius: 0.35rem;
-        color: #6e707e;
-    }
-
-    .form-control:focus {
-        border-color: #bac8f3;
-        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-    }
-
-    .form-select {
-        border: 1px solid #d1d3e2;
-        border-radius: 0.35rem;
-        color: #6e707e;
-    }
-
-    .form-label {
-        margin-bottom: 0.5rem;
-        font-weight: 700;
-        color: #5a5c69;
-        font-size: 0.875rem;
-    }
-
-    .container-fluid {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-    }
-
-    .stats-card {
-        border-left: 0.25rem solid #4e73df;
-    }
-
-    .stats-card.success {
-        border-left-color: #1cc88a;
-    }
-
-    .stats-card.warning {
-        border-left-color: #f6c23e;
-    }
-
-    .stats-card.info {
-        border-left-color: #36b9cc;
-    }
-
-    .btn-outline-secondary.active {
-        background-color: #858796;
-        border-color: #858796;
-        color: #fff;
-    }
-
-    .order-item {
-        border: 1px solid #e3e6f0;
-        border-radius: 0.35rem;
-        padding: 0.75rem;
-        margin-bottom: 0.5rem;
-        background-color: #f8f9fc;
-    }
-    </style>
-
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Firebase Configuration -->
     <script type="module">
