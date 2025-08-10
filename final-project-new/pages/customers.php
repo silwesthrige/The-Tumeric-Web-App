@@ -22,19 +22,15 @@
         <div class="row">
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card">
-                    <div class="stats-number" id="totalCustomers">
-                        <div class="loading"></div>
-                    </div>
+                    <div class="stats-number" id="totalCustomers">0</div>
                     <div class="stats-label">Total Customers</div>
-                    <small class="text-muted" id="customerGrowth">Loading...</small>
+                    <small class="text-muted" id="customerGrowth">+0% this month</small>
                     <i class="fas fa-users stats-icon"></i>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card success">
-                    <div class="stats-number" id="activeCustomers">
-                        <div class="loading"></div>
-                    </div>
+                    <div class="stats-number" id="activeCustomers">0</div>
                     <div class="stats-label">Active Customers</div>
                     <small class="text-muted">Ordered this month</small>
                     <i class="fas fa-user-check stats-icon"></i>
@@ -42,9 +38,7 @@
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card warning">
-                    <div class="stats-number" id="newCustomers">
-                        <div class="loading"></div>
-                    </div>
+                    <div class="stats-number" id="newCustomers">0</div>
                     <div class="stats-label">New Customers</div>
                     <small class="text-muted">This month</small>
                     <i class="fas fa-user-plus stats-icon"></i>
@@ -52,15 +46,13 @@
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card info">
-                    <div class="stats-number" id="avgOrderValue">
-                        <div class="loading"></div>
-                    </div>
+                    <div class="stats-number" id="avgOrderValue">$0.00</div>
                     <div class="stats-label">Avg Order Value</div>
                     <small class="text-muted">Per customer</small>
                     <i class="fas fa-dollar-sign stats-icon"></i>
                 </div>
             </div>
-        </div></div>
+        </div>
 
         <!-- Customer Filters -->
         <div class="card mb-4">
@@ -105,58 +97,9 @@
                             </tr>
                         </thead>
                         <tbody id="customersTableBody">
-                            <!-- Customers will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-        <!-- Customer Filters -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-filter me-2"></i>Filters
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label for="dateFilter" class="form-label">Registration Date</label>
-                        <input type="date" class="form-control" id="dateFilter">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="customerSearch" class="form-label">Search</label>
-                        <input type="text" class="form-control" id="customerSearch" placeholder="Search customers...">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Customers Table -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-users me-2"></i>Customer List
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover" id="customersTable">
-                        <thead>
                             <tr>
-                                <th>Customer</th>
-                                <th>Contact</th>
-                                <th>Location</th>
-                                <th>Orders</th>
-                                <th>Total Spent</th>
-                                <th>Last Order</th>
-                                <th>Actions</th>
+                                <td colspan="7" class="text-center">Loading customers...</td>
                             </tr>
-                        </thead>
-                        <tbody id="customersTableBody">
-                            <!-- Customers will be loaded here -->
                         </tbody>
                     </table>
                 </div>
@@ -530,7 +473,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Toast container styling */
         .toast-container {
             z-index: 9999 !important;
         }
@@ -539,10 +481,9 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Firebase Configuration -->
     <script type="module">
         // Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { 
             getFirestore, 
             collection, 
@@ -552,18 +493,14 @@
             updateDoc, 
             deleteDoc,
             query,
-            where,
-            orderBy,
-            onSnapshot,
-            getDoc
-        } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+            orderBy
+        } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
         import { 
             getStorage, 
             ref, 
             uploadBytes, 
-            getDownloadURL,
-            deleteObject
-        } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
+            getDownloadURL
+        } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -584,7 +521,7 @@
         // Global variables
         let allCustomers = [];
         let allOrders = [];
-        let nextUserId = 1;
+        let filteredCustomers = [];
 
         // Utility functions
         function showToast(message, type = 'success') {
@@ -615,27 +552,33 @@
             });
         }
 
-        function formatDate(date) {
-            const now = new Date();
-            const customerDate = new Date(date);
-            const isToday = customerDate.toDateString() === now.toDateString();
-            
-            if (isToday) {
-                return customerDate.toLocaleTimeString('en-US', { 
-                    hour: 'numeric', 
-                    minute: '2-digit',
-                    hour12: true 
-                });
-            } else {
-                return customerDate.toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric',
-                    year: 'numeric'
-                });
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const isToday = date.toDateString() === now.toDateString();
+                
+                if (isToday) {
+                    return date.toLocaleTimeString('en-US', { 
+                        hour: 'numeric', 
+                        minute: '2-digit',
+                        hour12: true 
+                    });
+                } else {
+                    return date.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+                }
+            } catch (error) {
+                return 'Invalid Date';
             }
         }
 
         function formatCurrency(amount) {
+            if (typeof amount !== 'number') amount = 0;
             return new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: 'USD'
@@ -643,62 +586,38 @@
         }
 
         function getInitials(name) {
+            if (!name) return 'UN';
             return name.split(' ').map(word => word.charAt(0)).join('').toUpperCase().slice(0, 2);
-        }
-
-        function getCustomerType(customer) {
-            const customerOrders = allOrders.filter(order => order.userId === customer.id);
-            const orderCount = customerOrders.length;
-            const totalSpent = customerOrders.reduce((sum, order) => sum + (order.total || 0), 0);
-            
-            if (orderCount >= 20 || totalSpent >= 10000) {
-                return { type: 'vip', badge: 'bg-success', label: 'VIP' };
-            } else if (orderCount >= 5) {
-                return { type: 'regular', badge: 'bg-primary', label: 'Regular' };
-            } else {
-                return { type: 'new', badge: 'bg-warning', label: 'New' };
-            }
-        }
-
-        function getNextUserId() {
-            return nextUserId++;
-        }
-
-        // Upload image to Firebase Storage
-        async function uploadImage(file, path) {
-            const storageRef = ref(storage, path);
-            const snapshot = await uploadBytes(storageRef, file);
-            return await getDownloadURL(snapshot.ref);
         }
 
         // Load data from Firestore
         async function loadCustomers() {
             try {
+                console.log('Loading customers...');
                 const usersRef = collection(db, 'users');
                 const q = query(usersRef, orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
                 
                 allCustomers = [];
-                let maxUserId = 0;
                 querySnapshot.forEach((doc) => {
-                    const customerData = { id: doc.id, ...doc.data() };
-                    allCustomers.push(customerData);
-                    if (customerData.userId > maxUserId) {
-                        maxUserId = customerData.userId;
-                    }
+                    allCustomers.push({ id: doc.id, ...doc.data() });
                 });
                 
-                nextUserId = maxUserId + 1;
-                updateCustomersDisplay();
+                console.log(`Loaded ${allCustomers.length} customers`);
+                filteredCustomers = [...allCustomers];
+                updateCustomersTable();
                 updateStats();
             } catch (error) {
                 console.error('Error loading customers:', error);
-                showToast('Error loading customers', 'error');
+                showToast('Error loading customers: ' + error.message, 'error');
+                document.getElementById('customersTableBody').innerHTML = 
+                    '<tr><td colspan="7" class="text-center text-danger">Error loading customers</td></tr>';
             }
         }
 
         async function loadOrders() {
             try {
+                console.log('Loading orders...');
                 const ordersRef = collection(db, 'orders');
                 const querySnapshot = await getDocs(ordersRef);
                 
@@ -706,122 +625,101 @@
                 querySnapshot.forEach((doc) => {
                     allOrders.push({ id: doc.id, ...doc.data() });
                 });
+                
+                console.log(`Loaded ${allOrders.length} orders`);
+                updateStats();
+                updateCustomersTable();
             } catch (error) {
                 console.error('Error loading orders:', error);
+                showToast('Error loading orders: ' + error.message, 'error');
             }
         }
 
-        // Update displays
-        function updateCustomersDisplay() {
-            updateCustomersTable();
-        }
-
+        // Update table
         function updateCustomersTable() {
             const tbody = document.getElementById('customersTableBody');
+            
+            if (!filteredCustomers || filteredCustomers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No customers found</td></tr>';
+                return;
+            }
+
             tbody.innerHTML = '';
             
-            allCustomers.forEach(customer => {
-                // Get customer orders from the orders array in customer document
-                let orderCount = 0;
-                let totalSpent = 0;
-                let lastOrderDate = null;
+            filteredCustomers.forEach(customer => {
+                const customerOrders = allOrders.filter(order => 
+                    order.userId === customer.id || order.userId === customer.userId
+                );
                 
-                // If customer has orders array and it's populated
-                if (customer.orders && Array.isArray(customer.orders) && customer.orders.length > 0) {
-                    orderCount = customer.orders.length;
-                    
-                    // Calculate total spent and find last order from the orders that match this customer
-                    const customerOrders = allOrders.filter(order => 
-                        customer.orders.includes(order.orderID) || 
-                        customer.orders.includes(order.id) ||
-                        order.userId === customer.id ||
-                        order.userId === customer.userId
-                    );
-                    
-                    if (customerOrders.length > 0) {
-                        totalSpent = customerOrders.reduce((sum, order) => sum + (order.total || 0), 0);
-                        const sortedOrders = customerOrders.sort((a, b) => new Date(b.createdTime || b.createdAt) - new Date(a.createdTime || a.createdAt));
-                        lastOrderDate = sortedOrders[0]?.createdTime || sortedOrders[0]?.createdAt;
-                    }
-                } else {
-                    // Fallback: try to find orders by matching userId
-                    const customerOrders = allOrders.filter(order => 
-                        order.userId === customer.id || 
-                        order.userId === customer.userId
-                    );
-                    
-                    if (customerOrders.length > 0) {
-                        orderCount = customerOrders.length;
-                        totalSpent = customerOrders.reduce((sum, order) => sum + (order.total || 0), 0);
-                        const sortedOrders = customerOrders.sort((a, b) => new Date(b.createdTime || b.createdAt) - new Date(a.createdTime || a.createdAt));
-                        lastOrderDate = sortedOrders[0]?.createdTime || sortedOrders[0]?.createdAt;
-                    }
-                }
+                const orderCount = customerOrders.length;
+                const totalSpent = customerOrders.reduce((sum, order) => sum + (parseFloat(order.total) || 0), 0);
+                const lastOrder = customerOrders.sort((a, b) => 
+                    new Date(b.createdTime || b.createdAt || 0) - new Date(a.createdTime || a.createdAt || 0)
+                )[0];
                 
-                const locationDisplay = customer.location || (customer.address ? customer.address.split(',')[0] : 'Unknown');
+                const locationDisplay = customer.address ? customer.address.split(',')[0] : 'Unknown';
                 
-                tbody.innerHTML += `
-                    <tr data-customer-type="customer" data-location="${locationDisplay.toLowerCase()}">
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-circle me-3">
-                                    ${customer.profileImageUrl ? 
-                                        `<img src="${customer.profileImageUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` :
-                                        getInitials(customer.name || 'Unknown')
-                                    }
-                                </div>
-                                <div>
-                                    <strong>${customer.name || 'Unknown'}</strong><br>
-                                    <small class="text-muted">Customer since ${formatDate(customer.createdAt)}</small>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div>
-                                <i class="fas fa-phone me-1"></i>${customer.phone || 'N/A'}<br>
-                                <i class="fas fa-envelope me-1"></i>${customer.email || 'N/A'}
-                            </div>
-                        </td>
-                        <td>
-                            <div>
-                                ${locationDisplay}<br>
-                                <small class="text-muted">${customer.address || 'No address'}</small>
-                            </div>
-                        </td>
-                        <td>
-                            <div>
-                                <strong>${orderCount}</strong><br>
-                                <small class="text-muted">orders</small>
-                            </div>
-                        </td>
-                        <td><strong>${formatCurrency(totalSpent)}</strong></td>
-                        <td>
-                            <div>
-                                ${lastOrderDate ? 
-                                    `<strong>${formatDate(lastOrderDate)}</strong><br>
-                                     <small class="text-muted">${new Date(lastOrderDate).toDateString() === new Date().toDateString() ? 'Today' : formatDate(lastOrderDate)}</small>` :
-                                    '<small class="text-muted">No orders</small>'
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle me-3">
+                                ${customer.profileImageUrl ? 
+                                    `<img src="${customer.profileImageUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` :
+                                    getInitials(customer.name)
                                 }
                             </div>
-                        </td>
-                        <td>
-                            <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-primary" onclick="viewCustomerDetails('${customer.id}')" title="View Details">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-outline-info" onclick="openSendEmail('${customer.email}', '${customer.name}')" title="Send Email">
-                                    <i class="fas fa-envelope"></i>
-                                </button>
-                                <button class="btn btn-outline-warning" onclick="editCustomer('${customer.id}')" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-outline-danger" onclick="deleteCustomer('${customer.id}')" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                            <div>
+                                <strong>${customer.name || 'Unknown'}</strong><br>
+                                <small class="text-muted">Customer since ${formatDate(customer.createdAt)}</small>
                             </div>
-                        </td>
-                    </tr>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <i class="fas fa-phone me-1"></i>${customer.phone || 'N/A'}<br>
+                            <i class="fas fa-envelope me-1"></i>${customer.email || 'N/A'}
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            ${locationDisplay}<br>
+                            <small class="text-muted">${customer.address || 'No address'}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <strong>${orderCount}</strong><br>
+                            <small class="text-muted">orders</small>
+                        </div>
+                    </td>
+                    <td><strong>${formatCurrency(totalSpent)}</strong></td>
+                    <td>
+                        <div>
+                            ${lastOrder ? 
+                                `<strong>${formatDate(lastOrder.createdTime || lastOrder.createdAt)}</strong>` :
+                                '<small class="text-muted">No orders</small>'
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary" onclick="viewCustomerDetails('${customer.id}')" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-info" onclick="openSendEmail('${customer.email}', '${customer.name}')" title="Send Email">
+                                <i class="fas fa-envelope"></i>
+                            </button>
+                            <button class="btn btn-outline-warning" onclick="editCustomer('${customer.id}')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="deleteCustomer('${customer.id}')" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
                 `;
+                tbody.appendChild(row);
             });
         }
 
@@ -830,35 +728,43 @@
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
             
-            // New customers this month
             const newCustomers = allCustomers.filter(customer => {
+                if (!customer.createdAt) return false;
                 const createdDate = new Date(customer.createdAt);
                 return createdDate.getMonth() === currentMonth && createdDate.getFullYear() === currentYear;
             }).length;
             
-            // Active customers (ordered this month)
             const activeCustomers = allCustomers.filter(customer => {
-                const customerOrders = allOrders.filter(order => {
-                    const orderDate = new Date(order.createdTime);
-                    return order.userId === customer.id && 
+                return allOrders.some(order => {
+                    if (!order.createdTime && !order.createdAt) return false;
+                    const orderDate = new Date(order.createdTime || order.createdAt);
+                    return (order.userId === customer.id || order.userId === customer.userId) && 
                            orderDate.getMonth() === currentMonth && 
                            orderDate.getFullYear() === currentYear;
                 });
-                return customerOrders.length > 0;
             }).length;
             
-            // Calculate average order value
-            const totalRevenue = allOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+            const totalRevenue = allOrders.reduce((sum, order) => sum + (parseFloat(order.total) || 0), 0);
             const avgOrderValue = allOrders.length > 0 ? totalRevenue / allOrders.length : 0;
-            
-            // Calculate growth rate (dummy calculation for demo)
-            const growthRate = newCustomers > 0 ? Math.round((newCustomers / totalCustomers) * 100) : 0;
+            const growthRate = totalCustomers > 0 ? Math.round((newCustomers / totalCustomers) * 100) : 0;
             
             document.getElementById('totalCustomers').textContent = totalCustomers;
             document.getElementById('activeCustomers').textContent = activeCustomers;
             document.getElementById('newCustomers').textContent = newCustomers;
             document.getElementById('avgOrderValue').textContent = formatCurrency(avgOrderValue);
             document.getElementById('customerGrowth').textContent = `+${growthRate}% this month`;
+        }
+
+        // Upload image to Firebase Storage
+        async function uploadImage(file, path) {
+            try {
+                const storageRef = ref(storage, path);
+                const snapshot = await uploadBytes(storageRef, file);
+                return await getDownloadURL(snapshot.ref);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                throw error;
+            }
         }
 
         // Customer operations
@@ -873,7 +779,6 @@
                 
                 const docRef = await addDoc(collection(db, 'users'), {
                     ...customerData,
-                    userId: getNextUserId(),
                     profileImageUrl,
                     orders: [],
                     cart: [],
@@ -882,11 +787,11 @@
                 });
                 
                 showToast('Customer added successfully!');
-                loadCustomers();
+                await loadCustomers();
                 return docRef.id;
             } catch (error) {
                 console.error('Error creating customer:', error);
-                showToast('Error creating customer', 'error');
+                showToast('Error creating customer: ' + error.message, 'error');
                 throw error;
             }
         }
@@ -904,15 +809,15 @@
                 await updateDoc(customerRef, updateData);
                 
                 showToast('Customer updated successfully!');
-                loadCustomers();
+                await loadCustomers();
             } catch (error) {
                 console.error('Error updating customer:', error);
-                showToast('Error updating customer', 'error');
+                showToast('Error updating customer: ' + error.message, 'error');
                 throw error;
             }
         }
 
-        // Global functions for window access
+        // Global functions
         window.deleteCustomer = async function(id) {
             if (!confirm('Are you sure you want to delete this customer? This action cannot be undone.')) {
                 return;
@@ -921,26 +826,26 @@
             try {
                 await deleteDoc(doc(db, 'users', id));
                 showToast('Customer deleted successfully!');
-                loadCustomers();
+                await loadCustomers();
             } catch (error) {
                 console.error('Error deleting customer:', error);
-                showToast('Error deleting customer', 'error');
+                showToast('Error deleting customer: ' + error.message, 'error');
             }
         };
 
         window.editCustomer = function(id) {
             const customer = allCustomers.find(c => c.id === id);
-            if (!customer) return;
+            if (!customer) {
+                showToast('Customer not found', 'error');
+                return;
+            }
             
-            // Populate edit form
             document.getElementById('editCustomerId').value = id;
             document.getElementById('editCustomerName').value = customer.name || '';
             document.getElementById('editCustomerEmail').value = customer.email || '';
             document.getElementById('editCustomerPhone').value = customer.phone || '';
             document.getElementById('editCustomerAddress').value = customer.address || '';
             
-            // Update avatar
-            const avatar = document.getElementById('editCustomerAvatar');
             const avatarImg = document.getElementById('editCustomerImage');
             const avatarInitials = document.getElementById('editCustomerInitials');
             
@@ -950,7 +855,7 @@
                 avatarInitials.style.display = 'none';
             } else {
                 avatarImg.classList.add('d-none');
-                avatarInitials.textContent = getInitials(customer.name || 'Unknown');
+                avatarInitials.textContent = getInitials(customer.name);
                 avatarInitials.style.display = 'flex';
             }
             
@@ -959,75 +864,40 @@
 
         window.viewCustomerDetails = function(id) {
             const customer = allCustomers.find(c => c.id === id);
-            if (!customer) return;
-            
-            // Get customer orders using multiple matching strategies
-            let customerOrders = [];
-            
-            // Strategy 1: Match using orders array in customer document
-            if (customer.orders && Array.isArray(customer.orders) && customer.orders.length > 0) {
-                customerOrders = allOrders.filter(order => 
-                    customer.orders.includes(order.orderID) || 
-                    customer.orders.includes(order.id)
-                );
+            if (!customer) {
+                showToast('Customer not found', 'error');
+                return;
             }
             
-            // Strategy 2: Fallback to userId matching
-            if (customerOrders.length === 0) {
-                customerOrders = allOrders.filter(order => 
-                    order.userId === customer.id || 
-                    order.userId === customer.userId
-                );
-            }
+            const customerOrders = allOrders.filter(order => 
+                order.userId === customer.id || order.userId === customer.userId
+            );
             
             const orderCount = customerOrders.length;
-            const totalSpent = customerOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+            const totalSpent = customerOrders.reduce((sum, order) => sum + (parseFloat(order.total) || 0), 0);
             const avgOrderValue = orderCount > 0 ? totalSpent / orderCount : 0;
             
-            // Sort orders by date (newest first)
             const sortedOrders = customerOrders.sort((a, b) => 
-                new Date(b.createdTime || b.createdAt) - new Date(a.createdTime || a.createdAt)
+                new Date(b.createdTime || b.createdAt || 0) - new Date(a.createdTime || a.createdAt || 0)
             );
-            const lastOrder = sortedOrders[0];
             
-            // Determine customer type based on actual data
-            let customerType = { type: 'new', badge: 'bg-warning', label: 'New' };
+            let customerType = { badge: 'bg-warning', label: 'New' };
             if (orderCount >= 20 || totalSpent >= 10000) {
-                customerType = { type: 'vip', badge: 'bg-success', label: 'VIP' };
+                customerType = { badge: 'bg-success', label: 'VIP' };
             } else if (orderCount >= 5) {
-                customerType = { type: 'regular', badge: 'bg-primary', label: 'Regular' };
+                customerType = { badge: 'bg-primary', label: 'Regular' };
             }
             
             document.getElementById('customerDetailsTitle').textContent = `Customer Details - ${customer.name}`;
             
-            // Get recent orders (last 5)
             const recentOrders = sortedOrders.slice(0, 5);
             let ordersHtml = '';
             
             if (recentOrders.length > 0) {
                 recentOrders.forEach(order => {
-                    const orderDate = new Date(order.createdTime || order.createdAt);
-                    const isToday = orderDate.toDateString() === new Date().toDateString();
-                    const displayDate = isToday ? 
-                        `Today, ${orderDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}` : 
-                        orderDate.toLocaleDateString();
-                    
-                    // Get items display
-                    let itemsDisplay = 'No items';
-                    if (order.items && Array.isArray(order.items) && order.items.length > 0) {
-                        const firstItem = order.items[0];
-                        const itemCount = order.items.length;
-                        if (itemCount === 1) {
-                            itemsDisplay = `1 item`;
-                        } else {
-                            itemsDisplay = `${itemCount} items`;
-                        }
-                    }
-                    
-                    // Determine status badge
                     const status = order.status || 'unknown';
                     let statusBadge = 'bg-secondary';
-                    switch(status) {
+                    switch(status.toLowerCase()) {
                         case 'delivered': statusBadge = 'bg-success'; break;
                         case 'pending': statusBadge = 'bg-warning'; break;
                         case 'preparing': statusBadge = 'bg-primary'; break;
@@ -1035,12 +905,15 @@
                         case 'cancelled': statusBadge = 'bg-danger'; break;
                     }
                     
+                    const itemCount = order.items ? order.items.length : 0;
+                    const itemsDisplay = itemCount === 1 ? '1 item' : `${itemCount} items`;
+                    
                     ordersHtml += `
                         <tr>
-                            <td>#${order.orderID || order.id}</td>
-                            <td>${displayDate}</td>
+                            <td>#${order.orderID || order.id || 'N/A'}</td>
+                            <td>${formatDate(order.createdTime || order.createdAt)}</td>
                             <td>${itemsDisplay}</td>
-                            <td>${formatCurrency(order.total || 0)}</td>
+                            <td>${formatCurrency(parseFloat(order.total) || 0)}</td>
                             <td><span class="badge ${statusBadge}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></td>
                         </tr>
                     `;
@@ -1056,10 +929,10 @@
                             <div class="avatar-circle-large mx-auto mb-3">
                                 ${customer.profileImageUrl ? 
                                     `<img src="${customer.profileImageUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` :
-                                    getInitials(customer.name || 'Unknown')
+                                    getInitials(customer.name)
                                 }
                             </div>
-                            <h5>${customer.name}</h5>
+                            <h5>${customer.name || 'Unknown'}</h5>
                             <span class="badge ${customerType.badge}">${customerType.label} Customer</span>
                         </div>
                     </div>
@@ -1077,7 +950,7 @@
                             </div>
                             <div class="col-6">
                                 <p><strong>Average Order:</strong> ${formatCurrency(avgOrderValue)}</p>
-                                <p><strong>Last Order:</strong> ${lastOrder ? formatDate(lastOrder.createdTime || lastOrder.createdAt) : 'No orders'}</p>
+                                <p><strong>Last Order:</strong> ${sortedOrders[0] ? formatDate(sortedOrders[0].createdTime || sortedOrders[0].createdAt) : 'No orders'}</p>
                             </div>
                         </div>
                     </div>
@@ -1104,7 +977,6 @@
                 </div>
             `;
             
-            // Store customer ID for edit button
             document.getElementById('editFromDetailsBtn').onclick = () => {
                 bootstrap.Modal.getInstance(document.getElementById('customerDetailsModal')).hide();
                 setTimeout(() => editCustomer(id), 300);
@@ -1119,8 +991,13 @@
         };
 
         window.openSendEmail = function(email, name) {
+            if (!email) {
+                showToast('Customer email not available', 'error');
+                return;
+            }
+            
             document.getElementById('emailRecipient').value = email;
-            document.getElementById('emailSubject').value = `Hello ${name}!`;
+            document.getElementById('emailSubject').value = `Hello ${name || 'Customer'}!`;
             document.getElementById('emailMessage').value = '';
             new bootstrap.Modal(document.getElementById('sendEmailModal')).show();
         };
@@ -1135,7 +1012,6 @@
                 return;
             }
             
-            // Open Gmail compose with pre-filled data
             const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
             window.open(gmailUrl, '_blank');
             
@@ -1185,137 +1061,137 @@ Visit us: www.theturmericindian.com
 Call us: (555) 123-4567
 Follow us on social media for daily updates!`;
             
-            // Open Gmail compose with newsletter content
             const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&bcc=${encodeURIComponent(emails.join(','))}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
             window.open(gmailUrl, '_blank');
             
             showToast(`Newsletter prepared for ${emails.length} customers in Gmail!`);
         };
 
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load initial data
-            loadCustomers();
-            loadOrders();
-        });
-
-        // Add customer form handler
-        document.getElementById('addCustomerBtn').addEventListener('click', async function() {
-            const form = document.getElementById('addCustomerForm');
-            const btn = this;
-            const spinner = btn.querySelector('.spinner-border');
-            
-            if (!form.checkValidity()) {
-                form.classList.add('was-validated');
-                return;
-            }
-            
-            try {
-                btn.disabled = true;
-                spinner.classList.remove('d-none');
-                
-                const customerData = {
-                    name: document.getElementById('customerName').value,
-                    email: document.getElementById('customerEmail').value,
-                    phone: document.getElementById('customerPhone').value,
-                    password: document.getElementById('customerPassword').value,
-                    address: document.getElementById('customerAddress').value
-                };
-                
-                const imageFile = document.getElementById('customerProfileImage').files[0];
-                
-                await createCustomer(customerData, imageFile);
-                
-                // Reset form and close modal
-                form.reset();
-                form.classList.remove('was-validated');
-                bootstrap.Modal.getInstance(document.getElementById('addCustomerModal')).hide();
-                
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                btn.disabled = false;
-                spinner.classList.add('d-none');
-            }
-        });
-
-        // Update customer form handler
-        document.getElementById('updateCustomerBtn').addEventListener('click', async function() {
-            const form = document.getElementById('editCustomerForm');
-            const btn = this;
-            const spinner = btn.querySelector('.spinner-border');
-            
-            if (!form.checkValidity()) {
-                form.classList.add('was-validated');
-                return;
-            }
-            
-            try {
-                btn.disabled = true;
-                spinner.classList.remove('d-none');
-                
-                const customerData = {
-                    name: document.getElementById('editCustomerName').value,
-                    email: document.getElementById('editCustomerEmail').value,
-                    phone: document.getElementById('editCustomerPhone').value,
-                    address: document.getElementById('editCustomerAddress').value
-                };
-                
-                const imageFile = document.getElementById('editCustomerProfileImage').files[0];
-                const customerId = document.getElementById('editCustomerId').value;
-                
-                await updateCustomer(customerId, customerData, imageFile);
-                
-                // Reset form and close modal
-                form.reset();
-                form.classList.remove('was-validated');
-                bootstrap.Modal.getInstance(document.getElementById('editCustomerModal')).hide();
-                
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                btn.disabled = false;
-                spinner.classList.add('d-none');
-            }
-        });
-
         // Filter functionality
-        document.getElementById('dateFilter').addEventListener('change', applyFilters);
-        document.getElementById('customerSearch').addEventListener('input', applyFilters);
-
         function applyFilters() {
             const dateFilter = document.getElementById('dateFilter').value;
             const searchFilter = document.getElementById('customerSearch').value.toLowerCase();
             
-            const rows = document.querySelectorAll('#customersTableBody tr');
-            
-            rows.forEach(row => {
-                let showRow = true;
+            filteredCustomers = allCustomers.filter(customer => {
+                let matchesDate = true;
+                let matchesSearch = true;
                 
-                // Date filter
                 if (dateFilter) {
-                    const filterDate = new Date(dateFilter).toDateString();
-                    const customerDate = row.textContent; // This is simplified - you'd want to parse the actual date
-                    // Simplified date comparison - in real implementation you'd want more precise matching
+                    const filterDate = new Date(dateFilter);
+                    const customerDate = new Date(customer.createdAt);
+                    matchesDate = customerDate.toDateString() === filterDate.toDateString();
                 }
                 
-                // Search filter
-                if (searchFilter && !row.textContent.toLowerCase().includes(searchFilter)) {
-                    showRow = false;
+                if (searchFilter) {
+                    const searchText = `${customer.name || ''} ${customer.email || ''} ${customer.phone || ''} ${customer.address || ''}`.toLowerCase();
+                    matchesSearch = searchText.includes(searchFilter);
                 }
                 
-                row.style.display = showRow ? '' : 'none';
+                return matchesDate && matchesSearch;
             });
+            
+            updateCustomersTable();
         }
 
-        // Form validation
-        document.querySelectorAll('.needs-validation').forEach(form => {
-            form.addEventListener('submit', function(event) {
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing Customer Management System...');
+            
+            // Load data
+            loadCustomers();
+            loadOrders();
+            
+            // Set up filter listeners
+            document.getElementById('dateFilter').addEventListener('change', applyFilters);
+            document.getElementById('customerSearch').addEventListener('input', applyFilters);
+            
+            // Add customer form handler
+            document.getElementById('addCustomerBtn').addEventListener('click', async function() {
+                const form = document.getElementById('addCustomerForm');
+                const btn = this;
+                const spinner = btn.querySelector('.spinner-border');
+                
                 if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
+                    form.classList.add('was-validated');
+                    return;
                 }
-                form.classList.add('was-validated');
+                
+                try {
+                    btn.disabled = true;
+                    spinner.classList.remove('d-none');
+                    
+                    const customerData = {
+                        name: document.getElementById('customerName').value,
+                        email: document.getElementById('customerEmail').value,
+                        phone: document.getElementById('customerPhone').value,
+                        password: document.getElementById('customerPassword').value,
+                        address: document.getElementById('customerAddress').value
+                    };
+                    
+                    const imageFile = document.getElementById('customerProfileImage').files[0];
+                    
+                    await createCustomer(customerData, imageFile);
+                    
+                    form.reset();
+                    form.classList.remove('was-validated');
+                    bootstrap.Modal.getInstance(document.getElementById('addCustomerModal')).hide();
+                    
+                } catch (error) {
+                    console.error('Error adding customer:', error);
+                } finally {
+                    btn.disabled = false;
+                    spinner.classList.add('d-none');
+                }
+            });
+            
+            // Update customer form handler
+            document.getElementById('updateCustomerBtn').addEventListener('click', async function() {
+                const form = document.getElementById('editCustomerForm');
+                const btn = this;
+                const spinner = btn.querySelector('.spinner-border');
+                
+                if (!form.checkValidity()) {
+                    form.classList.add('was-validated');
+                    return;
+                }
+                
+                try {
+                    btn.disabled = true;
+                    spinner.classList.remove('d-none');
+                    
+                    const customerData = {
+                        name: document.getElementById('editCustomerName').value,
+                        email: document.getElementById('editCustomerEmail').value,
+                        phone: document.getElementById('editCustomerPhone').value,
+                        address: document.getElementById('editCustomerAddress').value
+                    };
+                    
+                    const imageFile = document.getElementById('editCustomerProfileImage').files[0];
+                    const customerId = document.getElementById('editCustomerId').value;
+                    
+                    await updateCustomer(customerId, customerData, imageFile);
+                    
+                    form.reset();
+                    form.classList.remove('was-validated');
+                    bootstrap.Modal.getInstance(document.getElementById('editCustomerModal')).hide();
+                    
+                } catch (error) {
+                    console.error('Error updating customer:', error);
+                } finally {
+                    btn.disabled = false;
+                    spinner.classList.add('d-none');
+                }
+            });
+            
+            // Form validation
+            document.querySelectorAll('.needs-validation').forEach(form => {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                });
             });
         });
 

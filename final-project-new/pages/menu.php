@@ -4,7 +4,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border: 2px solid transparent;
-            min-height: 140px;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .category-card:hover {
@@ -15,6 +19,42 @@
         .category-card.active {
             border-color: #007bff;
             background-color: #f8f9fa;
+        }
+
+        .category-card .card-body {
+            padding: 1rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .category-card h6 {
+            margin: 0.5rem 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+            line-height: 1.2;
+            min-height: 2.4em;
+            display: flex;
+            align-items: center;
+            text-align: center;
+        }
+
+        .category-card .badge {
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            padding: 0.35em 0.65em;
+        }
+
+        .category-card .btn-group {
+            margin-top: 0.5rem;
+        }
+
+        .category-card .btn-sm {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.7rem;
         }
 
         .loading {
@@ -188,10 +228,33 @@
         }
 
         .category-image {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             object-fit: cover;
-            border-radius: 50%;
+            border-radius: 8px;
+            border: 2px solid #e3e6f0;
+            margin-bottom: 0.5rem;
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Ensure all category cards have the same size */
+        .categories-container .col-md-2 {
+            min-height: 220px;
+            display: flex;
+        }
+
+        .categories-container .category-card {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Make category action buttons always visible */
+        .category-actions {
+            opacity: 1;
         }
     </style>
 </head>
@@ -208,7 +271,6 @@
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
                     <i class="fas fa-plus me-1"></i>Add Item
                 </button>
-
             </div>
         </div>
 
@@ -222,11 +284,11 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="row" id="categoriesContainer">
+                        <div class="row categories-container" id="categoriesContainer">
                             <div class="col-md-2 mb-3">
                                 <div class="card text-center category-card active" data-category="all">
                                     <div class="card-body">
-                                        <i class="fas fa-utensils fa-2x mb-2 text-primary"></i>
+                                        <i class="fas fa-utensils category-icon text-primary"></i>
                                         <h6>All Items</h6>
                                         <span class="badge bg-primary" id="count-all">0</span>
                                     </div>
@@ -1128,16 +1190,18 @@
                 categoryCard.innerHTML = `
                     <div class="card text-center category-card" data-category="${category.categoryId}">
                         <div class="card-body">
-                            <img src="${category.imageUrl}" alt="${category.categoryName}" class="category-image mb-2">
+                            <img src="${category.imageUrl}" alt="${category.categoryName}" class="category-image">
                             <h6>${category.categoryName}</h6>
                             <span class="badge bg-secondary" id="count-${category.categoryId}">0</span>
-                            <div class="mt-2">
-                                <button class="btn btn-outline-primary btn-sm me-1" onclick="editCategory('${category.categoryId}')" title="Edit Category">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-outline-danger btn-sm" onclick="deleteCategory('${category.categoryId}')" title="Delete Category">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                            <div class="category-actions">
+                                <div class="btn-group btn-group-sm mt-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="editCategory('${category.categoryId}')" title="Edit Category">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteCategory('${category.categoryId}')" title="Delete Category">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
