@@ -133,7 +133,7 @@
                         <div class="loading"></div>
                     </div>
                     <div class="stats-label">Today's Revenue</div>
-                    <i class="fas fa-rupee-sign stats-icon"></i>
+                    <span class="stats-icon">₹</span>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">

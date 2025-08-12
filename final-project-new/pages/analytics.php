@@ -139,7 +139,7 @@
                     <div class="stats-change text-success" id="revenueChange">
                         <i class="fas fa-arrow-up me-1"></i>Calculating...
                     </div>
-                    <i class="fas fa-rupee-sign stats-icon"></i>
+                    <span class="stats-icon">₹</span>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">

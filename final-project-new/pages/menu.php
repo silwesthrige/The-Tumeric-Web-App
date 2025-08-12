@@ -495,7 +495,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="itemPrice" class="form-label">Price ($)</label>
+                                    <label for="itemPrice" class="form-label">Price (₹)</label>
                                     <input type="number" class="form-control" id="itemPrice" step="0.01" min="0" required>
                                     <div class="invalid-feedback">Please provide a valid price.</div>
                                 </div>
@@ -570,7 +570,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="editItemPrice" class="form-label">Price ($)</label>
+                                    <label for="editItemPrice" class="form-label">Price (₹)</label>
                                     <input type="number" class="form-control" id="editItemPrice" step="0.01" min="0" required>
                                     <div class="invalid-feedback">Please provide a valid price.</div>
                                 </div>
@@ -1320,7 +1320,7 @@
                     </div>
                 </td>
                 <td><span class="badge bg-primary" data-category-id="${item.category}">${categoryName}</span></td>
-                <td><strong>${item.price}</strong></td>
+                <td><strong>₹${item.price}</strong></td>
                 <td>${item.cookedTime} min</td>
                 <td><span class="badge ${item.status === 'available' ? 'bg-success' : 'bg-danger'}">${item.status === 'available' ? 'Available' : 'Out of Stock'}</span></td>
                 <td>
@@ -1470,7 +1470,7 @@
                     document.getElementById('viewItemImage').src = item.imageUrl || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop';
                     document.getElementById('viewItemName').textContent = item.foodName;
                     document.getElementById('viewItemCategory').textContent = categoryName;
-                    document.getElementById('viewItemPrice').textContent = `${item.price}`;
+                    document.getElementById('viewItemPrice').textContent = `₹${item.price}`;
                     document.getElementById('viewItemCookTime').textContent = item.cookedTime;
                     document.getElementById('viewItemOrders').textContent = item.orders || 0;
                     document.getElementById('viewItemShortDesc').textContent = item.shortDisc;

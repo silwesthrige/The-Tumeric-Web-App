@@ -1,4 +1,3 @@
-
 <body>
     <div class="container-fluid">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -226,7 +225,7 @@
                                 <div class="invalid-feedback">Please provide a role.</div>
                             </div>
                             <div class="col-md-6">
-                                <label for="staffSalary" class="form-label">Salary ($)</label>
+                                <label for="staffSalary" class="form-label">Salary (₹)</label>
                                 <input type="number" class="form-control" id="staffSalary" min="0" step="0.01" required>
                                 <div class="invalid-feedback">Please provide a valid salary.</div>
                             </div>
@@ -310,7 +309,7 @@
                                 <input type="text" class="form-control" id="editStaffRole" required>
                             </div>
                             <div class="col-md-6">
-                                <label for="editStaffSalary" class="form-label">Salary ($)</label>
+                                <label for="editStaffSalary" class="form-label">Salary (₹)</label>
                                 <input type="number" class="form-control" id="editStaffSalary" min="0" step="0.01" required>
                             </div>
                         </div>
@@ -727,9 +726,9 @@
         }
 
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', {
+            return new Intl.NumberFormat('en-IN', {
                 style: 'currency',
-                currency: 'USD'
+                currency: 'INR'
             }).format(amount);
         }
 

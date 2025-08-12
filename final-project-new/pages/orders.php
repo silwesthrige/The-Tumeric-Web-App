@@ -309,7 +309,7 @@
                                         <div class="invalid-feedback">Please enter quantity.</div>
                                     </div>
                                     <div class="col-md-2">
-                                        <span class="form-control-plaintext item-price">$0</span>
+                                        <span class="form-control-plaintext item-price">₹0</span>
                                     </div>
                                     <div class="col-md-1">
                                         <button type="button" class="btn btn-outline-danger btn-sm remove-item" disabled>
@@ -324,7 +324,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <strong>Total: $<span id="orderTotal">0</span></strong>
+                                <strong>Total: ₹<span id="orderTotal">0</span></strong>
                             </div>
                         </div>
                     </form>
@@ -374,7 +374,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <strong>Total: $<span id="editOrderTotal">0</span></strong>
+                                <strong>Total: ₹<span id="editOrderTotal">0</span></strong>
                             </div>
                         </div>
                     </form>
@@ -588,9 +588,9 @@
         }
 
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', {
+            return new Intl.NumberFormat('en-IN', {
                 style: 'currency',
-                currency: 'USD'
+                currency: 'INR'
             }).format(amount);
         }
 
@@ -843,28 +843,28 @@
             switch (order.status) {
                 case 'pending':
                     return `
-                        <button class="btn btn-outline-success" onclick="updateOrderStatus('${order.id}', 'confirmed')" title="Confirm">
+                        <button class="btn btn-outline-success" onclick="confirmStatusChange('${order.id}', 'confirmed')" title="Confirm">
                             <i class="fas fa-check"></i>
                         </button>
-                        <button class="btn btn-outline-danger" onclick="updateOrderStatus('${order.id}', 'rejected')" title="Reject">
+                        <button class="btn btn-outline-danger" onclick="confirmStatusChange('${order.id}', 'rejected')" title="Reject">
                             <i class="fas fa-times"></i>
                         </button>
                     `;
                 case 'confirmed':
                     return `
-                        <button class="btn btn-outline-primary" onclick="updateOrderStatus('${order.id}', 'preparing')" title="Start Preparing">
+                        <button class="btn btn-outline-primary" onclick="confirmStatusChange('${order.id}', 'preparing')" title="Start Preparing">
                             <i class="fas fa-utensils"></i>
                         </button>
                     `;
                 case 'preparing':
                     return `
-                        <button class="btn btn-outline-info" onclick="updateOrderStatus('${order.id}', 'out_for_delivery')" title="Out for Delivery">
+                        <button class="btn btn-outline-info" onclick="confirmStatusChange('${order.id}', 'out_for_delivery')" title="Out for Delivery">
                             <i class="fas fa-truck"></i>
                         </button>
                     `;
                 case 'out_for_delivery':
                     return `
-                        <button class="btn btn-outline-success" onclick="updateOrderStatus('${order.id}', 'delivered')" title="Mark Delivered">
+                        <button class="btn btn-outline-success" onclick="confirmStatusChange('${order.id}', 'delivered')" title="Mark Delivered">
                             <i class="fas fa-check-double"></i>
                         </button>
                     `;
@@ -933,6 +933,25 @@
         }
 
         // Global functions for window access
+        window.confirmStatusChange = function(id, newStatus) {
+            const statusDisplayNames = {
+                'confirmed': 'Confirm',
+                'rejected': 'Reject',
+                'preparing': 'Start Preparing',
+                'out_for_delivery': 'Send Out for Delivery',
+                'delivered': 'Mark as Delivered',
+                'cancelled': 'Cancel'
+            };
+            
+            const order = allOrders.find(o => o.id === id);
+            const orderNumber = order ? order.orderId : 'Unknown';
+            const actionName = statusDisplayNames[newStatus] || `Change status to ${newStatus}`;
+            
+            if (confirm(`Are you sure you want to ${actionName.toLowerCase()} order #${orderNumber}?`)) {
+                updateOrderStatus(id, newStatus);
+            }
+        };
+
         window.updateOrderStatus = async function(id, newStatus) {
             try {
                 const orderRef = doc(db, 'orders', id);
@@ -1087,7 +1106,7 @@
                     <div class="invalid-feedback">Please enter quantity.</div>
                 </div>
                 <div class="col-md-2">
-                    <span class="form-control-plaintext item-price">$0</span>
+                    <span class="form-control-plaintext item-price">₹0</span>
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-outline-danger btn-sm remove-item" ${isFirst ? 'disabled' : ''}>
@@ -1146,7 +1165,7 @@
                     <div class="invalid-feedback">Please enter quantity.</div>
                 </div>
                 <div class="col-md-2">
-                    <span class="form-control-plaintext item-price">$0</span>
+                    <span class="form-control-plaintext item-price">₹0</span>
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-outline-danger btn-sm remove-item" ${isFirst ? 'disabled' : ''}>

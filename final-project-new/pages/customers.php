@@ -1,4 +1,3 @@
-
 <body>
     <!-- Toast Container -->
     <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
@@ -46,10 +45,10 @@
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card info">
-                    <div class="stats-number" id="avgOrderValue">$0.00</div>
+                    <div class="stats-number" id="avgOrderValue">₹0.00</div>
                     <div class="stats-label">Avg Order Value</div>
                     <small class="text-muted">Per customer</small>
-                    <i class="fas fa-dollar-sign stats-icon"></i>
+                    <i class="fas fa-rupee-sign stats-icon"></i>
                 </div>
             </div>
         </div>
@@ -579,9 +578,9 @@
 
         function formatCurrency(amount) {
             if (typeof amount !== 'number') amount = 0;
-            return new Intl.NumberFormat('en-US', {
+            return new Intl.NumberFormat('en-IN', {
                 style: 'currency',
-                currency: 'USD'
+                currency: 'INR'
             }).format(amount);
         }
 
@@ -1042,7 +1041,7 @@ Thank you for being part of our family! We're excited to share our latest update
 - Special weekend dishes
 
 🎉 SPECIAL OFFERS:
-- 15% off on orders above $50
+- 15% off on orders above ₹2000
 - Free delivery on weekends
 - Loyalty points for regular customers
 
