@@ -133,7 +133,7 @@
                         <div class="loading"></div>
                     </div>
                     <div class="stats-label">Today's Revenue</div>
-                    <span class="stats-icon">£</span>
+                    <i class="fas fa-pound-sign stats-icon"></i>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">

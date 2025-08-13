@@ -1,7 +1,5 @@
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -145,7 +143,7 @@
                     <div class="stats-change text-success" id="revenueChange">
                         <i class="fas fa-arrow-up me-1"></i>Calculating...
                     </div>
-                    <span class="stats-icon">£</span>
+                    <i class="fas fa-pound-sign stats-icon"></i>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">

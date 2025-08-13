@@ -48,7 +48,7 @@
                     <div class="stats-number" id="avgOrderValue">£0.00</div>
                     <div class="stats-label">Avg Order Value</div>
                     <small class="text-muted">Per customer</small>
-                    <i class="fas fa-rupee-sign stats-icon"></i>
+                    <i class="fas fa-pound-sign stats-icon"></i>
                 </div>
             </div>
         </div>
