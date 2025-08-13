@@ -45,7 +45,7 @@
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card info">
-                    <div class="stats-number" id="avgOrderValue">₹0.00</div>
+                    <div class="stats-number" id="avgOrderValue">£0.00</div>
                     <div class="stats-label">Avg Order Value</div>
                     <small class="text-muted">Per customer</small>
                     <i class="fas fa-rupee-sign stats-icon"></i>
@@ -577,11 +577,11 @@
         }
 
         function formatCurrency(amount) {
-            if (typeof amount !== 'number') amount = 0;
-            return new Intl.NumberFormat('en-IN', {
-                style: 'currency',
-                currency: 'INR'
-            }).format(amount);
+         if (typeof amount !== 'number' || isNaN(amount)) amount = 0;
+          return new Intl.NumberFormat('en-GB', {
+          style: 'currency',
+         currency: 'GBP'
+         }).format(amount);
         }
 
         function getInitials(name) {

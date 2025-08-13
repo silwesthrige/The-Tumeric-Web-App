@@ -280,17 +280,17 @@
                                             <input type="number" class="form-control" id="deliveryRadius" name="deliveryRadius" value="10">
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="minOrderValue" class="form-label">Minimum Order Value (₹)</label>
+                                            <label for="minOrderValue" class="form-label">Minimum Order Value (£)</label>
                                             <input type="number" class="form-control" id="minOrderValue" name="minOrderValue" value="200">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <label for="deliveryCharge" class="form-label">Delivery Charge (₹)</label>
+                                            <label for="deliveryCharge" class="form-label">Delivery Charge (£)</label>
                                             <input type="number" class="form-control" id="deliveryCharge" name="deliveryCharge" value="30">
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="freeDeliveryAbove" class="form-label">Free Delivery Above (₹)</label>
+                                            <label for="freeDeliveryAbove" class="form-label">Free Delivery Above (£)</label>
                                             <input type="number" class="form-control" id="freeDeliveryAbove" name="freeDeliveryAbove" value="500">
                                         </div>
                                     </div>

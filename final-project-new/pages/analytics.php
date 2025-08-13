@@ -1,4 +1,10 @@
 
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -139,7 +145,7 @@
                     <div class="stats-change text-success" id="revenueChange">
                         <i class="fas fa-arrow-up me-1"></i>Calculating...
                     </div>
-                    <span class="stats-icon">₹</span>
+                    <span class="stats-icon">£</span>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
@@ -341,9 +347,9 @@
 
         // Utility functions
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-IN', {
+            return new Intl.NumberFormat('en-GB', {
                 style: 'currency',
-                currency: 'INR',
+                currency: 'GBP',
                 minimumFractionDigits: 0
             }).format(amount);
         }
@@ -669,7 +675,7 @@
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
-                                    return '₹' + value.toLocaleString('en-IN');
+                                    return '£' + value.toLocaleString('en-GB');
                                 }
                             }
                         }

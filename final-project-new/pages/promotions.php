@@ -520,7 +520,7 @@
                                 <div class="invalid-feedback">Please provide a valid discount value.</div>
                             </div>
                             <div class="col-md-4">
-                                <label for="minOrderValue" class="form-label">Min Order Value (₹)</label>
+                                <label for="minOrderValue" class="form-label">Min Order Value (£)</label>
                                 <input type="number" class="form-control" id="minOrderValue" placeholder="0" min="0">
                             </div>
                         </div>
@@ -599,7 +599,7 @@
                                 <input type="number" class="form-control" id="editDiscountValue" required min="0">
                             </div>
                             <div class="col-md-4">
-                                <label for="editMinOrderValue" class="form-label">Min Order Value (₹)</label>
+                                <label for="editMinOrderValue" class="form-label">Min Order Value (£)</label>
                                 <input type="number" class="form-control" id="editMinOrderValue" min="0">
                             </div>
                         </div>
@@ -730,9 +730,9 @@
         }
 
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-IN', {
+            return new Intl.NumberFormat('en-GB', {
                 style: 'currency',
-                currency: 'INR'
+                currency: 'GBP'
             }).format(amount);
         }
 
@@ -868,7 +868,7 @@
                 const usagePercentage = Math.round((usageCount / promotion.usageLimit) * 100);
                 const discountDisplay = promotion.discountType === 'percentage' 
                     ? `${promotion.discountValue}%` 
-                    : `₹${promotion.discountValue}`;
+                    : `£${promotion.discountValue}`;
                 
                 container.innerHTML += `
                     <div class="col-lg-4 mb-3">
@@ -924,7 +924,7 @@
                 const usagePercentage = Math.round((usageCount / promotion.usageLimit) * 100);
                 const discountDisplay = promotion.discountType === 'percentage' 
                     ? `${promotion.discountValue}%` 
-                    : `₹${promotion.discountValue}`;
+                    : `£${promotion.discountValue}`;
                 
                 tbody.innerHTML += `
                     <tr data-status="${status}">

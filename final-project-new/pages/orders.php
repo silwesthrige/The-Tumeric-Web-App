@@ -255,7 +255,7 @@
                                 <th>Order ID</th>
                                 <th>Customer</th>
                                 <th>Items</th>
-                                <th>Total</th>
+                                <th>Total(£)</th>
                                 <th>Status</th>
                                 <th>Order Time</th>
                                 <th>Actions</th>
@@ -324,7 +324,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <strong>Total: ₹<span id="orderTotal">0</span></strong>
+                                <strong>Total: £<span id="orderTotal">0</span></strong>
                             </div>
                         </div>
                     </form>
@@ -374,7 +374,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <strong>Total: ₹<span id="editOrderTotal">0</span></strong>
+                                <strong>Total: £<span id="editOrderTotal">0</span></strong>
                             </div>
                         </div>
                     </form>
@@ -587,11 +587,12 @@
             }
         }
 
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-IN', {
-                style: 'currency',
-                currency: 'INR'
-            }).format(amount);
+       function formatCurrency(amount) { 
+             if (isNaN(amount) || amount === null) return "£0";
+             return new Intl.NumberFormat('en-GB', {
+             style: 'currency',
+             currency: 'GBP'
+         }).format(amount);
         }
 
         function getStatusBadge(status) {

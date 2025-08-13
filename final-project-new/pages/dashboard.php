@@ -133,7 +133,7 @@
                         <div class="loading"></div>
                     </div>
                     <div class="stats-label">Today's Revenue</div>
-                    <span class="stats-icon">₹</span>
+                    <span class="stats-icon">£</span>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
@@ -259,7 +259,7 @@
                             <div id="menuItems"></div>
                         </div>
                         <div class="mb-3">
-                            <strong>Total: ₹<span id="orderTotal">0</span></strong>
+                            <strong>Total: £<span id="orderTotal">0</span></strong>
                         </div>
                     </form>
                 </div>
@@ -369,7 +369,7 @@
                     return orderDate >= today;
                 })
                 .reduce((sum, order) => sum + (order.total || 0), 0);
-            document.getElementById('todayRevenue').textContent = '₹' + todayRevenue.toLocaleString();
+            document.getElementById('todayRevenue').textContent = '£' + todayRevenue.toLocaleString();
 
             // Pending Deliveries
             const pendingDeliveries = ordersData.filter(order => 
@@ -461,7 +461,7 @@
                 data: {
                     labels: last7Days,
                     datasets: [{
-                        label: 'Revenue (₹)',
+                        label: 'Revenue (£)',
                         data: salesData,
                         borderColor: 'rgb(75, 192, 192)',
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -477,7 +477,7 @@
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
-                                    return '₹' + value.toLocaleString();
+                                    return '£' + value.toLocaleString();
                                 }
                             }
                         }
@@ -635,7 +635,7 @@
                                 <input class="form-check-input menu-item" type="checkbox" value="${item.id}" 
                                        data-price="${item.price}" data-name="${item.name || 'Unnamed Item'}">
                                 <label class="form-check-label">
-                                    ${item.name || 'Unnamed Item'} - ₹${item.price || 0}
+                                    ${item.name || 'Unnamed Item'} - £${item.price || 0}
                                 </label>
                             </div>
                             <input type="number" class="form-control" style="width: 80px;" placeholder="Qty" 
