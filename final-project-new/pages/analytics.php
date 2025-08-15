@@ -120,6 +120,12 @@
             height: 1rem;
             border-width: 0.15em;
         }
+        .h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            line-height: 1.2;
+            color: #495057;
+        }
     </style>
 </head>
 <body>
