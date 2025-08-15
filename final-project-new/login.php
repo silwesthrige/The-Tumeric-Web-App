@@ -1,9 +1,8 @@
 <?php
 session_start();
 
-if ($_POST) {
-    $_SESSION['logged_in'] = true;
-    $_SESSION['user_name'] = 'Admin User';
+// If user is already logged in, redirect to dashboard
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     header('Location: index.php');
     exit();
 }
@@ -149,6 +148,18 @@ if ($_POST) {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Alert Styles */
+        .alert {
+            margin-bottom: 1rem;
+            border-radius: 8px;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -157,7 +168,7 @@ if ($_POST) {
     <div class="loading-overlay" id="loadingOverlay">
         <img src="public/images/UK PJ Logo.png" alt="The Turmeric Logo">
         <h2>The Turmeric</h2>
-        <p>Loading Dashboard...</p>
+        <p>Authenticating user...</p>
         <div class="spinner"></div>
     </div>
 
@@ -167,7 +178,13 @@ if ($_POST) {
         <h3>The Turmeric</h3>
         <h6>Indian Cuisine</h6>
 
-        <form method="POST" id="loginForm">
+        <!-- Error Alert -->
+        <div id="errorAlert" class="alert alert-danger" style="display: none;" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <form id="loginForm">
             <div class="mb-3 text-start">
                 <label for="email" class="form-label">Email Address</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="admin@theturmeric.com" required>
@@ -185,24 +202,104 @@ if ($_POST) {
                 <a href="#" class="forgot-link">Forgot password?</a>
             </div>
 
-            <button type="submit" class="btn btn-login">Sign in to Dashboard</button>
+            <button type="submit" class="btn btn-login">
+                <i class="fas fa-sign-in-alt me-2"></i>Sign in to Dashboard
+            </button>
         </form>
 
         <p class="info-text">This is a secure admin area. All access attempts are logged and monitored.</p>
     </div>
 
-    <script>
+    <!-- Firebase Configuration -->
+    <script type="module">
+        import { db } from './includes/dbcon.js';
+        import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
         const loginForm = document.getElementById('loginForm');
         const loadingOverlay = document.getElementById('loadingOverlay');
+        const errorAlert = document.getElementById('errorAlert');
+        const errorMessage = document.getElementById('errorMessage');
 
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent default submit
-            loadingOverlay.style.display = 'flex'; // Show loading screen
+        // Function to show error
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorAlert.style.display = 'block';
+            loadingOverlay.style.display = 'none';
+        }
 
-            // Delay then submit form
-            setTimeout(() => {
-                loginForm.submit();
-            }, 2000); // 2 seconds delay
+        // Function to hide error
+        function hideError() {
+            errorAlert.style.display = 'none';
+        }
+
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideError();
+            loadingOverlay.style.display = 'flex';
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // Query Firestore for user with matching email
+                const usersRef = collection(db, 'userManage');
+                const q = query(usersRef, where("email", "==", email));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    showError('Invalid email or password. Please try again.');
+                    return;
+                }
+
+                let userFound = false;
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    
+                    // Check if password matches and user is active
+                    if (userData.password === password && userData.isActive === true) {
+                        userFound = true;
+                        
+                        // Create session via AJAX call to PHP
+                        fetch('auth_handler.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                action: 'login',
+                                user_data: {
+                                    id: doc.id,
+                                    email: userData.email,
+                                    username: userData.username,
+                                    role: userData.role,
+                                    imageUrl: userData.imageUrl
+                                }
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Redirect to dashboard
+                                window.location.href = 'index.php';
+                            } else {
+                                showError('Login failed. Please try again.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showError('An error occurred. Please try again.');
+                        });
+                    }
+                });
+
+                if (!userFound) {
+                    showError('Invalid email or password, or account is inactive.');
+                }
+
+            } catch (error) {
+                console.error('Error during login:', error);
+                showError('An error occurred during login. Please try again.');
+            }
         });
     </script>
 

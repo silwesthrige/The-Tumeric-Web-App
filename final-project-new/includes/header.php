@@ -1,5 +1,4 @@
-
-    <style>
+<style>
         .bg-orange-transparent {
             background-color: rgba(255, 165, 0, 0.1);
         }
@@ -15,6 +14,8 @@
         .dropdown-menu {
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
         }
         
         .rounded-pill {
@@ -34,6 +35,47 @@
             .d-flex.gap-3 {
                 gap: 0.5rem !important;
             }
+        }
+
+        /* Notification styles */
+        .notification-item {
+            transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .notification-new {
+            background-color: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .notification-badge-animate {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .no-notifications {
+            padding: 2rem 1rem;
+            text-align: center;
+            color: #6c757d;
         }
     </style>
 </head>
@@ -71,31 +113,44 @@
                         data-bs-toggle="dropdown" 
                         aria-expanded="false">
                     <i class="fas fa-bell text-warning"></i>
-                    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">3</span>
+                    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" id="notificationBadge" style="display: none;">0</span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown">
-                    <li><h6 class="dropdown-header"><i class="fas fa-bell me-2"></i>Notifications</h6></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-shopping-cart me-2 text-success"></i>New order received</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-star me-2 text-warning"></i>New review posted</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-exclamation-triangle me-2 text-danger"></i>Low stock alert</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-primary" href="#"><i class="fas fa-eye me-2"></i>View all notifications</a></li>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="width: 350px;">
+                    <li>
+                        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                            <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notifications</h6>
+                            <button class="btn btn-sm btn-outline-primary" id="markAllRead" style="display: none;">
+                                <i class="fas fa-check-double me-1"></i>Mark All Read
+                            </button>
+                        </div>
+                    </li>
+                    <div id="notificationsList">
+                        <li class="no-notifications">
+                            <i class="fas fa-bell-slash mb-2 text-muted"></i>
+                            <div>No notifications</div>
+                        </li>
+                    </div>
+                    <li class="border-top">
+                        <a class="dropdown-item text-primary text-center" href="#" id="viewAllNotifications">
+                            <i class="fas fa-eye me-2"></i>View all notifications
+                        </a>
+                    </li>
                 </ul>
             </div>
 
-            <!-- Admin Profile Dropdown -->
+            <!-- User Profile Dropdown -->
             <div class="dropdown">
                 <button class="btn btn-light border rounded-pill px-3 py-1 d-flex align-items-center gap-2" 
                         type="button"
                         id="userDropdown" 
                         data-bs-toggle="dropdown" 
                         aria-expanded="false">
-                    <img src="public/images/profile.png" 
-                         alt="Admin" 
+                    <img src="<?php echo !empty($_SESSION['user_image']) ? $_SESSION['user_image'] : 'public/images/profile.png'; ?>" 
+                         alt="User" 
                          width="32" 
                          height="32" 
                          class="rounded-circle profile-img">
-                    <span class="d-none d-md-inline">Admin User</span>
+                    <span class="d-none d-md-inline"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin User'); ?></span>
                     <i class="fas fa-chevron-down small"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
@@ -104,9 +159,8 @@
                             <i class="fas fa-user me-2 text-primary"></i>Profile
                         </a>
                     </li>
-                    <li><a class="dropdown-item" href="index.php?page=settings"><i class="fas fa-cog me-2 text-secondary"></i>Settings</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger logout-btn" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -119,79 +173,52 @@
         <div class="modal-content">
             <div class="modal-header bg-orange-transparent border-0">
                 <h5 class="modal-title d-flex align-items-center" id="profileModalLabel">
-                    <i class="fas fa-user-circle me-2 text-primary"></i>Admin Profile
+                    <i class="fas fa-user-circle me-2 text-primary"></i>User Profile
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="text-center mb-4 position-relative">
-                    <div class="position-relative d-inline-block">
-                        <img src="public/images/profile.png" 
-                             class="rounded-circle border border-3 profile-img" 
-                             width="80" 
-                             height="80" 
-                             alt="Admin" 
-                             id="profileImage">
-                        <button class="btn btn-sm btn-outline-secondary position-absolute" 
-                                style="top: -5px; right: -5px; border-radius: 50%;" 
-                                title="Edit Photo"
-                                type="button">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </div>
-                    <h5 class="mt-3 mb-0">Admin User</h5>
-                    <small class="text-muted badge bg-light text-dark">Administrator</small>
+                <div class="text-center mb-4">
+                    <img src="<?php echo !empty($_SESSION['user_image']) ? $_SESSION['user_image'] : 'public/images/profile.png'; ?>" 
+                         class="rounded-circle border border-3 profile-img" 
+                         width="80" 
+                         height="80" 
+                         alt="User" 
+                         id="profileImage">
+                    <h5 class="mt-3 mb-0"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin User'); ?></h5>
+                    <small class="text-muted badge bg-light text-dark"><?php echo ucfirst($_SESSION['user_role'] ?? 'Administrator'); ?></small>
                 </div>
 
                 <div class="mb-3">
-                    <div class="d-flex align-items-end justify-content-between">
-                        <div class="flex-grow-1 me-2">
-                            <label class="form-label fw-semibold">Email Address</label>
-                            <input type="email" 
-                                   class="form-control" 
-                                   value="admin@turmericrestaurant.com" 
-                                   readonly>
-                        </div>
-                        <button class="btn btn-outline-secondary btn-sm" 
-                                title="Edit Email"
-                                type="button">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </div>
+                    <label class="form-label fw-semibold">Email Address</label>
+                    <input type="email" 
+                           class="form-control" 
+                           value="<?php echo htmlspecialchars($_SESSION['user_email'] ?? 'admin@turmericrestaurant.com'); ?>" 
+                           readonly>
                 </div>
 
                 <div class="mb-3">
-                    <div class="d-flex align-items-end justify-content-between">
-                        <div class="flex-grow-1 me-2">
-                            <label class="form-label fw-semibold">Username</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   value="admin_user" 
-                                   readonly>
-                        </div>
-                        <button class="btn btn-outline-secondary btn-sm" 
-                                title="Edit Username"
-                                type="button">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </div>
+                    <label class="form-label fw-semibold">Username</label>
+                    <input type="text" 
+                           class="form-control" 
+                           value="<?php echo htmlspecialchars($_SESSION['user_name'] ?? 'admin_user'); ?>" 
+                           readonly>
                 </div>
 
                 <div class="mb-3">
-                    <div class="d-flex align-items-end justify-content-between">
-                        <div class="flex-grow-1 me-2">
-                            <label class="form-label fw-semibold">Role</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   value="Administrator" 
-                                   readonly>
-                        </div>
-                        <button class="btn btn-outline-secondary btn-sm" 
-                                title="Edit Role"
-                                type="button">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </div>
+                    <label class="form-label fw-semibold">Role</label>
+                    <input type="text" 
+                           class="form-control" 
+                           value="<?php echo ucfirst($_SESSION['user_role'] ?? 'Administrator'); ?>" 
+                           readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">User ID</label>
+                    <input type="text" 
+                           class="form-control" 
+                           value="<?php echo htmlspecialchars($_SESSION['user_id'] ?? 'N/A'); ?>" 
+                           readonly>
                 </div>
 
                 <!-- Additional Profile Stats -->
@@ -221,9 +248,6 @@
             </div>
 
             <div class="modal-footer border-0">
-                <a href="index.php?page=settings" class="btn btn-outline-primary">
-                    <i class="fas fa-cog me-1"></i>Settings
-                </a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times me-1"></i>Close
                 </button>
@@ -232,12 +256,28 @@
     </div>
 </div>
 
-
-
 <!-- Bootstrap 5 JavaScript Bundle -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
-<script>
+<!-- Firebase and Real-time Notifications -->
+<script type="module">
+    import { db } from './includes/dbcon.js';
+    import { 
+        collection, 
+        query, 
+        orderBy, 
+        limit, 
+        onSnapshot, 
+        doc, 
+        getDoc,
+        where,
+        Timestamp
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    // Notification management
+    let notifications = [];
+    let unreadCount = 0;
+
     // Real-time clock function
     function updateDateTime() {
         const now = new Date();
@@ -254,53 +294,290 @@
         document.getElementById("dateTimeText").textContent = now.toLocaleString('en-US', options);
     }
 
-    // Sidebar toggle functionality
-    document.getElementById('sidebarCollapse').addEventListener('click', function() {
-        // Add your sidebar toggle logic here
-        console.log('Sidebar toggle clicked');
-        // Example: document.getElementById('sidebar').classList.toggle('show');
-    });
+    // Format time ago
+    function timeAgo(date) {
+        const now = new Date();
+        const diffInMinutes = Math.floor((now - date) / 60000);
+        
+        if (diffInMinutes < 1) return 'Just now';
+        if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+        
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) return `${diffInHours}h ago`;
+        
+        const diffInDays = Math.floor(diffInHours / 24);
+        return `${diffInDays}d ago`;
+    }
 
-    // Initialize clock
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
+    // Get user name from users collection
+    async function getUserName(userId) {
+        try {
+            const userDoc = await getDoc(doc(db, 'users', userId));
+            return userDoc.exists() ? userDoc.data().name || 'Unknown User' : 'Unknown User';
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            return 'Unknown User';
+        }
+    }
 
-    // Add some interactive feedback
+    // Update notification badge
+    function updateNotificationBadge() {
+        const badge = document.getElementById('notificationBadge');
+        const markAllBtn = document.getElementById('markAllRead');
+        
+        if (unreadCount > 0) {
+            badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            badge.style.display = 'block';
+            badge.classList.add('notification-badge-animate');
+            markAllBtn.style.display = 'block';
+        } else {
+            badge.style.display = 'none';
+            badge.classList.remove('notification-badge-animate');
+            markAllBtn.style.display = 'none';
+        }
+    }
+
+    // Render notifications
+    function renderNotifications() {
+        const notificationsList = document.getElementById('notificationsList');
+        
+        if (notifications.length === 0) {
+            notificationsList.innerHTML = `
+                <li class="no-notifications">
+                    <i class="fas fa-bell-slash mb-2 text-muted"></i>
+                    <div>No notifications</div>
+                </li>
+            `;
+            return;
+        }
+
+        const notificationHTML = notifications.map(notification => `
+            <li class="notification-item ${notification.isNew ? 'notification-new' : ''}">
+                <a class="dropdown-item py-3" href="#" data-notification-id="${notification.id}">
+                    <div class="d-flex align-items-start">
+                        <div class="me-3">
+                            <i class="fas fa-${notification.icon} ${notification.iconColor}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">${notification.title}</div>
+                            <div class="text-muted small">${notification.message}</div>
+                            <div class="notification-time">${notification.timeAgo}</div>
+                        </div>
+                        ${notification.isNew ? '<div class="ms-2"><span class="badge bg-primary rounded-pill">New</span></div>' : ''}
+                    </div>
+                </a>
+            </li>
+        `).join('');
+
+        notificationsList.innerHTML = notificationHTML;
+    }
+
+    // Process new order
+    async function processNewOrder(orderData, orderId) {
+        const userName = await getUserName(orderData.userId);
+        const notification = {
+            id: `order_${orderId}`,
+            type: 'order',
+            title: 'New Order Received',
+            message: `Order #${orderId.substring(0, 8)} from ${userName} - $${orderData.total}`,
+            icon: 'shopping-cart',
+            iconColor: 'text-success',
+            timestamp: orderData.createdAt.toDate(),
+            timeAgo: timeAgo(orderData.createdAt.toDate()),
+            isNew: true
+        };
+        
+        // Add to beginning of notifications array
+        notifications.unshift(notification);
+        
+        // Keep only last 50 notifications
+        if (notifications.length > 50) {
+            notifications = notifications.slice(0, 50);
+        }
+        
+        unreadCount++;
+        updateNotificationBadge();
+        renderNotifications();
+        
+        // Show browser notification if supported
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('New Order Received', {
+                body: notification.message,
+                icon: 'public/images/UK PJ Logo.png'
+            });
+        }
+    }
+
+    // Process new feedback
+    async function processNewFeedback(feedbackData, feedbackId) {
+        const userName = await getUserName(feedbackData.userId);
+        const notification = {
+            id: `feedback_${feedbackId}`,
+            type: 'feedback',
+            title: 'New Review Posted',
+            message: `${userName} left a ${feedbackData.rating}-star review`,
+            icon: 'star',
+            iconColor: 'text-warning',
+            timestamp: feedbackData.createdAt.toDate(),
+            timeAgo: timeAgo(feedbackData.createdAt.toDate()),
+            isNew: true
+        };
+        
+        notifications.unshift(notification);
+        
+        if (notifications.length > 50) {
+            notifications = notifications.slice(0, 50);
+        }
+        
+        unreadCount++;
+        updateNotificationBadge();
+        renderNotifications();
+        
+        // Show browser notification
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('New Review Posted', {
+                body: notification.message,
+                icon: 'public/images/UK PJ Logo.png'
+            });
+        }
+    }
+
+    // Initialize real-time listeners
+    function initializeNotificationListeners() {
+        // Listen for new orders
+        const ordersQuery = query(
+            collection(db, 'orders'),
+            orderBy('createdAt', 'desc'),
+            limit(10)
+        );
+
+        onSnapshot(ordersQuery, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === 'added') {
+                    const orderData = change.doc.data();
+                    const orderId = change.doc.id;
+                    
+                    // Only process if it's a recent order (within last 5 minutes)
+                    const orderTime = orderData.createdAt.toDate();
+                    const now = new Date();
+                    const timeDiff = (now - orderTime) / 1000 / 60; // minutes
+                    
+                    if (timeDiff < 5) {
+                        processNewOrder(orderData, orderId);
+                    }
+                }
+            });
+        });
+
+        // Listen for new feedbacks
+        const feedbacksQuery = query(
+            collection(db, 'feedbacks'),
+            orderBy('createdAt', 'desc'),
+            limit(10)
+        );
+
+        onSnapshot(feedbacksQuery, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === 'added') {
+                    const feedbackData = change.doc.data();
+                    const feedbackId = change.doc.id;
+                    
+                    // Only process recent feedback
+                    const feedbackTime = feedbackData.createdAt.toDate();
+                    const now = new Date();
+                    const timeDiff = (now - feedbackTime) / 1000 / 60; // minutes
+                    
+                    if (timeDiff < 5) {
+                        processNewFeedback(feedbackData, feedbackId);
+                    }
+                }
+            });
+        });
+    }
+
+    // Request notification permission
+    function requestNotificationPermission() {
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    }
+
+    // Event listeners
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize clock
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+        
+        // Request notification permission
+        requestNotificationPermission();
+        
+        // Initialize Firebase listeners
+        initializeNotificationListeners();
+
+        // Mark all as read
+        document.getElementById('markAllRead').addEventListener('click', function() {
+            notifications.forEach(notification => notification.isNew = false);
+            unreadCount = 0;
+            updateNotificationBadge();
+            renderNotifications();
+        });
+
+        // Notification click handler
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.notification-item')) {
+                const notificationId = e.target.closest('[data-notification-id]')?.dataset.notificationId;
+                if (notificationId) {
+                    // Find and mark as read
+                    const notification = notifications.find(n => n.id === notificationId);
+                    if (notification && notification.isNew) {
+                        notification.isNew = false;
+                        unreadCount--;
+                        updateNotificationBadge();
+                        renderNotifications();
+                    }
+                    
+                    // Handle navigation based on notification type
+                    if (notification.type === 'order') {
+                        window.location.href = 'index.php?page=orders';
+                    } else if (notification.type === 'feedback') {
+                        window.location.href = 'index.php?page=reviews';
+                    }
+                }
+            }
+        });
+
+        // Sidebar toggle functionality
+        document.getElementById('sidebarCollapse')?.addEventListener('click', function() {
+            console.log('Sidebar toggle clicked');
+        });
+
         // Profile modal event
         const profileModal = document.getElementById('profileModal');
         profileModal.addEventListener('shown.bs.modal', function () {
             console.log('Profile modal opened');
         });
 
-        // Notification click events
-        document.querySelectorAll('.dropdown-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                if (this.getAttribute('href') === '#') {
-                    e.preventDefault();
-                    console.log('Clicked:', this.textContent.trim());
+        // Logout functionality
+        document.querySelectorAll('.logout-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to logout?')) {
+                    if (typeof logout === 'function') {
+                        logout();
+                    } else {
+                        window.location.href = 'logout.php';
+                    }
                 }
             });
         });
 
-        // Edit button functionality
-        document.querySelectorAll('.btn-outline-secondary').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const input = this.parentElement.querySelector('input');
-                if (input && input.hasAttribute('readonly')) {
-                    input.removeAttribute('readonly');
-                    input.focus();
-                    this.innerHTML = '<i class="fas fa-save"></i>';
-                    this.classList.remove('btn-outline-secondary');
-                    this.classList.add('btn-success');
-                } else if (input) {
-                    input.setAttribute('readonly', true);
-                    this.innerHTML = '<i class="fas fa-edit"></i>';
-                    this.classList.remove('btn-success');
-                    this.classList.add('btn-outline-secondary');
-                }
+        // Update time ago every minute
+        setInterval(() => {
+            notifications.forEach(notification => {
+                notification.timeAgo = timeAgo(notification.timestamp);
             });
-        });
+            renderNotifications();
+        }, 60000);
     });
 </script>
 
