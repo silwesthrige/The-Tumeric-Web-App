@@ -166,13 +166,6 @@
         <!-- Header -->
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Reviews & Ratings</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-                <div class="btn-group me-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshData()">
-                        <i class="fas fa-sync-alt me-1"></i>Refresh
-                    </button>
-                </div>
-            </div>
         </div>
 
         <!-- Review Stats -->
@@ -362,6 +355,9 @@
                 document.getElementById('filtersCard').style.display = 'block';
                 document.getElementById('reviewsCard').style.display = 'block';
                 document.getElementById('chartsRow').style.display = 'flex';
+                
+                // Setup auto-refresh every 5 seconds
+                setInterval(refreshData, 5000);
             } catch (error) {
                 console.error('Error initializing dashboard:', error);
                 showError('Failed to load dashboard data. Please refresh the page.');
@@ -715,56 +711,18 @@
         };
 
         // Refresh data
-        window.refreshData = async function() {
+        async function refreshData() {
             try {
-                // Show loading state on all stat cards
-                document.getElementById('averageRatingCard').innerHTML = '<div class="loading"></div>';
-                document.getElementById('totalReviewsCard').innerHTML = '<div class="loading"></div>';
-                document.getElementById('positiveReviewsCard').innerHTML = '<div class="loading"></div>';
-                document.getElementById('anonymousReviewsCard').innerHTML = '<div class="loading"></div>';
-                
-                // Show loading in charts and reviews
-                document.getElementById('ratingDistribution').innerHTML = `
-                    <div class="loading-container">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                `;
-                
-                document.getElementById('reviewsList').innerHTML = `
-                    <div class="loading-container">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading reviews...</span>
-                        </div>
-                    </div>
-                `;
-                
-                // Hide cards during refresh
-                document.getElementById('filtersCard').style.display = 'none';
-                document.getElementById('reviewsCard').style.display = 'none';
-                document.getElementById('chartsRow').style.display = 'none';
-                
                 // Reload data
                 await Promise.all([loadUsers(), loadFeedbacks()]);
                 renderStats();
                 renderRatingDistribution();
                 renderReviews();
                 
-                // Show content
-                document.getElementById('filtersCard').style.display = 'block';
-                document.getElementById('reviewsCard').style.display = 'block';
-                document.getElementById('chartsRow').style.display = 'flex';
-                
             } catch (error) {
                 console.error('Error refreshing data:', error);
-                // Reset to error state
-                document.getElementById('averageRatingCard').innerHTML = 'Error';
-                document.getElementById('totalReviewsCard').innerHTML = 'Error';
-                document.getElementById('positiveReviewsCard').innerHTML = 'Error';
-                document.getElementById('anonymousReviewsCard').innerHTML = 'Error';
             }
-        };
+        }
 
         // Show error message
         function showError(message) {

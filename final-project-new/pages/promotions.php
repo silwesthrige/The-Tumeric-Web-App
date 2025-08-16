@@ -9,6 +9,10 @@
             position: relative;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             transition: all 0.3s ease;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         
         .stats-card:hover {
@@ -37,6 +41,12 @@
             font-weight: 700;
             color: #495057;
             margin-bottom: 0.25rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
         .stats-label {
@@ -354,6 +364,43 @@
             text-align: center;
             padding: 2rem;
         }
+
+        /* NEW: Horizontal scroll for active promotions */
+        .active-promotions-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            padding-bottom: 1rem;
+        }
+
+        .active-promotions-scroll .row {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .active-promotions-scroll .col-lg-4 {
+            flex: 0 0 300px;
+            max-width: 300px;
+            margin-right: 1rem;
+        }
+
+        .active-promotions-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .active-promotions-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .active-promotions-scroll::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .active-promotions-scroll::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
     </style>
 </head>
 <body>
@@ -419,10 +466,12 @@
                 </h5>
             </div>
             <div class="card-body">
-                <div class="row" id="activePromotionsContainer">
-                    <div class="col-12 stats-loading">
-                        <div class="loading"></div>
-                        <p class="mt-2">Loading active promotions...</p>
+                <div class="active-promotions-scroll">
+                    <div class="row" id="activePromotionsContainer">
+                        <div class="col-12 stats-loading">
+                            <div class="loading"></div>
+                            <p class="mt-2">Loading active promotions...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -683,6 +732,7 @@
 
         // Global variables
         let allPromotions = [];
+        let statsRefreshInterval;
 
         // Utility functions
         function showToast(message, type = 'success') {
@@ -828,6 +878,33 @@
             }
         }
 
+        // NEW: Auto-refresh stats every 5 seconds
+        function startStatsAutoRefresh() {
+            // Clear any existing interval
+            if (statsRefreshInterval) {
+                clearInterval(statsRefreshInterval);
+            }
+            
+            // Set up new interval for stats refresh
+            statsRefreshInterval = setInterval(async () => {
+                try {
+                    const promotionsRef = collection(db, 'promotions');
+                    const q = query(promotionsRef, orderBy('createdAt', 'desc'));
+                    const querySnapshot = await getDocs(q);
+                    
+                    allPromotions = [];
+                    querySnapshot.forEach((doc) => {
+                        allPromotions.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // Only update stats, not the full display
+                    updateStats();
+                } catch (error) {
+                    console.error('Error refreshing stats:', error);
+                }
+            }, 5000); // 5 seconds
+        }
+
         // Show error state in loading areas
         function showErrorState() {
             // Update stats cards
@@ -851,10 +928,10 @@
             updatePromotionsTable();
         }
 
-        // Update active promotions cards
+        // Update active promotions cards - MODIFIED for horizontal scrolling
         function updateActivePromotionsCards() {
             const container = document.getElementById('activePromotionsContainer');
-            const activePromotions = allPromotions.filter(promo => getPromotionStatus(promo) === 'active').slice(0, 3);
+            const activePromotions = allPromotions.filter(promo => getPromotionStatus(promo) === 'active');
             
             container.innerHTML = '';
             
@@ -971,14 +1048,14 @@
             document.getElementById('totalPromotionsCount').textContent = totalPromotions;
 
             // Most Used Promo
-            let mostUsed = { code: 'None', usageCount: 0 };
+            let mostUsed = { name: 'None', usageCount: 0 };
             allPromotions.forEach(promo => {
                 const usageCount = promo.usageCount || 0;
                 if (usageCount > mostUsed.usageCount) {
-                    mostUsed = { code: promo.code, usageCount };
+                    mostUsed = { name: promo.name, usageCount };
                 }
             });
-            document.getElementById('mostUsedPromo').textContent = mostUsed.code;
+            document.getElementById('mostUsedPromo').textContent = mostUsed.name;
 
             // Average Discount
             if (totalPromotions > 0) {
@@ -1163,6 +1240,9 @@
 
             // Load promotions on page load
             loadPromotions();
+            
+            // Start auto-refresh for stats
+            startStatsAutoRefresh();
         });
 
         // Create promotion form handler
@@ -1325,19 +1405,12 @@
             }
         });
 
-        // Real-time promotion monitoring (optional)
-        // Uncomment the following code to enable real-time updates
-        /*
-        const promotionsRef = collection(db, 'promotions');
-        onSnapshot(promotionsRef, (snapshot) => {
-            allPromotions = [];
-            snapshot.forEach((doc) => {
-                allPromotions.push({ id: doc.id, ...doc.data() });
-            });
-            updatePromotionsDisplay();
-            updateStats();
+        // Clean up interval on page unload
+        window.addEventListener('beforeunload', function() {
+            if (statsRefreshInterval) {
+                clearInterval(statsRefreshInterval);
+            }
         });
-        */
 
     </script>
 </body>

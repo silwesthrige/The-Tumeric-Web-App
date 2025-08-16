@@ -9,6 +9,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            min-width: 150px;
+            flex-shrink: 0;
         }
 
         .category-card:hover {
@@ -241,20 +243,61 @@
             margin-bottom: 0.5rem;
         }
 
-        /* Ensure all category cards have the same size */
-        .categories-container .col-md-2 {
-            min-height: 220px;
-            display: flex;
+        /* Categories horizontal scroll */
+        .categories-scroll-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 10px;
         }
 
-        .categories-container .category-card {
+        .categories-scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .categories-scroll-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .categories-scroll-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .categories-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .categories-flex {
+            display: flex;
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        .category-item {
+            min-width: 160px;
+            max-width: 160px;
+            width: 160px;
+            flex-shrink: 0;
+        }
+
+        .category-item .category-card {
+            height: 200px;
             width: 100%;
-            height: 100%;
         }
 
         /* Make category action buttons always visible */
         .category-actions {
             opacity: 1;
+        }
+
+        /* Bootstrap button styling for toolbar */
+        .btn-toolbar .btn {
+            margin-right: 0.25rem;
+        }
+
+        .btn-toolbar .btn-group {
+            margin-right: 0.5rem;
         }
     </style>
 </head>
@@ -284,17 +327,19 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="row categories-container" id="categoriesContainer">
-                            <div class="col-md-2 mb-3">
-                                <div class="card text-center category-card active" data-category="all">
-                                    <div class="card-body">
-                                        <i class="fas fa-utensils category-icon text-primary"></i>
-                                        <h6>All Items</h6>
-                                        <span class="badge bg-primary" id="count-all">0</span>
+                        <div class="categories-scroll-container">
+                            <div class="categories-flex" id="categoriesContainer">
+                                <div class="category-item">
+                                    <div class="card text-center category-card active" data-category="all">
+                                        <div class="card-body">
+                                            <i class="fas fa-utensils category-icon text-primary"></i>
+                                            <h6>All Items</h6>
+                                            <span class="badge bg-primary" id="count-all">0</span>
+                                        </div>
                                     </div>
                                 </div>
+                                <!-- Dynamic categories will be loaded here -->
                             </div>
-                            <!-- Dynamic categories will be loaded here -->
                         </div>
                     </div>
                 </div>
@@ -724,42 +769,69 @@
             });
         });
 
-        // Image upload functionality
+        // Fixed image upload functionality
         function setupImageUpload(uploadAreaId, fileInputId, previewId) {
             const uploadArea = document.getElementById(uploadAreaId);
             const fileInput = document.getElementById(fileInputId);
             const preview = document.getElementById(previewId);
 
+            // Remove any existing event listeners
+            const newUploadArea = uploadArea.cloneNode(true);
+            uploadArea.parentNode.replaceChild(newUploadArea, uploadArea);
+            
+            const newFileInput = document.getElementById(fileInputId);
+
             // Drag and drop functionality
-            uploadArea.addEventListener('dragover', (e) => {
+            newUploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                uploadArea.classList.add('dragover');
+                e.stopPropagation();
+                newUploadArea.classList.add('dragover');
             });
 
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
+            newUploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                newUploadArea.classList.remove('dragover');
             });
 
-            uploadArea.addEventListener('drop', (e) => {
+            newUploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
-                uploadArea.classList.remove('dragover');
+                e.stopPropagation();
+                newUploadArea.classList.remove('dragover');
                 const files = e.dataTransfer.files;
                 if (files.length > 0) {
                     handleFileSelect(files[0], preview);
-                    fileInput.files = files;
+                    // Create a new FileList and assign it
+                    const dt = new DataTransfer();
+                    dt.items.add(files[0]);
+                    newFileInput.files = dt.files;
                 }
             });
 
-            // Click to upload
-            uploadArea.addEventListener('click', () => {
-                fileInput.click();
+            // Click to upload - only on the upload area, not the button
+            newUploadArea.addEventListener('click', (e) => {
+                // Don't trigger if clicking on the button
+                if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'I') {
+                    newFileInput.click();
+                }
             });
 
-            fileInput.addEventListener('change', (e) => {
+            // File input change event
+            newFileInput.addEventListener('change', (e) => {
                 if (e.target.files.length > 0) {
                     handleFileSelect(e.target.files[0], preview);
                 }
             });
+
+            // Button click event
+            const chooseButton = newUploadArea.querySelector('button');
+            if (chooseButton) {
+                chooseButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    newFileInput.click();
+                });
+            }
         }
 
         function handleFileSelect(file, preview) {
@@ -779,12 +851,12 @@
         }
 
         // Initialize image upload for all modals
-        document.addEventListener('DOMContentLoaded', function() {
+        function initializeImageUploads() {
             setupImageUpload('uploadArea', 'imageUpload', 'imagePreview');
             setupImageUpload('editUploadArea', 'editImageUpload', 'editImagePreview');
             setupImageUpload('categoryUploadArea', 'categoryImageUpload', 'categoryImagePreview');
             setupImageUpload('editCategoryUploadArea', 'editCategoryImageUpload', 'editCategoryImagePreview');
-        });
+        }
     </script>
 
     <script type="module">
@@ -892,10 +964,17 @@
                 categoryForm.reset();
                 categoryForm.classList.remove('was-validated');
                 document.getElementById('categoryImagePreview').style.display = 'none';
-                bootstrap.Modal.getInstance(document.getElementById("addCategoryModal")).hide();
+                const addCategoryModal = bootstrap.Modal.getInstance(document.getElementById("addCategoryModal"));
+                addCategoryModal.hide();
                 
-                // Reload data
-                loadData();
+                // Reload data and reinitialize everything
+                await loadData();
+                
+                // Re-initialize image uploads after data load
+                setTimeout(() => {
+                    initializeImageUploads();
+                    updateCategoryCounts();
+                }, 200);
 
             } catch (error) {
                 console.error("Error adding category: ", error);
@@ -955,10 +1034,17 @@
                 editCategoryForm.reset();
                 editCategoryForm.classList.remove('was-validated');
                 document.getElementById('editCategoryImagePreview').style.display = 'none';
-                bootstrap.Modal.getInstance(document.getElementById("editCategoryModal")).hide();
+                const editCategoryModal = bootstrap.Modal.getInstance(document.getElementById("editCategoryModal"));
+                editCategoryModal.hide();
                 
-                // Reload data
-                loadData();
+                // Reload data and reinitialize everything
+                await loadData();
+                
+                // Re-initialize image uploads after data load
+                setTimeout(() => {
+                    initializeImageUploads();
+                    updateCategoryCounts();
+                }, 200);
 
             } catch (error) {
                 console.error("Error updating category: ", error);
@@ -1043,10 +1129,17 @@
                 form.reset();
                 form.classList.remove('was-validated');
                 document.getElementById('imagePreview').style.display = 'none';
-                bootstrap.Modal.getInstance(document.getElementById("addItemModal")).hide();
+                const addItemModal = bootstrap.Modal.getInstance(document.getElementById("addItemModal"));
+                addItemModal.hide();
                 
-                // Reload menu items
-                loadData();
+                // Reload data and reinitialize everything
+                await loadData();
+                
+                // Re-initialize image uploads after data load
+                setTimeout(() => {
+                    initializeImageUploads();
+                    updateCategoryCounts();
+                }, 200);
 
             } catch (error) {
                 console.error("Error adding document: ", error);
@@ -1138,10 +1231,17 @@
                 editForm.reset();
                 editForm.classList.remove('was-validated');
                 document.getElementById('editImagePreview').style.display = 'none';
-                bootstrap.Modal.getInstance(document.getElementById("editItemModal")).hide();
+                const editItemModal = bootstrap.Modal.getInstance(document.getElementById("editItemModal"));
+                editItemModal.hide();
                 
-                // Reload menu items
-                loadData();
+                // Reload data and reinitialize everything
+                await loadData();
+                
+                // Re-initialize image uploads after data load
+                setTimeout(() => {
+                    initializeImageUploads();
+                    updateCategoryCounts();
+                }, 200);
 
             } catch (error) {
                 console.error("Error updating document: ", error);
@@ -1178,15 +1278,32 @@
         function updateCategoriesDisplay() {
             const container = document.getElementById('categoriesContainer');
             
-            // Keep the "All Items" card and remove other dynamic categories
-            const allItemsCard = container.querySelector('[data-category="all"]').parentElement;
-            container.innerHTML = '';
-            container.appendChild(allItemsCard);
+            // Keep the "All Items" card
+            const allItemsCard = container.querySelector('[data-category="all"]');
+            if (allItemsCard) {
+                const allItemsContainer = allItemsCard.parentElement;
+                // Clear everything except the all items card
+                container.innerHTML = '';
+                container.appendChild(allItemsContainer);
+            } else {
+                // If "All Items" card doesn't exist, create it
+                container.innerHTML = `
+                    <div class="category-item">
+                        <div class="card text-center category-card active" data-category="all">
+                            <div class="card-body">
+                                <i class="fas fa-utensils category-icon text-primary"></i>
+                                <h6>All Items</h6>
+                                <span class="badge bg-primary" id="count-all">0</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
 
             // Add dynamic categories
             allCategories.forEach(category => {
                 const categoryCard = document.createElement('div');
-                categoryCard.className = 'col-md-2 mb-3';
+                categoryCard.className = 'category-item';
                 categoryCard.innerHTML = `
                     <div class="card text-center category-card" data-category="${category.categoryId}">
                         <div class="card-body">
@@ -1210,7 +1327,9 @@
             });
 
             // Re-setup category filtering
-            setupCategoryFiltering();
+            setTimeout(() => {
+                setupCategoryFiltering();
+            }, 100);
         }
 
         // Function to update category dropdowns
@@ -1291,6 +1410,9 @@
             await loadCategories();
             await loadMenuItems();
             
+            // Update category counts after loading
+            updateCategoryCounts();
+            
             // Re-setup category filtering after loading
             setTimeout(() => {
                 setupCategoryFiltering();
@@ -1298,7 +1420,7 @@
                 if (currentFilter !== 'all') {
                     filterMenuByCategory(currentFilter);
                 }
-            }, 100);
+            }, 150);
         }
 
         // Function to create menu item row
@@ -1390,9 +1512,16 @@
                 
                 // Remove from allMenuItems array
                 allMenuItems = allMenuItems.filter(item => item.id !== itemId);
-                updateCategoryCounts();
                 
-                loadMenuItems(); // Reload the list
+                // Reload data and reinitialize everything
+                await loadData();
+                
+                // Re-initialize image uploads after data load
+                setTimeout(() => {
+                    initializeImageUploads();
+                    updateCategoryCounts();
+                }, 200);
+                
                 alert("Item deleted successfully!");
             } catch (error) {
                 console.error("Error removing document: ", error);
@@ -1418,7 +1547,16 @@
                 console.log("Category successfully deleted!");
                 
                 alert("Category deleted successfully!");
-                loadData(); // Reload all data
+                
+                // Reload data and reinitialize everything
+                await loadData();
+                
+                // Re-initialize image uploads after data load
+                setTimeout(() => {
+                    initializeImageUploads();
+                    updateCategoryCounts();
+                }, 200);
+                
             } catch (error) {
                 console.error("Error deleting category: ", error);
                 alert("Failed to delete category");
@@ -1538,6 +1676,36 @@
         // Load all data when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
+            
+            // Initialize image uploads after DOM is loaded
+            setTimeout(() => {
+                initializeImageUploads();
+            }, 100);
+            
+            // Re-initialize image uploads when modals are shown
+            document.getElementById('addItemModal').addEventListener('shown.bs.modal', function () {
+                setTimeout(() => {
+                    initializeImageUploads();
+                }, 100);
+            });
+            
+            document.getElementById('editItemModal').addEventListener('shown.bs.modal', function () {
+                setTimeout(() => {
+                    initializeImageUploads();
+                }, 100);
+            });
+            
+            document.getElementById('addCategoryModal').addEventListener('shown.bs.modal', function () {
+                setTimeout(() => {
+                    initializeImageUploads();
+                }, 100);
+            });
+            
+            document.getElementById('editCategoryModal').addEventListener('shown.bs.modal', function () {
+                setTimeout(() => {
+                    initializeImageUploads();
+                }, 100);
+            });
         });
     </script>
 </body>

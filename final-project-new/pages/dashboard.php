@@ -113,13 +113,6 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Dashboard</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-                <div class="btn-group me-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshData()">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                </div>
-            </div>
         </div>
 
         <!-- Stats Cards -->
@@ -307,10 +300,12 @@
         let usersData = [];
         let menusData = [];
         let feedbacksData = [];
+        let autoRefreshInterval;
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
             initializeDashboard();
+            startAutoRefresh();
         });
 
         async function initializeDashboard() {
@@ -324,6 +319,20 @@
                 console.error('Error initializing dashboard:', error);
                 showError('Failed to load dashboard data');
             }
+        }
+
+        function startAutoRefresh() {
+            // Auto refresh every 5 seconds
+            autoRefreshInterval = setInterval(async () => {
+                try {
+                    await loadData();
+                    updateStatCards();
+                    loadRecentOrders();
+                    updateSalesChart();
+                } catch (error) {
+                    console.error('Error during auto refresh:', error);
+                }
+            }, 5000);
         }
 
         async function loadData() {
@@ -762,30 +771,17 @@
             alert('Reports & Analytics Page\n\nFeatures:\n• Detailed sales reports\n• Customer analytics\n• Performance metrics\n• Export capabilities\n• Revenue trends\n\nThis would show comprehensive reporting dashboards.');
         };
 
-        window.refreshData = async function() {
-            try {
-                // Show loading state
-                document.querySelectorAll('.stats-number').forEach(el => {
-                    if (!el.querySelector('.loading')) {
-                        el.innerHTML = '<div class="loading"></div>';
-                    }
-                });
-
-                await loadData();
-                updateStatCards();
-                loadRecentOrders();
-                updateSalesChart();
-                
-            } catch (error) {
-                console.error('Error refreshing data:', error);
-                showError('Failed to refresh data');
-            }
-        };
-
         // Add event listeners for menu item checkboxes
         document.addEventListener('change', function(e) {
             if (e.target.classList.contains('menu-item')) {
                 updateOrderTotal();
+            }
+        });
+
+        // Clean up auto refresh on page unload
+        window.addEventListener('beforeunload', function() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
             }
         });
 

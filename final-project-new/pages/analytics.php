@@ -1,8 +1,4 @@
 
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -133,11 +129,6 @@
     <div class="container-fluid px-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Analytics Dashboard</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="refreshData()">
-                    <i class="fas fa-sync-alt me-1"></i>Refresh
-                </button>
-            </div>
         </div>
 
         <!-- Key Metrics -->
@@ -988,6 +979,49 @@
             }
         }
 
+        // Auto-refresh function for only top 4 key metrics
+        async function autoRefreshKeyMetrics() {
+            try {
+                console.log('=== Auto-refreshing Key Metrics ===');
+                
+                // Fetch only the data needed for key metrics
+                const orders = await fetchOrders();
+                const users = await fetchUsers();
+
+                if (orders.length === 0 && users.length === 0) {
+                    console.warn('No data found for key metrics refresh');
+                    return;
+                }
+
+                // Calculate only key metrics
+                let keyMetrics;
+                try {
+                    keyMetrics = calculateKeyMetrics(orders, users);
+                    console.log('Key metrics refreshed:', keyMetrics);
+                } catch (error) {
+                    console.error('Error calculating key metrics during refresh:', error);
+                    keyMetrics = {
+                        totalRevenue: 0,
+                        revenueChange: 0,
+                        totalOrders: orders.length || 0,
+                        ordersChange: 0,
+                        avgOrderValue: 0,
+                        aovChange: 0,
+                        activeCustomers: users.length || 0,
+                        customersChange: 0
+                    };
+                }
+
+                // Update only the top 4 key metrics
+                updateKeyMetrics(keyMetrics);
+
+                console.log('=== Key metrics auto-refresh completed ===');
+
+            } catch (error) {
+                console.error('=== Error during auto-refresh ===', error);
+            }
+        }
+
         function showNoDataMessage() {
             const errorElements = ['totalRevenue', 'totalOrders', 'avgOrderValue', 'activeCustomers', 'newCustomers', 'retentionRate', 'avgRating'];
             errorElements.forEach(id => {
@@ -1044,46 +1078,6 @@
                 </div>`;
             });
         }
-
-        // Enhanced refresh function - only runs when button is clicked
-        window.refreshData = function() {
-            const refreshButton = document.querySelector('[onclick="refreshData()"]');
-            const originalText = refreshButton.innerHTML;
-            
-            // Prevent multiple simultaneous refreshes
-            if (refreshButton.disabled) {
-                return;
-            }
-            
-            refreshButton.innerHTML = '<i class="spinner-border spinner-border-sm me-1"></i>Refreshing...';
-            refreshButton.disabled = true;
-            
-            // Update connection status
-            const statusIndicator = document.getElementById('connectionStatus');
-            if (statusIndicator) {
-                statusIndicator.innerHTML = '<i class="spinner-border spinner-border-sm me-1"></i>Refreshing...';
-                statusIndicator.className = 'badge bg-warning';
-            }
-            
-            // DON'T show spinners during manual refresh - keep existing values visible
-            // Users can see the refresh button spinner and connection status to know it's updating
-            
-            initializeDashboard().then(() => {
-                if (statusIndicator) {
-                    statusIndicator.innerHTML = '<i class="fas fa-check-circle me-1"></i>Updated';
-                    statusIndicator.className = 'badge bg-success';
-                }
-            }).catch((error) => {
-                if (statusIndicator) {
-                    statusIndicator.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Error';
-                    statusIndicator.className = 'badge bg-danger';
-                }
-                console.error('Refresh failed:', error);
-            }).finally(() => {
-                refreshButton.innerHTML = originalText;
-                refreshButton.disabled = false;
-            });
-        };
 
         // Initialize dashboard when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -1157,9 +1151,11 @@
             }
         };
 
-        // Remove auto-refresh to prevent values from resetting
-        // Auto-refresh can be enabled by uncommenting the line below:
-        // setInterval(() => { console.log('Auto-refreshing dashboard...'); initializeDashboard(); }, 5 * 60 * 1000);
+        // Auto-refresh functionality - refresh only top 4 key metrics every 5 seconds
+        setInterval(() => { 
+            console.log('Auto-refreshing key metrics only...'); 
+            autoRefreshKeyMetrics(); 
+        }, 5000);
 
     </script>
 </body>

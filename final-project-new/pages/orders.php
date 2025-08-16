@@ -69,6 +69,16 @@
             animation: spin 1s linear infinite;
         }
         
+        .stats-loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0d6efd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -180,45 +190,52 @@
         .text-muted {
             color: #6c757d !important;
         }
+
+        .stats-number.loading {
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Orders Management</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newOrderModal">
-                    <i class="fas fa-plus me-1"></i>New Order
-                </button>
-            </div>
         </div>
 
         <!-- Order Stats -->
         <div class="row mb-4">
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card warning">
-                    <div class="stats-number" id="pendingCount">-</div>
+                    <div class="stats-number" id="pendingCount">
+                        <div class="stats-loading"></div>
+                    </div>
                     <div class="stats-label">Pending Orders</div>
                     <i class="fas fa-clock stats-icon"></i>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card">
-                    <div class="stats-number" id="preparingCount">-</div>
+                    <div class="stats-number" id="preparingCount">
+                        <div class="stats-loading"></div>
+                    </div>
                     <div class="stats-label">Preparing Orders</div>
                     <i class="fas fa-utensils stats-icon"></i>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card info">
-                    <div class="stats-number" id="deliveryCount">-</div>
+                    <div class="stats-number" id="deliveryCount">
+                        <div class="stats-loading"></div>
+                    </div>
                     <div class="stats-label">Out for Delivery</div>
                     <i class="fas fa-truck stats-icon"></i>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card success">
-                    <div class="stats-number" id="deliveredCount">-</div>
+                    <div class="stats-number" id="deliveredCount">
+                        <div class="stats-loading"></div>
+                    </div>
                     <div class="stats-label">Delivered Today</div>
                     <i class="fas fa-check-circle stats-icon"></i>
                 </div>
@@ -265,76 +282,6 @@
                             <!-- Orders will be loaded here -->
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- New Order Modal -->
-    <div class="modal fade" id="newOrderModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Create New Order</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="newOrderForm" class="needs-validation" novalidate>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label for="customerSelect" class="form-label">Customer</label>
-                                <select class="form-select" id="customerSelect" required>
-                                    <option value="">Select Customer</option>
-                                </select>
-                                <div class="invalid-feedback">Please select a customer.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="deliveryAddress" class="form-label">Delivery Address</label>
-                                <textarea class="form-control" id="deliveryAddress" rows="2" required></textarea>
-                                <div class="invalid-feedback">Please provide delivery address.</div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Order Items</label>
-                            <div id="orderItems">
-                                <div class="row mb-2 order-item">
-                                    <div class="col-md-6">
-                                        <select class="form-select food-select" required>
-                                            <option value="">Select Item</option>
-                                        </select>
-                                        <div class="invalid-feedback">Please select an item.</div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="number" class="form-control quantity-input" placeholder="Qty" min="1" value="1" required>
-                                        <div class="invalid-feedback">Please enter quantity.</div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <span class="form-control-plaintext item-price">₹0</span>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <button type="button" class="btn btn-outline-danger btn-sm remove-item" disabled>
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-outline-primary btn-sm" id="addItemBtn">
-                                <i class="fas fa-plus me-1"></i>Add Item
-                            </button>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <strong>Total: £<span id="orderTotal">0</span></strong>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="createOrderBtn">
-                        <span class="spinner-border spinner-border-sm me-2 d-none" role="status"></span>
-                        Create Order
-                    </button>
                 </div>
             </div>
         </div>
@@ -419,16 +366,13 @@
         import { 
             getFirestore, 
             collection, 
-            addDoc, 
             getDocs, 
             doc, 
             updateDoc, 
             deleteDoc,
             query,
-            where,
             orderBy,
-            onSnapshot,
-            getDoc
+            onSnapshot
         } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         // Firebase configuration
@@ -452,6 +396,23 @@
         let allMenuItems = [];
         let nextOrderId = 1;
         let isInitialLoad = true;
+        let autoRefreshInterval;
+
+        // Auto refresh function
+        function startAutoRefresh() {
+            autoRefreshInterval = setInterval(() => {
+                console.log('Auto-refreshing data...');
+                // Removed showStatsLoading() call here
+                loadOrders();
+            }, 5000); // Refresh every 5 seconds
+        }
+
+        function showStatsLoading() {
+            document.getElementById('pendingCount').innerHTML = '<div class="stats-loading"></div>';
+            document.getElementById('preparingCount').innerHTML = '<div class="stats-loading"></div>';
+            document.getElementById('deliveryCount').innerHTML = '<div class="stats-loading"></div>';
+            document.getElementById('deliveredCount').innerHTML = '<div class="stats-loading"></div>';
+        }
 
         // Utility functions
         function showToast(message, type = 'success') {
@@ -617,10 +578,6 @@
             return `<span class="badge ${badges[status]}">${displayNames[status]}</span>`;
         }
 
-        function getNextOrderId() {
-            return nextOrderId++;
-        }
-
         // Load data from Firestore
         async function loadUsers() {
             try {
@@ -630,7 +587,6 @@
                 allUsers = [];
                 querySnapshot.forEach((doc) => {
                     const userData = { id: doc.id, ...doc.data() };
-                    // Use userId from the document if it exists, otherwise use doc.id
                     userData.userId = userData.userId || doc.id;
                     allUsers.push(userData);
                 });
@@ -649,14 +605,12 @@
                 allMenuItems = [];
                 querySnapshot.forEach((doc) => {
                     const menuData = { id: doc.id, ...doc.data() };
-                    // Ensure we have the required fields
                     menuData.foodId = menuData.foodId || doc.id;
                     menuData.foodName = menuData.foodName || menuData.name || 'Unnamed Item';
                     menuData.price = menuData.price || 0;
                     allMenuItems.push(menuData);
                 });
                 
-                console.log('Loaded menu items:', allMenuItems);
                 populateFoodSelects();
             } catch (error) {
                 console.error('Error loading menu items:', error);
@@ -667,63 +621,63 @@
         async function loadOrders() {
             try {
                 const ordersRef = collection(db, 'orders');
-                const q = query(ordersRef, orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(ordersRef);
                 
-                // Use onSnapshot for real-time updates
-                onSnapshot(q, (querySnapshot) => {
-                    const newOrders = [];
-                    let maxOrderId = 0;
-                    
-                    querySnapshot.forEach((doc) => {
-                        const orderData = { id: doc.id, ...doc.data() };
-                        newOrders.push(orderData);
-                        if (orderData.orderId > maxOrderId) {
-                            maxOrderId = orderData.orderId;
-                        }
-                    });
-                    
-                    // Check for new orders (only after initial load)
-                    if (!isInitialLoad) {
-                        const previousOrderIds = allOrders.map(order => order.id);
-                        const newOrdersAdded = newOrders.filter(order => !previousOrderIds.includes(order.id));
-                        
-                        newOrdersAdded.forEach(order => {
-                            const customer = allUsers.find(u => u.userId === order.userId);
-                            const customerName = customer ? (customer.name || customer.username || 'Unknown Customer') : 'Unknown Customer';
-                            showTopNotification(`🆕 New order #${order.orderId} from ${customerName}`, 'success');
-                        });
-                        
-                        // Check for status changes
-                        allOrders.forEach(oldOrder => {
-                            const updatedOrder = newOrders.find(order => order.id === oldOrder.id);
-                            if (updatedOrder && updatedOrder.status !== oldOrder.status) {
-                                const statusMessages = {
-                                    'confirmed': '✅ Order confirmed',
-                                    'preparing': '👨‍🍳 Order is being prepared',
-                                    'out_for_delivery': '🚚 Order out for delivery',
-                                    'delivered': '📦 Order delivered',
-                                    'cancelled': '❌ Order cancelled',
-                                    'rejected': '🚫 Order rejected'
-                                };
-                                
-                                const message = statusMessages[updatedOrder.status] || `Status changed to ${updatedOrder.status}`;
-                                const notificationType = updatedOrder.status === 'delivered' ? 'success' : 
-                                                       updatedOrder.status === 'cancelled' || updatedOrder.status === 'rejected' ? 'warning' : 'info';
-                                
-                                showTopNotification(`${message} - Order #${updatedOrder.orderId}`, notificationType);
-                            }
-                        });
-                    }
-                    
-                    allOrders = newOrders;
-                    nextOrderId = maxOrderId + 1;
-                    updateOrdersDisplay();
-                    updateStats();
-                    
-                    if (isInitialLoad) {
-                        isInitialLoad = false;
+                const newOrders = [];
+                let maxOrderId = 0;
+                
+                querySnapshot.forEach((doc) => {
+                    const orderData = { id: doc.id, ...doc.data() };
+                    newOrders.push(orderData);
+                    if (orderData.orderId > maxOrderId) {
+                        maxOrderId = orderData.orderId;
                     }
                 });
+                
+                // Sort orders by creation date (newest first)
+                newOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                // Check for new orders (only after initial load)
+                if (!isInitialLoad) {
+                    const previousOrderIds = allOrders.map(order => order.id);
+                    const newOrdersAdded = newOrders.filter(order => !previousOrderIds.includes(order.id));
+                    
+                    newOrdersAdded.forEach(order => {
+                        const customer = allUsers.find(u => u.userId === order.userId);
+                        const customerName = customer ? (customer.name || customer.username || 'Unknown Customer') : 'Unknown Customer';
+                        showTopNotification(`🆕 New order #${order.orderId} from ${customerName}`, 'success');
+                    });
+                    
+                    // Check for status changes
+                    allOrders.forEach(oldOrder => {
+                        const updatedOrder = newOrders.find(order => order.id === oldOrder.id);
+                        if (updatedOrder && updatedOrder.status !== oldOrder.status) {
+                            const statusMessages = {
+                                'confirmed': '✅ Order confirmed',
+                                'preparing': '👨‍🍳 Order is being prepared',
+                                'out_for_delivery': '🚚 Order out for delivery',
+                                'delivered': '📦 Order delivered',
+                                'cancelled': '❌ Order cancelled',
+                                'rejected': '🚫 Order rejected'
+                            };
+                            
+                            const message = statusMessages[updatedOrder.status] || `Status changed to ${updatedOrder.status}`;
+                            const notificationType = updatedOrder.status === 'delivered' ? 'success' : 
+                                                   updatedOrder.status === 'cancelled' || updatedOrder.status === 'rejected' ? 'warning' : 'info';
+                            
+                            showTopNotification(`${message} - Order #${updatedOrder.orderId}`, notificationType);
+                        }
+                    });
+                }
+                
+                allOrders = newOrders;
+                nextOrderId = maxOrderId + 1;
+                updateOrdersDisplay();
+                updateStats();
+                
+                if (isInitialLoad) {
+                    isInitialLoad = false;
+                }
                 
             } catch (error) {
                 console.error('Error loading orders:', error);
@@ -733,19 +687,17 @@
 
         // Populate selects
         function populateCustomerSelects() {
-            const selects = [document.getElementById('customerSelect'), document.getElementById('editCustomerSelect')];
+            const editSelect = document.getElementById('editCustomerSelect');
             
-            selects.forEach(select => {
-                if (select) {
-                    select.innerHTML = '<option value="">Select Customer</option>';
-                    allUsers.forEach(user => {
-                        const userDisplayName = user.name || user.username || 'Unnamed User';
-                        const userContact = user.phone || user.email || '';
-                        const displayText = userContact ? `${userDisplayName} - ${userContact}` : userDisplayName;
-                        select.innerHTML += `<option value="${user.userId}">${displayText}</option>`;
-                    });
-                }
-            });
+            if (editSelect) {
+                editSelect.innerHTML = '<option value="">Select Customer</option>';
+                allUsers.forEach(user => {
+                    const userDisplayName = user.name || user.username || 'Unnamed User';
+                    const userContact = user.phone || user.email || '';
+                    const displayText = userContact ? `${userDisplayName} - ${userContact}` : userDisplayName;
+                    editSelect.innerHTML += `<option value="${user.userId}">${displayText}</option>`;
+                });
+            }
         }
 
         function populateFoodSelects() {
@@ -761,8 +713,6 @@
                     select.innerHTML += `<option value="${item.foodId}" data-price="${item.price}" data-name="${item.foodName}">${item.foodName} - ${formatCurrency(item.price)}</option>`;
                 });
             });
-            
-            console.log('Populated food selects with', allMenuItems.length, 'items');
         }
 
         // Update displays
@@ -781,14 +731,12 @@
                 
                 // Get order items details
                 let itemsDisplay = '';
-                let totalQuantity = 0;
                 let calculatedTotal = 0;
                 
                 if (order.items && typeof order.items === 'object') {
                     const itemKeys = Object.keys(order.items);
                     itemKeys.forEach((key, index) => {
                         const item = order.items[key];
-                        totalQuantity += item.qty;
                         calculatedTotal += (item.price * item.qty);
                         
                         if (index === 0) {
@@ -891,29 +839,6 @@
             document.getElementById('deliveredCount').textContent = delivered;
         }
 
-        // Order operations
-        async function createOrder(orderData) {
-            try {
-                const docRef = await addDoc(collection(db, 'orders'), {
-                    createdAt: new Date().toISOString(),
-                    deliveryAddress: orderData.deliveryAddress,
-                    items: orderData.items,
-                    orderId: getNextOrderId(),
-                    status: 'pending',
-                    updatedAt: new Date().toISOString(),
-                    userId: orderData.userId
-                });
-                
-                showToast('Order created successfully!');
-                // Real-time listener will handle the update and notification
-                return docRef.id;
-            } catch (error) {
-                console.error('Error creating order:', error);
-                showToast('Error creating order', 'error');
-                throw error;
-            }
-        }
-
         async function updateOrder(id, orderData) {
             try {
                 const orderRef = doc(db, 'orders', id);
@@ -925,7 +850,7 @@
                 });
                 
                 showToast('Order updated successfully!');
-                // Real-time listener will handle the update
+                loadOrders();
             } catch (error) {
                 console.error('Error updating order:', error);
                 showToast('Error updating order', 'error');
@@ -961,8 +886,8 @@
                     updatedAt: new Date().toISOString()
                 });
                 
-                // Don't show toast here as the real-time listener will handle the notification
                 console.log(`Order ${newStatus} successfully!`);
+                loadOrders();
             } catch (error) {
                 console.error('Error updating order status:', error);
                 showToast('Error updating order status', 'error');
@@ -977,7 +902,7 @@
             try {
                 await deleteDoc(doc(db, 'orders', id));
                 showToast('Order deleted successfully!');
-                // Real-time listener will handle the update
+                loadOrders();
             } catch (error) {
                 console.error('Error deleting order:', error);
                 showToast('Error deleting order', 'error');
@@ -1090,65 +1015,6 @@
         };
 
         // Order item management
-        function addOrderItem(foodId = '', quantity = 1, isFirst = false) {
-            const itemsContainer = document.getElementById('orderItems');
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'row mb-2 order-item';
-            
-            itemDiv.innerHTML = `
-                <div class="col-md-6">
-                    <select class="form-select food-select" required>
-                        <option value="">Select Item</option>
-                    </select>
-                    <div class="invalid-feedback">Please select an item.</div>
-                </div>
-                <div class="col-md-3">
-                    <input type="number" class="form-control quantity-input" placeholder="Qty" min="1" value="${quantity}" required>
-                    <div class="invalid-feedback">Please enter quantity.</div>
-                </div>
-                <div class="col-md-2">
-                    <span class="form-control-plaintext item-price">₹0</span>
-                </div>
-                <div class="col-md-1">
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-item" ${isFirst ? 'disabled' : ''}>
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            `;
-            
-            itemsContainer.appendChild(itemDiv);
-            
-            // Populate food select
-            const foodSelect = itemDiv.querySelector('.food-select');
-            foodSelect.innerHTML = '<option value="">Select Item</option>';
-            
-            if (allMenuItems.length === 0) {
-                foodSelect.innerHTML += '<option value="" disabled>No menu items available</option>';
-            } else {
-                allMenuItems.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.foodId;
-                    option.setAttribute('data-price', item.price);
-                    option.setAttribute('data-name', item.foodName);
-                    option.textContent = `${item.foodName} - ${formatCurrency(item.price)}`;
-                    if (item.foodId === foodId) option.selected = true;
-                    foodSelect.appendChild(option);
-                });
-            }
-            
-            // Add event listeners
-            foodSelect.addEventListener('change', calculateOrderTotal);
-            itemDiv.querySelector('.quantity-input').addEventListener('input', calculateOrderTotal);
-            itemDiv.querySelector('.remove-item').addEventListener('click', function() {
-                itemDiv.remove();
-                calculateOrderTotal();
-                updateRemoveButtons();
-            });
-            
-            calculateOrderTotal();
-            updateRemoveButtons();
-        }
-
         function addEditOrderItem(foodId = '', quantity = 1, isFirst = false) {
             const itemsContainer = document.getElementById('editOrderItems');
             const itemDiv = document.createElement('div');
@@ -1166,7 +1032,7 @@
                     <div class="invalid-feedback">Please enter quantity.</div>
                 </div>
                 <div class="col-md-2">
-                    <span class="form-control-plaintext item-price">₹0</span>
+                    <span class="form-control-plaintext item-price">£0</span>
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-outline-danger btn-sm remove-item" ${isFirst ? 'disabled' : ''}>
@@ -1208,25 +1074,6 @@
             updateEditRemoveButtons();
         }
 
-        function calculateOrderTotal() {
-            let total = 0;
-            document.querySelectorAll('#orderItems .order-item').forEach(item => {
-                const select = item.querySelector('.food-select');
-                const quantityInput = item.querySelector('.quantity-input');
-                const priceSpan = item.querySelector('.item-price');
-                
-                const selectedOption = select.options[select.selectedIndex];
-                const price = selectedOption ? parseFloat(selectedOption.getAttribute('data-price')) || 0 : 0;
-                const quantity = parseInt(quantityInput.value) || 0;
-                const itemTotal = price * quantity;
-                
-                priceSpan.textContent = formatCurrency(itemTotal);
-                total += itemTotal;
-            });
-            
-            document.getElementById('orderTotal').textContent = total;
-        }
-
         function calculateEditOrderTotal() {
             let total = 0;
             document.querySelectorAll('#editOrderItems .order-item').forEach(item => {
@@ -1246,14 +1093,6 @@
             document.getElementById('editOrderTotal').textContent = total;
         }
 
-        function updateRemoveButtons() {
-            const items = document.querySelectorAll('#orderItems .order-item');
-            items.forEach((item, index) => {
-                const removeBtn = item.querySelector('.remove-item');
-                removeBtn.disabled = items.length === 1;
-            });
-        }
-
         function updateEditRemoveButtons() {
             const items = document.querySelectorAll('#editOrderItems .order-item');
             items.forEach((item, index) => {
@@ -1269,73 +1108,8 @@
             loadMenuItems();
             loadOrders();
             
-            // Add initial order item
-            addOrderItem('', 1, true);
-        });
-
-        // Create order form handler
-        document.getElementById('createOrderBtn').addEventListener('click', async function() {
-            const form = document.getElementById('newOrderForm');
-            const btn = this;
-            const spinner = btn.querySelector('.spinner-border');
-            
-            if (!form.checkValidity()) {
-                form.classList.add('was-validated');
-                return;
-            }
-            
-            try {
-                btn.disabled = true;
-                spinner.classList.remove('d-none');
-                
-                // Collect order items
-                const items = {};
-                let hasValidItems = false;
-                let itemIndex = 0;
-                
-                document.querySelectorAll('#orderItems .order-item').forEach(item => {
-                    const foodSelect = item.querySelector('.food-select');
-                    const quantityInput = item.querySelector('.quantity-input');
-                    const selectedOption = foodSelect.options[foodSelect.selectedIndex];
-                    
-                    if (foodSelect.value && quantityInput.value && selectedOption) {
-                        items[itemIndex.toString()] = {
-                            foodId: foodSelect.value,
-                            name: selectedOption.getAttribute('data-name'),
-                            price: parseFloat(selectedOption.getAttribute('data-price')),
-                            qty: parseInt(quantityInput.value)
-                        };
-                        itemIndex++;
-                        hasValidItems = true;
-                    }
-                });
-                
-                if (!hasValidItems) {
-                    showToast('Please add at least one item to the order', 'error');
-                    return;
-                }
-                
-                const orderData = {
-                    deliveryAddress: document.getElementById('deliveryAddress').value,
-                    items: items,
-                    userId: document.getElementById('customerSelect').value
-                };
-                
-                await createOrder(orderData);
-                
-                // Reset form and close modal
-                form.reset();
-                form.classList.remove('was-validated');
-                document.getElementById('orderItems').innerHTML = '';
-                addOrderItem('', 1, true);
-                bootstrap.Modal.getInstance(document.getElementById('newOrderModal')).hide();
-                
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                btn.disabled = false;
-                spinner.classList.add('d-none');
-            }
+            // Start auto-refresh
+            startAutoRefresh();
         });
 
         // Update order form handler
@@ -1403,11 +1177,7 @@
             }
         });
 
-        // Add item buttons
-        document.getElementById('addItemBtn').addEventListener('click', function() {
-            addOrderItem();
-        });
-
+        // Add item button
         document.getElementById('editAddItemBtn').addEventListener('click', function() {
             addEditOrderItem();
         });
@@ -1458,6 +1228,13 @@
                 }
                 form.classList.add('was-validated');
             });
+        });
+
+        // Cleanup auto-refresh on page unload
+        window.addEventListener('beforeunload', function() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
         });
 
     </script>

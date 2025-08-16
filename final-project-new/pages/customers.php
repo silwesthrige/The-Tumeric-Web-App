@@ -1,3 +1,4 @@
+
 <body>
     <!-- Toast Container -->
     <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
@@ -11,9 +12,6 @@
                         <i class="fas fa-envelope me-1"></i>Send Newsletter
                     </button>
                 </div>
-                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-                    <i class="fas fa-plus me-1"></i>Add Customer
-                </button>
             </div>
         </div>
 
@@ -21,15 +19,23 @@
         <div class="row">
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card">
-                    <div class="stats-number" id="totalCustomers">0</div>
+                    <div class="stats-number" id="totalCustomers">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
                     <div class="stats-label">Total Customers</div>
-                    <small class="text-muted" id="customerGrowth">+0% this month</small>
+                    <small class="text-muted" id="customerGrowth">Loading...</small>
                     <i class="fas fa-users stats-icon"></i>
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card success">
-                    <div class="stats-number" id="activeCustomers">0</div>
+                    <div class="stats-number" id="activeCustomers">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
                     <div class="stats-label">Active Customers</div>
                     <small class="text-muted">Ordered this month</small>
                     <i class="fas fa-user-check stats-icon"></i>
@@ -37,7 +43,11 @@
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card warning">
-                    <div class="stats-number" id="newCustomers">0</div>
+                    <div class="stats-number" id="newCustomers">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
                     <div class="stats-label">New Customers</div>
                     <small class="text-muted">This month</small>
                     <i class="fas fa-user-plus stats-icon"></i>
@@ -45,7 +55,11 @@
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card info">
-                    <div class="stats-number" id="avgOrderValue">£0.00</div>
+                    <div class="stats-number" id="avgOrderValue">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
                     <div class="stats-label">Avg Order Value</div>
                     <small class="text-muted">Per customer</small>
                     <i class="fas fa-pound-sign stats-icon"></i>
@@ -101,58 +115,6 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Customer Modal -->
-    <div class="modal fade" id="addCustomerModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add New Customer</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addCustomerForm" class="needs-validation" novalidate>
-                        <div class="mb-3">
-                            <label for="customerName" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="customerName" required>
-                            <div class="invalid-feedback">Please provide a valid name.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="customerEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="customerEmail" required>
-                            <div class="invalid-feedback">Please provide a valid email.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="customerPhone" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="customerPhone" required>
-                            <div class="invalid-feedback">Please provide a valid phone number.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="customerPassword" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="customerPassword" required>
-                            <div class="invalid-feedback">Please provide a password.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="customerAddress" class="form-label">Address</label>
-                            <textarea class="form-control" id="customerAddress" rows="3" required></textarea>
-                            <div class="invalid-feedback">Please provide an address.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="customerProfileImage" class="form-label">Profile Image (Optional)</label>
-                            <input type="file" class="form-control" id="customerProfileImage" accept="image/*">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="addCustomerBtn">
-                        <span class="spinner-border spinner-border-sm me-2 d-none" role="status"></span>
-                        Add Customer
-                    </button>
                 </div>
             </div>
         </div>
@@ -486,7 +448,6 @@
         import { 
             getFirestore, 
             collection, 
-            addDoc, 
             getDocs, 
             doc, 
             updateDoc, 
@@ -521,6 +482,7 @@
         let allCustomers = [];
         let allOrders = [];
         let filteredCustomers = [];
+        let refreshInterval;
 
         // Utility functions
         function showToast(message, type = 'success') {
@@ -631,6 +593,37 @@
             } catch (error) {
                 console.error('Error loading orders:', error);
                 showToast('Error loading orders: ' + error.message, 'error');
+            }
+        }
+
+        // Auto refresh function
+        async function refreshData() {
+            try {
+                console.log('Auto refreshing data...');
+                await Promise.all([loadCustomers(), loadOrders()]);
+            } catch (error) {
+                console.error('Error during auto refresh:', error);
+            }
+        }
+
+        // Start auto refresh
+        function startAutoRefresh() {
+            // Clear existing interval if any
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            
+            // Set up new interval for 5 seconds
+            refreshInterval = setInterval(refreshData, 5000);
+            console.log('Auto refresh started (5 seconds interval)');
+        }
+
+        // Stop auto refresh
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+                console.log('Auto refresh stopped');
             }
         }
 
@@ -747,10 +740,11 @@
             const avgOrderValue = allOrders.length > 0 ? totalRevenue / allOrders.length : 0;
             const growthRate = totalCustomers > 0 ? Math.round((newCustomers / totalCustomers) * 100) : 0;
             
-            document.getElementById('totalCustomers').textContent = totalCustomers;
-            document.getElementById('activeCustomers').textContent = activeCustomers;
-            document.getElementById('newCustomers').textContent = newCustomers;
-            document.getElementById('avgOrderValue').textContent = formatCurrency(avgOrderValue);
+            // Update stats with actual values and remove spinners
+            document.getElementById('totalCustomers').innerHTML = totalCustomers;
+            document.getElementById('activeCustomers').innerHTML = activeCustomers;
+            document.getElementById('newCustomers').innerHTML = newCustomers;
+            document.getElementById('avgOrderValue').innerHTML = formatCurrency(avgOrderValue);
             document.getElementById('customerGrowth').textContent = `+${growthRate}% this month`;
         }
 
@@ -767,34 +761,6 @@
         }
 
         // Customer operations
-        async function createCustomer(customerData, imageFile) {
-            try {
-                let profileImageUrl = '';
-                
-                if (imageFile) {
-                    const imagePath = `customers/${Date.now()}_${imageFile.name}`;
-                    profileImageUrl = await uploadImage(imageFile, imagePath);
-                }
-                
-                const docRef = await addDoc(collection(db, 'users'), {
-                    ...customerData,
-                    profileImageUrl,
-                    orders: [],
-                    cart: [],
-                    favFoods: [],
-                    createdAt: new Date().toISOString()
-                });
-                
-                showToast('Customer added successfully!');
-                await loadCustomers();
-                return docRef.id;
-            } catch (error) {
-                console.error('Error creating customer:', error);
-                showToast('Error creating customer: ' + error.message, 'error');
-                throw error;
-            }
-        }
-
         async function updateCustomer(id, customerData, imageFile) {
             try {
                 let updateData = { ...customerData };
@@ -1100,48 +1066,12 @@ Follow us on social media for daily updates!`;
             loadCustomers();
             loadOrders();
             
+            // Start auto refresh
+            startAutoRefresh();
+            
             // Set up filter listeners
             document.getElementById('dateFilter').addEventListener('change', applyFilters);
             document.getElementById('customerSearch').addEventListener('input', applyFilters);
-            
-            // Add customer form handler
-            document.getElementById('addCustomerBtn').addEventListener('click', async function() {
-                const form = document.getElementById('addCustomerForm');
-                const btn = this;
-                const spinner = btn.querySelector('.spinner-border');
-                
-                if (!form.checkValidity()) {
-                    form.classList.add('was-validated');
-                    return;
-                }
-                
-                try {
-                    btn.disabled = true;
-                    spinner.classList.remove('d-none');
-                    
-                    const customerData = {
-                        name: document.getElementById('customerName').value,
-                        email: document.getElementById('customerEmail').value,
-                        phone: document.getElementById('customerPhone').value,
-                        password: document.getElementById('customerPassword').value,
-                        address: document.getElementById('customerAddress').value
-                    };
-                    
-                    const imageFile = document.getElementById('customerProfileImage').files[0];
-                    
-                    await createCustomer(customerData, imageFile);
-                    
-                    form.reset();
-                    form.classList.remove('was-validated');
-                    bootstrap.Modal.getInstance(document.getElementById('addCustomerModal')).hide();
-                    
-                } catch (error) {
-                    console.error('Error adding customer:', error);
-                } finally {
-                    btn.disabled = false;
-                    spinner.classList.add('d-none');
-                }
-            });
             
             // Update customer form handler
             document.getElementById('updateCustomerBtn').addEventListener('click', async function() {
@@ -1192,6 +1122,9 @@ Follow us on social media for daily updates!`;
                     form.classList.add('was-validated');
                 });
             });
+
+            // Stop auto refresh when page is unloaded
+            window.addEventListener('beforeunload', stopAutoRefresh);
         });
 
     </script>

@@ -1,3 +1,4 @@
+
 <body>
     <div class="container-fluid">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -188,6 +189,25 @@
                 </div>
                 <div class="modal-body">
                     <form id="addStaffForm" class="needs-validation" novalidate>
+                        <!-- Photo Upload Section -->
+                        <div class="row mb-3">
+                            <div class="col-12 text-center">
+                                <div class="photo-upload-container">
+                                    <div class="photo-preview" id="photoPreview">
+                                        <i class="fas fa-camera fa-2x text-muted"></i>
+                                        <p class="text-muted mt-2">Click to upload photo</p>
+                                    </div>
+                                    <input type="file" class="d-none" id="staffPhoto" accept="image/*">
+                                    <div class="upload-progress d-none" id="uploadProgress">
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                        <small class="text-muted">Uploading photo...</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="staffName" class="form-label">Full Name</label>
@@ -277,6 +297,26 @@
                 <div class="modal-body">
                     <form id="editStaffForm" class="needs-validation" novalidate>
                         <input type="hidden" id="editStaffId">
+                        
+                        <!-- Photo Upload Section for Edit -->
+                        <div class="row mb-3">
+                            <div class="col-12 text-center">
+                                <div class="photo-upload-container">
+                                    <div class="photo-preview" id="editPhotoPreview">
+                                        <i class="fas fa-camera fa-2x text-muted"></i>
+                                        <p class="text-muted mt-2">Click to upload photo</p>
+                                    </div>
+                                    <input type="file" class="d-none" id="editStaffPhoto" accept="image/*">
+                                    <div class="upload-progress d-none" id="editUploadProgress">
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                        <small class="text-muted">Uploading photo...</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="editStaffName" class="form-label">Full Name</label>
@@ -574,6 +614,7 @@
             justify-content: center;
             font-weight: bold;
             font-size: 14px;
+            object-fit: cover;
         }
 
         .avatar-circle-large {
@@ -587,6 +628,53 @@
             justify-content: center;
             font-weight: bold;
             font-size: 24px;
+            object-fit: cover;
+        }
+
+        /* Photo Upload Styles */
+        .photo-upload-container {
+            margin-bottom: 1rem;
+        }
+
+        .photo-preview {
+            width: 120px;
+            height: 120px;
+            border: 2px dashed #dee2e6;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-preview:hover {
+            border-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .photo-preview.has-image {
+            border: 2px solid #28a745;
+        }
+
+        .upload-progress {
+            margin-top: 10px;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .status-buttons {
@@ -663,6 +751,13 @@
             onSnapshot,
             getDoc
         } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import {
+            getStorage,
+            ref,
+            uploadBytes,
+            getDownloadURL,
+            uploadBytesResumable
+        } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -678,10 +773,12 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
         // Global variables
         let allStaff = [];
         let nextEmployeeId = 1;
+        let autoRefreshInterval;
 
         // Utility functions
         function showToast(message, type = 'success') {
@@ -789,6 +886,116 @@
             });
         }
 
+        // Photo upload function
+        async function uploadPhoto(file, employeeId, isEdit = false) {
+            const progressId = isEdit ? 'editUploadProgress' : 'uploadProgress';
+            const progressElement = document.getElementById(progressId);
+            const progressBar = progressElement.querySelector('.progress-bar');
+            
+            progressElement.classList.remove('d-none');
+            
+            try {
+                // Create a reference to the storage location
+                const storageRef = ref(storage, `staff-photos/${employeeId}-${Date.now()}.jpg`);
+                
+                // Upload the file with progress tracking
+                const uploadTask = uploadBytesResumable(storageRef, file);
+                
+                return new Promise((resolve, reject) => {
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            // Progress monitoring
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            progressBar.style.width = progress + '%';
+                        },
+                        (error) => {
+                            // Error handling
+                            progressElement.classList.add('d-none');
+                            console.error('Upload error:', error);
+                            reject(error);
+                        },
+                        async () => {
+                            // Upload completed successfully
+                            try {
+                                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                                progressElement.classList.add('d-none');
+                                resolve(downloadURL);
+                            } catch (error) {
+                                progressElement.classList.add('d-none');
+                                reject(error);
+                            }
+                        }
+                    );
+                });
+            } catch (error) {
+                progressElement.classList.add('d-none');
+                throw error;
+            }
+        }
+
+        // Setup photo upload handlers
+        function setupPhotoUpload() {
+            // Add staff photo upload
+            const photoPreview = document.getElementById('photoPreview');
+            const photoInput = document.getElementById('staffPhoto');
+            
+            photoPreview.addEventListener('click', () => {
+                photoInput.click();
+            });
+            
+            photoInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        photoPreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        photoPreview.classList.add('has-image');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Edit staff photo upload
+            const editPhotoPreview = document.getElementById('editPhotoPreview');
+            const editPhotoInput = document.getElementById('editStaffPhoto');
+            
+            editPhotoPreview.addEventListener('click', () => {
+                editPhotoInput.click();
+            });
+            
+            editPhotoInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        editPhotoPreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        editPhotoPreview.classList.add('has-image');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Auto refresh functionality
+        function startAutoRefresh() {
+            // Clear any existing interval
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+            
+            // Set up new interval for 5 seconds
+            autoRefreshInterval = setInterval(() => {
+                loadStaff();
+            }, 5000);
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
         // Load staff from Firestore
         async function loadStaff() {
             try {
@@ -847,11 +1054,15 @@
                 const row = document.createElement('tr');
                 row.setAttribute('data-department', staff.department);
                 
+                const avatarContent = staff.photoURL 
+                    ? `<img src="${staff.photoURL}" alt="${staff.name}" class="avatar-circle">`
+                    : `<div class="avatar-circle">${getInitials(staff.name)}</div>`;
+                
                 row.innerHTML = `
                     <td>
                         <div class="d-flex align-items-center">
-                            <div class="avatar-circle me-3">${getInitials(staff.name)}</div>
-                            <div>
+                            ${avatarContent}
+                            <div class="ms-3">
                                 <strong>${staff.name}</strong><br>
                                 <small class="text-muted">ID: ${staff.employeeId}</small>
                             </div>
@@ -942,10 +1153,25 @@
         // Create staff
         async function createStaff(staffData) {
             try {
+                const employeeId = generateEmployeeId();
+                let photoURL = null;
+
+                // Handle photo upload if provided
+                const photoFile = document.getElementById('staffPhoto').files[0];
+                if (photoFile) {
+                    try {
+                        photoURL = await uploadPhoto(photoFile, employeeId);
+                    } catch (photoError) {
+                        console.error('Photo upload failed:', photoError);
+                        showToast('Staff added but photo upload failed', 'warning');
+                    }
+                }
+
                 const docRef = await addDoc(collection(db, 'staff'), {
                     ...staffData,
-                    employeeId: generateEmployeeId(),
+                    employeeId: employeeId,
                     status: 'off_duty',
+                    photoURL: photoURL,
                     createdAt: new Date().toISOString()
                 });
                 
@@ -962,9 +1188,24 @@
         // Update staff
         async function updateStaff(id, staffData) {
             try {
+                const staff = allStaff.find(s => s.id === id);
+                let photoURL = staff?.photoURL || null;
+
+                // Handle photo upload if new photo provided
+                const photoFile = document.getElementById('editStaffPhoto').files[0];
+                if (photoFile) {
+                    try {
+                        photoURL = await uploadPhoto(photoFile, staff.employeeId, true);
+                    } catch (photoError) {
+                        console.error('Photo upload failed:', photoError);
+                        showToast('Staff updated but photo upload failed', 'warning');
+                    }
+                }
+
                 const staffRef = doc(db, 'staff', id);
                 await updateDoc(staffRef, {
                     ...staffData,
+                    photoURL: photoURL,
                     updatedAt: new Date().toISOString()
                 });
                 
@@ -1072,6 +1313,19 @@
             document.getElementById('editJoinDate').value = staff.joinDate;
             document.getElementById('editShiftType').value = staff.shiftType;
             
+            // Set photo preview
+            const editPhotoPreview = document.getElementById('editPhotoPreview');
+            if (staff.photoURL) {
+                editPhotoPreview.innerHTML = `<img src="${staff.photoURL}" alt="${staff.name}">`;
+                editPhotoPreview.classList.add('has-image');
+            } else {
+                editPhotoPreview.innerHTML = `
+                    <i class="fas fa-camera fa-2x text-muted"></i>
+                    <p class="text-muted mt-2">Click to upload photo</p>
+                `;
+                editPhotoPreview.classList.remove('has-image');
+            }
+            
             new bootstrap.Modal(document.getElementById('editStaffModal')).show();
         }
 
@@ -1082,11 +1336,15 @@
             
             document.getElementById('staffDetailsTitle').textContent = `Staff Details - ${staff.name}`;
             
+            const avatarContent = staff.photoURL 
+                ? `<img src="${staff.photoURL}" alt="${staff.name}" class="avatar-circle-large mx-auto mb-3">`
+                : `<div class="avatar-circle-large mx-auto mb-3">${getInitials(staff.name)}</div>`;
+            
             document.getElementById('staffDetailsBody').innerHTML = `
                 <div class="row">
                     <div class="col-md-4">
                         <div class="text-center mb-3">
-                            <div class="avatar-circle-large mx-auto mb-3">${getInitials(staff.name)}</div>
+                            ${avatarContent}
                             <h5>${staff.name}</h5>
                             <span class="badge bg-primary">${staff.role}</span>
                         </div>
@@ -1149,14 +1407,39 @@
             new bootstrap.Modal(document.getElementById('staffDetailsModal')).show();
         }
 
+        // Reset photo preview
+        function resetPhotoPreview(previewId) {
+            const preview = document.getElementById(previewId);
+            preview.innerHTML = `
+                <i class="fas fa-camera fa-2x text-muted"></i>
+                <p class="text-muted mt-2">Click to upload photo</p>
+            `;
+            preview.classList.remove('has-image');
+        }
+
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Set default joining date to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('joinDate').value = today;
             
+            // Setup photo upload functionality
+            setupPhotoUpload();
+            
             // Load staff data
             loadStaff();
+            
+            // Start auto refresh
+            startAutoRefresh();
+        });
+
+        // Stop auto refresh when page is not visible
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                stopAutoRefresh();
+            } else {
+                startAutoRefresh();
+            }
         });
 
         // Add staff form handler
@@ -1191,6 +1474,8 @@
                 // Reset form and close modal
                 form.reset();
                 form.classList.remove('was-validated');
+                resetPhotoPreview('photoPreview');
+                document.getElementById('staffPhoto').value = '';
                 bootstrap.Modal.getInstance(document.getElementById('addStaffModal')).hide();
                 
                 // Reset default date
@@ -1237,6 +1522,8 @@
                 // Reset form and close modal
                 form.reset();
                 form.classList.remove('was-validated');
+                resetPhotoPreview('editPhotoPreview');
+                document.getElementById('editStaffPhoto').value = '';
                 bootstrap.Modal.getInstance(document.getElementById('editStaffModal')).hide();
                 
             } catch (error) {
@@ -1289,6 +1576,11 @@
                 }
                 form.classList.add('was-validated');
             });
+        });
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+            stopAutoRefresh();
         });
 
     </script>
