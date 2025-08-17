@@ -194,9 +194,75 @@
         .stats-number.loading {
             color: #6c757d;
         }
+
+        /* Print Receipt Styles */
+        .receipt-print {
+            display: none;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .receipt-print, .receipt-print * {
+                visibility: visible;
+            }
+            .receipt-print {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100% !important;
+                display: block !important;
+                font-family: 'Courier New', monospace;
+                font-size: 12px;
+                line-height: 1.4;
+                color: #000;
+            }
+            .receipt-header {
+                text-align: center;
+                border-bottom: 2px solid #000;
+                padding-bottom: 10px;
+                margin-bottom: 15px;
+            }
+            .receipt-title {
+                font-size: 18px;
+                font-weight: bold;
+                margin: 0;
+            }
+            .receipt-subtitle {
+                font-size: 14px;
+                margin: 5px 0;
+            }
+            .receipt-section {
+                margin: 15px 0;
+                padding: 5px 0;
+                border-bottom: 1px dashed #000;
+            }
+            .receipt-row {
+                display: flex;
+                justify-content: space-between;
+                margin: 3px 0;
+            }
+            .receipt-total {
+                border-top: 2px solid #000;
+                padding-top: 5px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            .receipt-footer {
+                text-align: center;
+                margin-top: 20px;
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Receipt Template (Hidden, only visible when printing) -->
+    <div id="receiptPrint" class="receipt-print">
+        <!-- Receipt content will be generated here -->
+    </div>
+
     <div class="container-fluid">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Orders Management</h1>
@@ -359,7 +425,6 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Firebase Configuration -->
     <script type="module">
         // Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
@@ -397,14 +462,14 @@
         let nextOrderId = 1;
         let isInitialLoad = true;
         let autoRefreshInterval;
+        let currentOrderForReceipt = null;
 
         // Auto refresh function
         function startAutoRefresh() {
             autoRefreshInterval = setInterval(() => {
                 console.log('Auto-refreshing data...');
-                // Removed showStatsLoading() call here
                 loadOrders();
-            }, 5000); // Refresh every 5 seconds
+            }, 5000);
         }
 
         function showStatsLoading() {
@@ -436,7 +501,6 @@
         }
 
         function showTopNotification(message, type = 'info') {
-            // Create notification container if it doesn't exist
             let notificationContainer = document.getElementById('notificationContainer');
             if (!notificationContainer) {
                 notificationContainer = document.createElement('div');
@@ -452,7 +516,6 @@
                 document.body.appendChild(notificationContainer);
             }
 
-            // Create notification
             const notification = document.createElement('div');
             notification.className = `alert alert-${type} alert-dismissible fade show mb-2`;
             notification.style.cssText = `
@@ -481,7 +544,6 @@
                 </div>
             `;
 
-            // Add CSS animation if not already added
             if (!document.getElementById('notificationStyles')) {
                 const style = document.createElement('style');
                 style.id = 'notificationStyles';
@@ -503,7 +565,6 @@
 
             notificationContainer.appendChild(notification);
 
-            // Auto remove after 4 seconds
             setTimeout(() => {
                 if (notification.parentNode) {
                     notification.classList.add('notification-exit');
@@ -515,7 +576,6 @@
                 }
             }, 4000);
 
-            // Handle manual close
             const closeBtn = notification.querySelector('.btn-close');
             closeBtn.addEventListener('click', () => {
                 notification.classList.add('notification-exit');
@@ -548,12 +608,12 @@
             }
         }
 
-       function formatCurrency(amount) { 
-             if (isNaN(amount) || amount === null) return "£0";
-             return new Intl.NumberFormat('en-GB', {
-             style: 'currency',
-             currency: 'GBP'
-         }).format(amount);
+        function formatCurrency(amount) { 
+            if (isNaN(amount) || amount === null) return "£0";
+            return new Intl.NumberFormat('en-GB', {
+                style: 'currency',
+                currency: 'GBP'
+            }).format(amount);
         }
 
         function getStatusBadge(status) {
@@ -634,10 +694,8 @@
                     }
                 });
                 
-                // Sort orders by creation date (newest first)
                 newOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 
-                // Check for new orders (only after initial load)
                 if (!isInitialLoad) {
                     const previousOrderIds = allOrders.map(order => order.id);
                     const newOrdersAdded = newOrders.filter(order => !previousOrderIds.includes(order.id));
@@ -648,7 +706,6 @@
                         showTopNotification(`🆕 New order #${order.orderId} from ${customerName}`, 'success');
                     });
                     
-                    // Check for status changes
                     allOrders.forEach(oldOrder => {
                         const updatedOrder = newOrders.find(order => order.id === oldOrder.id);
                         if (updatedOrder && updatedOrder.status !== oldOrder.status) {
@@ -685,7 +742,6 @@
             }
         }
 
-        // Populate selects
         function populateCustomerSelects() {
             const editSelect = document.getElementById('editCustomerSelect');
             
@@ -715,7 +771,6 @@
             });
         }
 
-        // Update displays
         function updateOrdersDisplay() {
             updateOrdersTable();
         }
@@ -729,7 +784,6 @@
                 const customerName = customer ? (customer.name || customer.username || 'Unknown Customer') : 'Unknown Customer';
                 const customerPhone = customer ? (customer.phone || customer.email || '') : 'N/A';
                 
-                // Get order items details
                 let itemsDisplay = '';
                 let calculatedTotal = 0;
                 
@@ -913,12 +967,10 @@
             const order = allOrders.find(o => o.id === id);
             if (!order) return;
             
-            // Populate edit form
             document.getElementById('editOrderId').value = id;
             document.getElementById('editCustomerSelect').value = order.userId;
             document.getElementById('editDeliveryAddress').value = order.deliveryAddress;
             
-            // Populate items
             const itemsContainer = document.getElementById('editOrderItems');
             itemsContainer.innerHTML = '';
             
@@ -939,6 +991,8 @@
         window.viewOrderDetails = function(id) {
             const order = allOrders.find(o => o.id === id);
             if (!order) return;
+            
+            currentOrderForReceipt = order;
             
             const customer = allUsers.find(u => u.userId === order.userId);
             const customerName = customer ? (customer.name || customer.username || 'Unknown Customer') : 'Unknown Customer';
@@ -1011,10 +1065,103 @@
         };
 
         window.printReceipt = function() {
+            if (!currentOrderForReceipt) {
+                showToast('No order selected for printing', 'error');
+                return;
+            }
+
+            const order = currentOrderForReceipt;
+            const customer = allUsers.find(u => u.userId === order.userId);
+            const customerName = customer ? (customer.name || customer.username || 'Unknown Customer') : 'Unknown Customer';
+            const customerPhone = customer ? (customer.phone || customer.email || '') : 'N/A';
+            
+            let itemsHtml = '';
+            let subtotal = 0;
+            
+            if (order.items && typeof order.items === 'object') {
+                Object.keys(order.items).forEach(key => {
+                    const item = order.items[key];
+                    const itemTotal = item.price * item.qty;
+                    subtotal += itemTotal;
+                    
+                    itemsHtml += `
+                        <div class="receipt-row">
+                            <span>${item.name}</span>
+                            <span>${item.qty} x £${item.price.toFixed(2)} = £${itemTotal.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            const receiptHtml = `
+                <div class="receipt-header">
+                    <h1 class="receipt-title">THE TURMERIC INDIAN CUISINE</h1>
+                    <div class="receipt-subtitle">Order Receipt</div>
+                    <div class="receipt-subtitle">Tel: +44 123 456 7890</div>
+                </div>
+                
+                <div class="receipt-section">
+                    <div class="receipt-row">
+                        <span><strong>Order #:</strong></span>
+                        <span><strong>${order.orderId}</strong></span>
+                    </div>
+                    <div class="receipt-row">
+                        <span><strong>Date:</strong></span>
+                        <span>${new Date(order.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span><strong>Time:</strong></span>
+                        <span>${new Date(order.createdAt).toLocaleTimeString()}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span><strong>Status:</strong></span>
+                        <span>${order.status.toUpperCase()}</span>
+                    </div>
+                </div>
+                
+                <div class="receipt-section">
+                    <div class="receipt-row">
+                        <span><strong>Customer:</strong></span>
+                        <span>${customerName}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span><strong>Phone:</strong></span>
+                        <span>${customerPhone}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span><strong>Address:</strong></span>
+                        <span>${order.deliveryAddress}</span>
+                    </div>
+                </div>
+                
+                <div class="receipt-section">
+                    <div class="receipt-row">
+                        <span><strong>ITEMS ORDERED:</strong></span>
+                        <span></span>
+                    </div>
+                    ${itemsHtml}
+                </div>
+                
+                <div class="receipt-total">
+                    <div class="receipt-row">
+                        <span><strong>TOTAL:</strong></span>
+                        <span><strong>£${subtotal.toFixed(2)}</strong></span>
+                    </div>
+                </div>
+                
+                <div class="receipt-footer">
+                    <div>Thank you for your order!</div>
+                    <div>Enjoy your meal!</div>
+                    <div>---</div>
+                    <div>Follow us on social media</div>
+                    <div>@turmericindian</div>
+                </div>
+            `;
+            
+            document.getElementById('receiptPrint').innerHTML = receiptHtml;
             window.print();
         };
 
-        // Order item management
         function addEditOrderItem(foodId = '', quantity = 1, isFirst = false) {
             const itemsContainer = document.getElementById('editOrderItems');
             const itemDiv = document.createElement('div');
@@ -1043,7 +1190,6 @@
             
             itemsContainer.appendChild(itemDiv);
             
-            // Populate food select
             const foodSelect = itemDiv.querySelector('.food-select');
             foodSelect.innerHTML = '<option value="">Select Item</option>';
             
@@ -1061,7 +1207,6 @@
                 });
             }
             
-            // Add event listeners
             foodSelect.addEventListener('change', calculateEditOrderTotal);
             itemDiv.querySelector('.quantity-input').addEventListener('input', calculateEditOrderTotal);
             itemDiv.querySelector('.remove-item').addEventListener('click', function() {
@@ -1103,16 +1248,12 @@
 
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // Load initial data
             loadUsers();
             loadMenuItems();
             loadOrders();
-            
-            // Start auto-refresh
             startAutoRefresh();
         });
 
-        // Update order form handler
         document.getElementById('updateOrderBtn').addEventListener('click', async function() {
             const form = document.getElementById('editOrderForm');
             const btn = this;
@@ -1127,7 +1268,6 @@
                 btn.disabled = true;
                 spinner.classList.remove('d-none');
                 
-                // Collect order items
                 const items = {};
                 let hasValidItems = false;
                 let itemIndex = 0;
@@ -1164,7 +1304,6 @@
                 
                 await updateOrder(orderId, orderData);
                 
-                // Reset form and close modal
                 form.reset();
                 form.classList.remove('was-validated');
                 bootstrap.Modal.getInstance(document.getElementById('editOrderModal')).hide();
@@ -1177,18 +1316,13 @@
             }
         });
 
-        // Add item button
         document.getElementById('editAddItemBtn').addEventListener('click', function() {
             addEditOrderItem();
         });
 
-        // Filter orders by status
         document.querySelectorAll('[data-filter]').forEach(button => {
             button.addEventListener('click', function() {
-                // Remove active class from all buttons
                 document.querySelectorAll('[data-filter]').forEach(btn => btn.classList.remove('active'));
-                
-                // Add active class to clicked button
                 this.classList.add('active');
                 
                 const filter = this.dataset.filter;
@@ -1204,7 +1338,6 @@
             });
         });
 
-        // Search functionality
         document.getElementById('orderSearch').addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
             const rows = document.querySelectorAll('#ordersTableBody tr');
@@ -1219,7 +1352,6 @@
             });
         });
 
-        // Form validation
         document.querySelectorAll('.needs-validation').forEach(form => {
             form.addEventListener('submit', function(event) {
                 if (!form.checkValidity()) {
@@ -1230,7 +1362,6 @@
             });
         });
 
-        // Cleanup auto-refresh on page unload
         window.addEventListener('beforeunload', function() {
             if (autoRefreshInterval) {
                 clearInterval(autoRefreshInterval);
