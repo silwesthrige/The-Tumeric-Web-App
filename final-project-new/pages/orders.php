@@ -1097,7 +1097,7 @@
                 <div class="receipt-header">
                     <h1 class="receipt-title">THE TURMERIC INDIAN CUISINE</h1>
                     <div class="receipt-subtitle">Order Receipt</div>
-                    <div class="receipt-subtitle">Tel: +44 123 456 7890</div>
+                    <div class="receipt-subtitle">Contact us: +94 771656886</div>
                 </div>
                 
                 <div class="receipt-section">

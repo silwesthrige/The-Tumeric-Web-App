@@ -465,10 +465,6 @@
         window.getReportBadgeColor = getReportBadgeColor;
         window.getReportTypeLabel = getReportTypeLabel;
         window.formatDateRange = formatDateRange;
-        window.downloadReport = downloadReport;
-        window.viewReport = viewReport;
-        window.shareReport = shareReport;
-        window.deleteReport = deleteReport;
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -690,7 +686,7 @@
                         <div class="col-md-3">
                             <div class="card text-center">
                                 <div class="card-body">
-                                    <h4 class="text-primary">₹${totalRevenue.toLocaleString()}</h4>
+                                    <h4 class="text-primary">£${totalRevenue.toLocaleString()}</h4>
                                     <p class="text-muted">Total Revenue</p>
                                 </div>
                             </div>
@@ -706,7 +702,7 @@
                         <div class="col-md-3">
                             <div class="card text-center">
                                 <div class="card-body">
-                                    <h4 class="text-warning">₹${Math.round(avgOrderValue)}</h4>
+                                    <h4 class="text-warning">£${Math.round(avgOrderValue)}</h4>
                                     <p class="text-muted">Avg Order Value</p>
                                 </div>
                             </div>
@@ -714,7 +710,7 @@
                         <div class="col-md-3">
                             <div class="card text-center">
                                 <div class="card-body">
-                                    <h4 class="text-info">${((statusCounts.delivered || 0) / totalOrders * 100).toFixed(1)}%</h4>
+                                    <h4 class="text-info">${totalOrders > 0 ? ((statusCounts.delivered || 0) / totalOrders * 100).toFixed(1) : 0}%</h4>
                                     <p class="text-muted">Success Rate</p>
                                 </div>
                             </div>
@@ -766,7 +762,7 @@
                                 <tr>
                                     <td>${order.orderId || 'N/A'}</td>
                                     <td>${order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : 'N/A'}</td>
-                                    <td>₹${order.total || 0}</td>
+                                    <td>£${order.total || 0}</td>
                                     <td><span class="badge bg-secondary">${order.status || 'N/A'}</span></td>
                                 </tr>
                             `).join('')}
@@ -830,7 +826,7 @@
                                 <tr>
                                     <td>${category}</td>
                                     <td>${stats.count}</td>
-                                    <td>₹${Math.round(stats.totalPrice / stats.count)}</td>
+                                    <td>£${Math.round(stats.totalPrice / stats.count)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -853,7 +849,7 @@
                                 <tr>
                                     <td>${stats.name}</td>
                                     <td>${stats.totalSold}</td>
-                                    <td>₹${stats.totalRevenue.toLocaleString()}</td>
+                                    <td>£${stats.totalRevenue.toLocaleString()}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -875,7 +871,7 @@
                                 <tr>
                                     <td>${item.foodName || 'N/A'}</td>
                                     <td>${item.category || 'N/A'}</td>
-                                    <td>₹${item.price || 0}</td>
+                                    <td>£${item.price || 0}</td>
                                     <td><span class="badge bg-${item.status === 'active' ? 'success' : 'secondary'}">${item.status || 'N/A'}</span></td>
                                     <td>${item.cookedTime || 'N/A'} min</td>
                                 </tr>
@@ -948,7 +944,7 @@
                         <div class="col-md-3">
                             <div class="card text-center">
                                 <div class="card-body">
-                                    <h4 class="text-info">₹${customerStats.length > 0 ? Math.round(customerStats.reduce((sum, c) => sum + c.avgOrderValue, 0) / customerStats.length) : 0}</h4>
+                                    <h4 class="text-info">£${customerStats.length > 0 ? Math.round(customerStats.reduce((sum, c) => sum + c.avgOrderValue, 0) / customerStats.length) : 0}</h4>
                                     <p class="text-muted">Avg Customer Value</p>
                                 </div>
                             </div>
@@ -976,8 +972,8 @@
                                     <td>${customer.email}</td>
                                     <td>${customer.phone}</td>
                                     <td>${customer.orderCount}</td>
-                                    <td>₹${customer.totalSpent.toLocaleString()}</td>
-                                    <td>₹${Math.round(customer.avgOrderValue)}</td>
+                                    <td>£${customer.totalSpent.toLocaleString()}</td>
+                                    <td>£${Math.round(customer.avgOrderValue)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -1387,6 +1383,12 @@
                 showNotification('Report deleted successfully!', 'success');
             }
         }
+
+        // Make functions globally available
+        window.downloadReport = downloadReport;
+        window.viewReport = viewReport;
+        window.shareReport = shareReport;
+        window.deleteReport = deleteReport;
 
         // Report card click handlers
         document.querySelectorAll('.stats-card').forEach(card => {
