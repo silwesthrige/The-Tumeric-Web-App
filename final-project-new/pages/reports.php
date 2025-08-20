@@ -221,7 +221,7 @@
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card success" data-report="inventory">
-                    <div class="report-title">Menu Analysis</div>
+                    <div class="report-title">Menu Report</div>
                     <div class="report-description">Menu items performance</div>
                     <button class="generate-btn">Generate</button>
                     <i class="fas fa-boxes stats-icon"></i>

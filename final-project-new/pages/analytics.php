@@ -122,6 +122,19 @@
             line-height: 1.2;
             color: #495057;
         }
+
+        .chart-toggle-buttons {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            z-index: 10;
+        }
+
+        .chart-toggle-buttons .btn {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            margin-left: 0.25rem;
+        }
     </style>
 </head>
 <body>
@@ -183,6 +196,10 @@
                         <h5 class="card-title mb-0">
                             <i class="fas fa-chart-area me-2"></i>Revenue Trend
                         </h5>
+                        <div class="chart-toggle-buttons">
+                            <button type="button" class="btn btn-sm btn-primary" id="weeklyBtn" onclick="switchRevenueChart('weekly')">Weekly</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="monthlyBtn" onclick="switchRevenueChart('monthly')">Monthly</button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="chart-container">
@@ -238,6 +255,38 @@
                 </div>
             </div>
             <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Low Demand Items
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="loading" id="lowDemandLoading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <div class="table-responsive" id="lowDemandTable" style="display: none;">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Orders</th>
+                                        <th>Revenue</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lowDemandBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Trends by Hour - Full Width -->
+        <div class="row mb-4">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
@@ -339,6 +388,8 @@
 
         // Global variables for charts
         let revenueChart, ratingsChart, hourlyChart;
+        let currentRevenueView = 'weekly'; // Track current view
+        let ordersData = []; // Store orders data for chart switching
 
         // Utility functions
         function formatCurrency(amount) {
@@ -429,6 +480,27 @@
                 return menus;
             } catch (error) {
                 console.error('Error fetching menus:', error);
+                console.error('Error details:', error.message, error.code);
+                return [];
+            }
+        }
+
+        async function fetchCategories() {
+            try {
+                console.log('Attempting to fetch categories...');
+                const categoriesRef = collection(db, 'category');
+                const snapshot = await getDocs(categoriesRef);
+                console.log(`Fetched ${snapshot.docs.length} categories`);
+                
+                const categories = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                console.log('Categories sample:', categories.slice(0, 2));
+                return categories;
+            } catch (error) {
+                console.error('Error fetching categories:', error);
                 console.error('Error details:', error.message, error.code);
                 return [];
             }
@@ -530,40 +602,61 @@
             };
         }
 
-        function calculateTopItems(orders, menus) {
+        function calculateTopItems(orders, menus, categories) {
             const itemStats = {};
+            const allMenuItems = {};
             
+            // First, create a map of all menu items
+            menus.forEach(menu => {
+                allMenuItems[menu.foodId] = {
+                    foodId: menu.foodId,
+                    name: menu.foodName,
+                    categoryId: menu.category,
+                    categoryName: 'Unknown',
+                    imageUrl: menu.imageUrl,
+                    price: menu.price,
+                    orders: 0,
+                    revenue: 0,
+                    status: menu.status || 'active'
+                };
+            });
+
+            // Add category names
+            categories.forEach(category => {
+                Object.values(allMenuItems).forEach(item => {
+                    if (item.categoryId === category.categoryId) {
+                        item.categoryName = category.categoryName || 'Unknown';
+                    }
+                });
+            });
+
+            // Count orders for items that have been ordered
             orders.forEach(order => {
                 if (order.items && Array.isArray(order.items)) {
                     order.items.forEach(item => {
                         const foodId = item.foodId;
-                        if (!itemStats[foodId]) {
-                            itemStats[foodId] = {
-                                name: item.name || 'Unknown Item',
-                                orders: 0,
-                                revenue: 0,
-                                category: 'Unknown'
-                            };
+                        if (allMenuItems[foodId]) {
+                            allMenuItems[foodId].orders += item.qty || 1;
+                            allMenuItems[foodId].revenue += (item.price || 0) * (item.qty || 1);
                         }
-                        itemStats[foodId].orders += item.qty || 1;
-                        itemStats[foodId].revenue += (item.price || 0) * (item.qty || 1);
                     });
                 }
             });
 
-            // Add menu details
-            menus.forEach(menu => {
-                if (itemStats[menu.foodId]) {
-                    itemStats[menu.foodId].category = menu.category || 'Unknown';
-                    itemStats[menu.foodId].imageUrl = menu.imageUrl;
-                    itemStats[menu.foodId].name = menu.foodName || itemStats[menu.foodId].name;
-                }
-            });
+            const sortedItems = Object.values(allMenuItems).sort((a, b) => b.revenue - a.revenue);
 
-            return Object.entries(itemStats)
-                .map(([foodId, stats]) => ({ foodId, ...stats }))
-                .sort((a, b) => b.revenue - a.revenue)
-                .slice(0, 5); // Show only top 5 items
+            // Get top items (items with orders > 0)
+            const topItems = sortedItems.filter(item => item.orders > 0).slice(0, 5);
+
+            // Get low demand items (items with 0 orders or very low orders)
+            const lowDemandItems = sortedItems
+                .filter(item => item.orders <= 2) // 0, 1, or 2 orders
+                .slice(0, 10); // Show top 10 low demand items
+
+            return {
+                topItems,
+                lowDemandItems
+            };
         }
 
         function calculateHourlyTrends(orders) {
@@ -615,29 +708,15 @@
         }
 
         // Chart creation functions
-        function createRevenueChart(orders) {
+        function createRevenueChart(orders, view = 'weekly') {
             const ctx = document.getElementById('revenueChart').getContext('2d');
             
-            // Get last 7 days data
-            const dailyRevenue = {};
-            for (let i = 6; i >= 0; i--) {
-                const date = getDateDaysAgo(i);
-                const dateStr = date.toISOString().split('T')[0];
-                dailyRevenue[dateStr] = 0;
+            let chartData;
+            if (view === 'weekly') {
+                chartData = generateWeeklyRevenueData(orders);
+            } else {
+                chartData = generateMonthlyRevenueData(orders);
             }
-
-            orders.forEach(order => {
-                const dateStr = order.createdAt.toISOString().split('T')[0];
-                if (dailyRevenue.hasOwnProperty(dateStr)) {
-                    dailyRevenue[dateStr] += order.total || 0;
-                }
-            });
-
-            const labels = Object.keys(dailyRevenue).map(date => {
-                const d = new Date(date);
-                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            });
-            const data = Object.values(dailyRevenue);
 
             if (revenueChart) {
                 revenueChart.destroy();
@@ -646,10 +725,10 @@
             revenueChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
+                    labels: chartData.labels,
                     datasets: [{
                         label: 'Revenue',
-                        data: data,
+                        data: chartData.data,
                         borderColor: '#007bff',
                         backgroundColor: 'rgba(0, 123, 255, 0.1)',
                         borderWidth: 3,
@@ -677,6 +756,57 @@
                     }
                 }
             });
+        }
+
+        function generateWeeklyRevenueData(orders) {
+            const dailyRevenue = {};
+            for (let i = 6; i >= 0; i--) {
+                const date = getDateDaysAgo(i);
+                const dateStr = date.toISOString().split('T')[0];
+                dailyRevenue[dateStr] = 0;
+            }
+
+            orders.forEach(order => {
+                const dateStr = order.createdAt.toISOString().split('T')[0];
+                if (dailyRevenue.hasOwnProperty(dateStr)) {
+                    dailyRevenue[dateStr] += order.total || 0;
+                }
+            });
+
+            const labels = Object.keys(dailyRevenue).map(date => {
+                const d = new Date(date);
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+            const data = Object.values(dailyRevenue);
+
+            return { labels, data };
+        }
+
+        function generateMonthlyRevenueData(orders) {
+            const monthlyRevenue = {};
+            for (let i = 5; i >= 0; i--) {
+                const date = new Date();
+                date.setMonth(date.getMonth() - i);
+                const monthKey = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
+                monthlyRevenue[monthKey] = 0;
+            }
+
+            orders.forEach(order => {
+                const orderDate = order.createdAt;
+                const monthKey = orderDate.getFullYear() + '-' + String(orderDate.getMonth() + 1).padStart(2, '0');
+                if (monthlyRevenue.hasOwnProperty(monthKey)) {
+                    monthlyRevenue[monthKey] += order.total || 0;
+                }
+            });
+
+            const labels = Object.keys(monthlyRevenue).map(monthKey => {
+                const [year, month] = monthKey.split('-');
+                const date = new Date(year, month - 1);
+                return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            });
+            const data = Object.values(monthlyRevenue);
+
+            return { labels, data };
         }
 
         function createRatingsChart(feedbacks) {
@@ -772,6 +902,18 @@
             });
         }
 
+        // Chart switching function
+        window.switchRevenueChart = function(view) {
+            currentRevenueView = view;
+            
+            // Update button states
+            document.getElementById('weeklyBtn').className = view === 'weekly' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary';
+            document.getElementById('monthlyBtn').className = view === 'monthly' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary';
+            
+            // Recreate chart with stored orders data
+            createRevenueChart(ordersData, view);
+        };
+
         // UI update functions
         function updateKeyMetrics(metrics) {
             document.getElementById('totalRevenue').textContent = formatCurrency(metrics.totalRevenue);
@@ -820,7 +962,44 @@
                         </td>
                         <td><strong>${formatNumber(item.orders)}</strong></td>
                         <td><strong>${formatCurrency(item.revenue)}</strong></td>
-                        <td><span class="badge bg-secondary">${item.category}</span></td>
+                        <td><span class="badge bg-success">${item.categoryName}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            loading.style.display = 'none';
+            table.style.display = 'block';
+        }
+
+        function updateLowDemandItems(lowDemandItems) {
+            const tbody = document.getElementById('lowDemandBody');
+            const loading = document.getElementById('lowDemandLoading');
+            const table = document.getElementById('lowDemandTable');
+
+            tbody.innerHTML = '';
+            
+            if (lowDemandItems.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No data available</td></tr>';
+            } else {
+                lowDemandItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    const statusBadge = item.orders === 0 ? 
+                        '<span class="badge bg-danger">Never Ordered</span>' : 
+                        `<span class="badge bg-warning">Only ${item.orders} order${item.orders > 1 ? 's' : ''}</span>`;
+                    
+                    row.innerHTML = `
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="${item.imageUrl || 'https://via.placeholder.com/40'}" 
+                                     alt="${item.name}" class="food-item-img me-2"
+                                     onerror="this.src='https://via.placeholder.com/40'">
+                                <span>${item.name}</span>
+                            </div>
+                        </td>
+                        <td><strong>${formatNumber(item.orders)}</strong></td>
+                        <td><strong>${formatCurrency(item.revenue)}</strong></td>
+                        <td>${statusBadge}</td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -877,6 +1056,7 @@
                 console.log('=== Fetching Data ===');
                 
                 const orders = await fetchOrders();
+                ordersData = orders; // Store orders data for chart switching
                 console.log(`Orders loaded: ${orders.length}`);
                 
                 const users = await fetchUsers();
@@ -884,6 +1064,9 @@
                 
                 const menus = await fetchMenus();
                 console.log(`Menus loaded: ${menus.length}`);
+                
+                const categories = await fetchCategories();
+                console.log(`Categories loaded: ${categories.length}`);
                 
                 const feedbacks = await fetchFeedbacks();
                 console.log(`Feedbacks loaded: ${feedbacks.length}`);
@@ -898,7 +1081,7 @@
                 console.log('=== Calculating Metrics ===');
                 
                 // Calculate metrics with fallbacks
-                let keyMetrics, topItems, customerMetrics;
+                let keyMetrics, itemData, customerMetrics;
                 
                 try {
                     keyMetrics = calculateKeyMetrics(orders, users);
@@ -918,11 +1101,14 @@
                 }
 
                 try {
-                    topItems = calculateTopItems(orders, menus);
-                    console.log('Top items calculated:', topItems.length);
+                    itemData = calculateTopItems(orders, menus, categories);
+                    console.log('Item data calculated:', itemData.topItems.length, 'top items,', itemData.lowDemandItems.length, 'low demand items');
                 } catch (error) {
-                    console.error('Error calculating top items:', error);
-                    topItems = [];
+                    console.error('Error calculating item data:', error);
+                    itemData = {
+                        topItems: [],
+                        lowDemandItems: []
+                    };
                 }
 
                 try {
@@ -942,14 +1128,15 @@
                 
                 // Update UI
                 updateKeyMetrics(keyMetrics);
-                updateTopItems(topItems);
+                updateTopItems(itemData.topItems);
+                updateLowDemandItems(itemData.lowDemandItems);
                 updateCustomerMetrics(customerMetrics);
 
                 console.log('=== Creating Charts ===');
                 
                 // Create charts with error handling
                 try {
-                    createRevenueChart(orders);
+                    createRevenueChart(orders, currentRevenueView);
                     console.log('Revenue chart created');
                 } catch (error) {
                     console.error('Error creating revenue chart:', error);
@@ -1038,10 +1225,19 @@
                     <h5>No Data Available</h5>
                     <p class="text-muted">No data found in Firestore collections. Please check:</p>
                     <ul class="text-start text-muted">
-                        <li>Database has data in collections: orders, users, menus, feedbacks</li>
+                        <li>Database has data in collections: orders, users, menus, category, feedbacks</li>
                         <li>Firestore security rules allow read access</li>
                         <li>Firebase project configuration is correct</li>
                     </ul>
+                </div>
+            `;
+
+            // Show message in low demand items table
+            document.getElementById('lowDemandLoading').innerHTML = `
+                <div class="text-center p-4">
+                    <i class="fas fa-exclamation-triangle text-warning mb-2" style="font-size: 2rem;"></i>
+                    <h5>No Data Available</h5>
+                    <p class="text-muted">No data found in Firestore collections.</p>
                 </div>
             `;
         }
@@ -1066,6 +1262,15 @@
                         ${error.code ? `<strong>Code:</strong> ${error.code}` : ''}
                     </div>
                     <p class="text-muted small">Please check the browser console for detailed logs.</p>
+                </div>
+            `;
+
+            // Show error in low demand items area
+            document.getElementById('lowDemandLoading').innerHTML = `
+                <div class="text-center p-4">
+                    <i class="fas fa-exclamation-circle text-danger mb-2" style="font-size: 2rem;"></i>
+                    <h5>Connection Error</h5>
+                    <p class="text-muted">Failed to load data from Firebase</p>
                 </div>
             `;
 
@@ -1114,15 +1319,17 @@
                 const orders = await fetchOrders();
                 const users = await fetchUsers();
                 const menus = await fetchMenus();
+                const categories = await fetchCategories();
                 const feedbacks = await fetchFeedbacks();
                 
                 console.log('Debug Results:');
                 console.log('Orders:', orders.length, orders.slice(0, 3));
                 console.log('Users:', users.length, users.slice(0, 3));
                 console.log('Menus:', menus.length, menus.slice(0, 3));
+                console.log('Categories:', categories.length, categories.slice(0, 3));
                 console.log('Feedbacks:', feedbacks.length, feedbacks.slice(0, 3));
                 
-                return { orders, users, menus, feedbacks };
+                return { orders, users, menus, categories, feedbacks };
             } catch (error) {
                 console.error('Debug failed:', error);
                 return null;
