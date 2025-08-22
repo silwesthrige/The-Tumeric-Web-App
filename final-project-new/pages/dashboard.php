@@ -120,7 +120,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-number" id="todayOrders">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Today's Orders</div>
                     <i class="fas fa-shopping-cart stats-icon"></i>
@@ -129,7 +131,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card success">
                     <div class="stats-number" id="todayRevenue">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Today's Revenue</div>
                     <i class="fas fa-pound-sign stats-icon"></i>
@@ -138,7 +142,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card warning">
                     <div class="stats-number" id="pendingDeliveries">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Pending Deliveries</div>
                     <i class="fas fa-truck stats-icon"></i>
@@ -147,7 +153,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card info">
                     <div class="stats-number" id="averageRating">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Average Rating</div>
                     <i class="fas fa-star stats-icon"></i>
@@ -181,7 +189,9 @@
                     <div class="card-body">
                         <div id="recentOrders">
                             <div class="text-center">
-                                <div class="loading"></div>
+                                 <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                 </div>
                                 <p class="mt-2">Loading recent orders...</p>
                             </div>
                         </div>

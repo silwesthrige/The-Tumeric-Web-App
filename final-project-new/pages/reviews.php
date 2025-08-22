@@ -101,7 +101,7 @@
             background-color: #fd7e14 !important;
         }
 
-        .loading {
+         .loading {
             display: inline-block;
             width: 20px;
             height: 20px;
@@ -114,18 +114,6 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-        }
-
-        .loading-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
         }
 
         .no-reviews {
@@ -173,7 +161,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card warning">
                     <div class="stats-number" id="averageRatingCard">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Average Rating</div>
                     <i class="fas fa-star stats-icon"></i>
@@ -182,7 +172,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-number" id="totalReviewsCard">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Total Reviews</div>
                     <i class="fas fa-comments stats-icon"></i>
@@ -191,7 +183,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card success">
                     <div class="stats-number" id="positiveReviewsCard">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Positive Reviews</div>
                     <i class="fas fa-thumbs-up stats-icon"></i>
@@ -200,7 +194,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card info">
                     <div class="stats-number" id="anonymousReviewsCard">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Anonymous Reviews</div>
                     <i class="fas fa-user-secret stats-icon"></i>

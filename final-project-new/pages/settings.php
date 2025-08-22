@@ -1,4 +1,3 @@
-
     <style>
         .nav-pills .nav-link {
             color: #666;
@@ -85,6 +84,38 @@
             line-height: 1.2;
             color: #495057;
         }
+        .btn-custom {
+            border-radius: 0.5rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            padding: 0.35rem 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.3s ease;
+            background-color: #ea580c;
+            border: 1px solid #ea580c;
+            color: #fff;
+        }
+        .btn-custom:hover {
+            background-color: #c2410c;
+            border-color: #c2410c;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        /* Secondary outline (for reload buttons - keep existing colors) */
+        .btn-custom-outline {
+            background-color: #fff;
+            border: 1px solid #6c757d;
+            color: #6c757d;
+        }
+        .btn-custom-outline:hover {
+            background-color: #6c757d;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
     </style>
 </head>
 <body>
@@ -102,8 +133,8 @@
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Restaurant Settings</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
-                <button type="button" class="btn btn-sm btn-success" id="saveAllBtn">
-                    <i class="fas fa-save me-1"></i>Save All Changes
+                <button type="button" class="btn-custom" id="saveAllBtn">
+                    <i class="fas fa-save"></i> Save All Changes
                 </button>
             </div>
         </div>
@@ -181,11 +212,11 @@
                                         </div>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-save me-1"></i>Save Restaurant Info
+                                        <button type="submit" class="btn-custom">
+                                            <i class="fas fa-save"></i> Save Restaurant Info
                                         </button>
-                                        <button type="button" class="btn btn-outline-secondary" id="loadRestaurantBtn">
-                                            <i class="fas fa-sync me-1"></i>Reload
+                                        <button type="button" class="btn-custom btn-custom-outline" id="loadRestaurantBtn">
+                                            <i class="fas fa-sync"></i> Reload
                                         </button>
                                     </div>
                                 </form>
@@ -199,8 +230,8 @@
                             <div class="card-header">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h5 class="card-title mb-0">User Management</h5>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                                        <i class="fas fa-plus me-1"></i>Add User
+                                    <button type="button" class="btn-custom" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                        <i class="fas fa-user-plus"></i> Add User
                                     </button>
                                 </div>
                             </div>
@@ -260,8 +291,8 @@
                                         </div>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-save me-1"></i>Save Payment Settings
+                                        <button type="submit" class="btn-custom">
+                                            <i class="fas fa-save"></i> Save Payment Settings
                                         </button>
                                         <button type="button" class="btn btn-outline-secondary" id="loadPaymentBtn">
                                             <i class="fas fa-sync me-1"></i>Reload
@@ -287,17 +318,17 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label for="minOrderValue" class="form-label">Minimum Order Value (£)</label>
-                                            <input type="number" class="form-control" id="minOrderValue" name="minOrderValue" value="200">
+                                            <input type="number" class="form-control" id="minOrderValue" name="minOrderValue" value="20">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="deliveryCharge" class="form-label">Delivery Charge (£)</label>
-                                            <input type="number" class="form-control" id="deliveryCharge" name="deliveryCharge" value="30">
+                                            <input type="number" class="form-control" id="deliveryCharge" name="deliveryCharge" value="3">
                                         </div>
                                         <div class="col-md-6">
                                             <label for="freeDeliveryAbove" class="form-label">Free Delivery Above (£)</label>
-                                            <input type="number" class="form-control" id="freeDeliveryAbove" name="freeDeliveryAbove" value="500">
+                                            <input type="number" class="form-control" id="freeDeliveryAbove" name="freeDeliveryAbove" value="25">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
@@ -311,8 +342,8 @@
                                         </div>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-save me-1"></i>Save Delivery Settings
+                                        <button type="submit" class="btn-custom">
+                                            <i class="fas fa-save"></i> Save Delivery Settings
                                         </button>
                                         <button type="button" class="btn btn-outline-secondary" id="loadDeliveryBtn">
                                             <i class="fas fa-sync me-1"></i>Reload
@@ -383,7 +414,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" form="addUserForm" id="addUserBtn">Add User</button>
+                        <button type="submit" class="btn-custom" form="addUserForm" id="addUserBtn">Add User</button>
                     </div>
                 </div>
             </div>
@@ -452,7 +483,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" form="editUserForm" id="editUserBtn">Update User</button>
+                        <button type="submit" class="btn-custom" form="editUserForm" id="editUserBtn">Update User</button>
                     </div>
                 </div>
             </div>

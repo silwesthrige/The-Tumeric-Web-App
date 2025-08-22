@@ -362,9 +362,9 @@
             </div>
             <div class="card-body">
                 <div id="loadingIndicator" class="text-center py-4" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
+                     <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     <p class="mt-2">Loading menu items...</p>
                 </div>
                 <div class="table-responsive">

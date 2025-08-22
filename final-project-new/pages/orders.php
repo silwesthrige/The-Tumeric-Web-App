@@ -273,7 +273,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card warning">
                     <div class="stats-number" id="pendingCount">
-                        <div class="stats-loading"></div>
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Pending Orders</div>
                     <i class="fas fa-clock stats-icon"></i>
@@ -282,7 +284,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-number" id="preparingCount">
-                        <div class="stats-loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Preparing Orders</div>
                     <i class="fas fa-utensils stats-icon"></i>
@@ -291,7 +295,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card info">
                     <div class="stats-number" id="deliveryCount">
-                        <div class="stats-loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Out for Delivery</div>
                     <i class="fas fa-truck stats-icon"></i>
@@ -300,7 +306,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card success">
                     <div class="stats-number" id="deliveredCount">
-                        <div class="stats-loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Delivered Today</div>
                     <i class="fas fa-check-circle stats-icon"></i>

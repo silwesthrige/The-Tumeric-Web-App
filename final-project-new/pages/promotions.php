@@ -419,7 +419,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-number" id="totalPromotionsCount">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Total Promotions</div>
                     <small class="text-muted d-block">All time created</small>
@@ -429,7 +431,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card success">
                     <div class="stats-number" id="mostUsedPromo">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Most Used Promo</div>
                     <small class="text-muted d-block">Highest redemptions</small>
@@ -439,7 +443,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card warning">
                     <div class="stats-number" id="avgDiscount">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Avg. Discount</div>
                     <small class="text-muted d-block">Average value offered</small>
@@ -449,7 +455,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card info">
                     <div class="stats-number" id="expiringSoon">
-                        <div class="loading"></div>
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Expiring Soon</div>
                     <small class="text-muted d-block">Next 7 days</small>
@@ -469,7 +477,9 @@
                 <div class="active-promotions-scroll">
                     <div class="row" id="activePromotionsContainer">
                         <div class="col-12 stats-loading">
-                            <div class="loading"></div>
+                             <div class="spinner-border spinner-border-sm" role="status">
+                               <span class="visually-hidden">Loading...</span>
+                             </div>
                             <p class="mt-2">Loading active promotions...</p>
                         </div>
                     </div>

@@ -139,53 +139,40 @@
         }
         
         .generate-btn {
-            background: #fff;
-            border: 2px solid transparent;
-            color: #0d6efd;
-            font-weight: 500;
+            background-color: #ea580c;
+            border: 2px solid #ea580c;
+            color: #fff;
             border-radius: 0.5rem;
-            padding: 0.5rem 1rem;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            }
+
+            .generate-btn:hover {
+            background-color: #ea580c;
+            color: #fff;
+            transform: translateY(-1px);
+            }
+
+        
+        .stats-card .generate-btn {
+            background-color: transparent;
+            border: 2px solid #ea580c;
+            color: #ea580c;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
             transition: all 0.3s ease;
         }
         
-        .generate-btn:hover {
-            background: #0d6efd;
+        .stats-card .generate-btn:hover {
+            background-color: #ea580c;
             color: #fff;
-            border-color: #0d6efd;
+            transform: translateY(-1px);
         }
         
-        .stats-card.primary .generate-btn:hover {
-            background: #0d6efd;
-            border-color: #0d6efd;
-        }
-        
-        .stats-card.success .generate-btn {
-            color: #198754;
-        }
-        
-        .stats-card.success .generate-btn:hover {
-            background: #198754;
-            border-color: #198754;
-        }
-        
-        .stats-card.info .generate-btn {
-            color: #0dcaf0;
-        }
-        
-        .stats-card.info .generate-btn:hover {
-            background: #0dcaf0;
-            border-color: #0dcaf0;
-        }
-        
-        .stats-card.warning .generate-btn {
-            color: #ffc107;
-        }
-        
-        .stats-card.warning .generate-btn:hover {
-            background: #ffc107;
-            border-color: #ffc107;
-            color: #000;
-        }
         .h2 {
             font-size: 2rem;
             font-weight: 400;
@@ -203,9 +190,10 @@
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Reports</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#generateReportModal">
-                    <i class="fas fa-plus me-1"></i>Generate Report
-                </button>
+                <button type="button" class="generate-btn" data-bs-toggle="modal" data-bs-target="#generateReportModal">
+    <i class="fas fa-plus me-1"></i> Generate Report
+</button>
+
             </div>
         </div>
 

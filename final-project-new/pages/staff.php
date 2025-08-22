@@ -15,7 +15,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-number" id="totalStaff">
-                        <div class="loading"></div>
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Active employees</div>
                     <i class="fas fa-users stats-icon"></i>
@@ -24,7 +26,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card success">
                     <div class="stats-number" id="onDutyStaff">
-                        <div class="loading"></div>
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Currently working</div>
                     <i class="fas fa-user-check stats-icon"></i>
@@ -33,7 +37,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card warning">
                     <div class="stats-number" id="onBreakStaff">
-                        <div class="loading"></div>
+                       <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Break time</div>
                     <i class="fas fa-coffee stats-icon"></i>
@@ -42,7 +48,9 @@
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card info">
                     <div class="stats-number" id="offDutyStaff">
-                        <div class="loading"></div>
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                     <div class="stats-label">Not scheduled</div>
                     <i class="fas fa-user-times stats-icon"></i>
