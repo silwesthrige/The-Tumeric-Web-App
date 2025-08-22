@@ -119,10 +119,10 @@
         <div class="row">
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="stats-card">
-                    <div class="stats-number" id="totalOrders">
+                    <div class="stats-number" id="todayOrders">
                         <div class="loading"></div>
                     </div>
-                    <div class="stats-label">Total Orders</div>
+                    <div class="stats-label">Today's Orders</div>
                     <i class="fas fa-shopping-cart stats-icon"></i>
                 </div>
             </div>
@@ -372,21 +372,26 @@
         }
 
         function updateStatCards() {
-            // Total Orders
-            document.getElementById('totalOrders').textContent = ordersData.length.toLocaleString();
-
-            // Today's Revenue
+            // Get today's date range
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const todayRevenue = ordersData
-                .filter(order => {
-                    const orderDate = order.createdAt?.toDate ? order.createdAt.toDate() : new Date(order.createdAt);
-                    return orderDate >= today;
-                })
-                .reduce((sum, order) => sum + (order.total || 0), 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            // Filter today's orders
+            const todayOrders = ordersData.filter(order => {
+                const orderDate = order.createdAt?.toDate ? order.createdAt.toDate() : new Date(order.createdAt);
+                return orderDate >= today && orderDate < tomorrow;
+            });
+
+            // Today's Orders Count
+            document.getElementById('todayOrders').textContent = todayOrders.length.toLocaleString();
+
+            // Today's Revenue
+            const todayRevenue = todayOrders.reduce((sum, order) => sum + (order.total || 0), 0);
             document.getElementById('todayRevenue').textContent = '£' + todayRevenue.toLocaleString();
 
-            // Pending Deliveries
+            // Pending Deliveries (all pending orders, not just today's)
             const pendingDeliveries = ordersData.filter(order => 
                 order.status === 'pending' || order.status === 'preparing' || order.status === 'ready'
             ).length;

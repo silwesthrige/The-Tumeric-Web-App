@@ -194,13 +194,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
                 <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="remember" name="remember">
-                    <label class="form-check-label" for="remember">Remember me</label>
-                </div>
-                <a href="#" class="forgot-link">Forgot password?</a>
-            </div>
+           
 
             <button type="submit" class="btn btn-login">
                 <i class="fas fa-sign-in-alt me-2"></i>Sign in to Dashboard

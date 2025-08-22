@@ -1,4 +1,5 @@
-<style>
+
+    <style>
         .bg-orange-transparent {
             background-color: rgba(255, 165, 0, 0.1);
         }
@@ -37,18 +38,28 @@
             }
         }
 
-        /* Notification styles */
+        /* Enhanced Notification styles */
         .notification-item {
-            transition: background-color 0.2s ease;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
         }
 
         .notification-item:hover {
             background-color: #f8f9fa;
+            transform: translateX(2px);
         }
 
         .notification-new {
             background-color: #e3f2fd;
-            border-left: 3px solid #2196f3;
+            border-left: 4px solid #2196f3;
+        }
+
+        .notification-order {
+            border-left-color: #28a745;
+        }
+
+        .notification-feedback {
+            border-left-color: #ffc107;
         }
 
         .notification-time {
@@ -58,6 +69,10 @@
 
         .notification-badge-animate {
             animation: pulse 2s infinite;
+        }
+
+        .notification-bell-shake {
+            animation: shake 0.5s ease-in-out;
         }
 
         @keyframes pulse {
@@ -72,10 +87,92 @@
             }
         }
 
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-2px);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(2px);
+            }
+        }
+
         .no-notifications {
             padding: 2rem 1rem;
             text-align: center;
             color: #6c757d;
+        }
+
+        .notification-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        /* Order specific notification styles */
+        .order-notification {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+
+        .order-notification .notification-icon {
+            color: #28a745;
+            font-size: 1.2rem;
+        }
+
+        .order-total {
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        .order-id {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        /* Status indicators */
+        .status-pending {
+            color: #ffc107;
+        }
+
+        .status-confirmed {
+            color: #17a2b8;
+        }
+
+        .status-preparing {
+            color: #fd7e14;
+        }
+
+        .status-ready {
+            color: #28a745;
+        }
+
+        .status-completed {
+            color: #6c757d;
+        }
+
+        /* Auto-refresh indicator */
+        .auto-refresh-indicator {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            z-index: 1050;
+        }
+
+        .auto-refresh-indicator.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Profile Modal Improvements */
@@ -165,6 +262,12 @@
             font-weight: 500;
         }
 
+        .notification-sound-toggle {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
         @media (max-width: 768px) {
             .profile-section {
                 padding: 1rem;
@@ -177,10 +280,22 @@
             .user-name {
                 font-size: 1.25rem;
             }
+
+            .auto-refresh-indicator {
+                right: 10px;
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
         }
     </style>
 </head>
 <body>
+
+<!-- Auto-refresh indicator -->
+<div id="autoRefreshIndicator" class="auto-refresh-indicator">
+    <i class="fas fa-sync-alt me-1"></i>
+    <span id="refreshText">Checking for new orders...</span>
+</div>
 
 <!-- Navigation Bar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm px-3 py-2">
@@ -213,27 +328,42 @@
                         id="notifDropdown" 
                         data-bs-toggle="dropdown" 
                         aria-expanded="false">
-                    <i class="fas fa-bell text-warning"></i>
-                    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" id="notificationBadge" style="display: none;">0</span>
+                    <i class="fas fa-bell text-warning" id="notificationBellIcon"></i>
+                    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" 
+                          id="notificationBadge" style="display: none;">0</span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="width: 350px;">
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="width: 380px;">
                     <li>
-                        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
-                            <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notifications</h6>
-                            <button class="btn btn-sm btn-outline-primary" id="markAllRead" style="display: none;">
-                                <i class="fas fa-check-double me-1"></i>Mark All Read
-                            </button>
+                        <div class="notification-header d-flex justify-content-between align-items-center px-3 py-2">
+                            <h6 class="mb-0">
+                                <i class="fas fa-bell me-2"></i>Notifications
+                                <span class="badge bg-secondary ms-2" id="totalNotificationCount">0</span>
+                            </h6>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm notification-sound-toggle" 
+                                        id="soundToggle" 
+                                        title="Toggle sound notifications">
+                                    <i class="fas fa-volume-up"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" 
+                                        id="markAllRead" 
+                                        style="display: none;"
+                                        title="Mark all as read">
+                                    <i class="fas fa-check-double me-1"></i>Mark All Read
+                                </button>
+                            </div>
                         </div>
                     </li>
                     <div id="notificationsList">
                         <li class="no-notifications">
                             <i class="fas fa-bell-slash mb-2 text-muted"></i>
                             <div>No notifications</div>
+                            <small class="text-muted">New orders will appear here</small>
                         </li>
                     </div>
                     <li class="border-top">
-                        <a class="dropdown-item text-primary text-center" href="#" id="viewAllNotifications">
-                            <i class="fas fa-eye me-2"></i>View all notifications
+                        <a class="dropdown-item text-primary text-center" href="index.php?page=orders" id="viewAllNotifications">
+                            <i class="fas fa-eye me-2"></i>View all orders
                         </a>
                     </li>
                 </ul>
@@ -390,6 +520,12 @@
     // Notification management
     let notifications = [];
     let unreadCount = 0;
+    let processedOrderIds = new Set();
+    let soundEnabled = localStorage.getItem('notificationSound') !== 'false';
+    let lastOrderCheck = new Date();
+
+    // Sound for notifications
+    const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IAAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwFJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiw=');
 
     // Real-time clock function
     function updateDateTime() {
@@ -419,17 +555,63 @@
         if (diffInHours < 24) return `${diffInHours}h ago`;
         
         const diffInDays = Math.floor(diffInHours / 24);
-        return `${diffInDays}d ago`;
+        if (diffInDays < 7) return `${diffInDays}d ago`;
+        
+        return date.toLocaleDateString();
     }
 
     // Get user name from users collection
     async function getUserName(userId) {
         try {
             const userDoc = await getDoc(doc(db, 'users', userId));
-            return userDoc.exists() ? userDoc.data().name || 'Unknown User' : 'Unknown User';
+            return userDoc.exists() ? (userDoc.data().name || userDoc.data().username || 'Customer') : 'Customer';
         } catch (error) {
             console.error('Error fetching user:', error);
-            return 'Unknown User';
+            return 'Customer';
+        }
+    }
+
+    // Get status color class
+    function getStatusColorClass(status) {
+        const statusColors = {
+            'pending': 'status-pending',
+            'confirmed': 'status-confirmed',
+            'preparing': 'status-preparing',
+            'ready': 'status-ready',
+            'completed': 'status-completed',
+            'cancelled': 'text-danger'
+        };
+        return statusColors[status?.toLowerCase()] || 'text-muted';
+    }
+
+    // Format currency
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(amount);
+    }
+
+    // Show auto-refresh indicator
+    function showAutoRefreshIndicator(message = 'Checking for new orders...') {
+        const indicator = document.getElementById('autoRefreshIndicator');
+        const text = document.getElementById('refreshText');
+        text.textContent = message;
+        indicator.classList.add('show');
+        
+        setTimeout(() => {
+            indicator.classList.remove('show');
+        }, 2000);
+    }
+
+    // Play notification sound
+    function playNotificationSound() {
+        if (soundEnabled) {
+            try {
+                notificationSound.play().catch(e => console.log('Sound play failed:', e));
+            } catch (error) {
+                console.log('Audio not supported:', error);
+            }
         }
     }
 
@@ -437,17 +619,35 @@
     function updateNotificationBadge() {
         const badge = document.getElementById('notificationBadge');
         const markAllBtn = document.getElementById('markAllRead');
+        const totalCount = document.getElementById('totalNotificationCount');
+        const bellIcon = document.getElementById('notificationBellIcon');
+        
+        totalCount.textContent = notifications.length;
         
         if (unreadCount > 0) {
             badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
             badge.style.display = 'block';
             badge.classList.add('notification-badge-animate');
             markAllBtn.style.display = 'block';
+            bellIcon.classList.add('notification-bell-shake');
+            
+            // Remove shake animation after it completes
+            setTimeout(() => {
+                bellIcon.classList.remove('notification-bell-shake');
+            }, 500);
         } else {
             badge.style.display = 'none';
             badge.classList.remove('notification-badge-animate');
             markAllBtn.style.display = 'none';
         }
+    }
+
+    // Get order items summary
+    function getOrderItemsSummary(items) {
+        if (!items || items.length === 0) return 'No items';
+        if (items.length === 1) return items[0].name;
+        if (items.length === 2) return `${items[0].name}, ${items[1].name}`;
+        return `${items[0].name} and ${items.length - 1} more items`;
     }
 
     // Render notifications
@@ -459,24 +659,31 @@
                 <li class="no-notifications">
                     <i class="fas fa-bell-slash mb-2 text-muted"></i>
                     <div>No notifications</div>
+                    <small class="text-muted">New orders will appear here</small>
                 </li>
             `;
             return;
         }
 
         const notificationHTML = notifications.map(notification => `
-            <li class="notification-item ${notification.isNew ? 'notification-new' : ''}">
-                <a class="dropdown-item py-3" href="#" data-notification-id="${notification.id}">
+            <li class="notification-item ${notification.type === 'order' ? 'notification-order' : ''} ${notification.isNew ? 'notification-new' : ''}" 
+                data-notification-id="${notification.id}">
+                <a class="dropdown-item py-3" href="#" style="text-decoration: none;">
                     <div class="d-flex align-items-start">
                         <div class="me-3">
-                            <i class="fas fa-${notification.icon} ${notification.iconColor}"></i>
+                            <i class="fas fa-${notification.icon} ${notification.iconColor} notification-icon"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <div class="fw-semibold">${notification.title}</div>
-                            <div class="text-muted small">${notification.message}</div>
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <div class="fw-semibold">${notification.title}</div>
+                                <div class="order-total">${notification.total || ''}</div>
+                            </div>
+                            <div class="text-muted small mb-1">${notification.message}</div>
+                            ${notification.orderId ? `<div class="order-id mb-1">#${notification.orderId}</div>` : ''}
+                            ${notification.status ? `<div class="small ${getStatusColorClass(notification.status)}">Status: ${notification.status}</div>` : ''}
                             <div class="notification-time">${notification.timeAgo}</div>
                         </div>
-                        ${notification.isNew ? '<div class="ms-2"><span class="badge bg-primary rounded-pill">New</span></div>' : ''}
+                        ${notification.isNew ? '<div class="ms-2"><span class="badge bg-success rounded-pill">New</span></div>' : ''}
                     </div>
                 </a>
             </li>
@@ -485,41 +692,336 @@
         notificationsList.innerHTML = notificationHTML;
     }
 
-    // Process new order
+    // Process new order notification
     async function processNewOrder(orderData, orderId) {
-        const userName = await getUserName(orderData.userId);
-        const notification = {
-            id: `order_${orderId}`,
-            type: 'order',
-            title: 'New Order Received',
-            message: `Order #${orderId.substring(0, 8)} from ${userName} - $${orderData.total}`,
-            icon: 'shopping-cart',
-            iconColor: 'text-success',
-            timestamp: orderData.createdAt.toDate(),
-            timeAgo: timeAgo(orderData.createdAt.toDate()),
-            isNew: true
-        };
-        
-        // Add to beginning of notifications array
-        notifications.unshift(notification);
-        
-        // Keep only last 50 notifications
-        if (notifications.length > 50) {
-            notifications = notifications.slice(0, 50);
+        // Check if we've already processed this order
+        if (processedOrderIds.has(orderId)) {
+            return;
         }
-        
-        unreadCount++;
-        updateNotificationBadge();
-        renderNotifications();
-        
-        // Show browser notification if supported
-        if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('New Order Received', {
-                body: notification.message,
-                icon: 'public/images/UK PJ Logo.png'
-            });
+
+        try {
+            const userName = await getUserName(orderData.userId);
+            const orderTime = orderData.createdAt?.toDate() || new Date();
+            const itemsSummary = getOrderItemsSummary(orderData.items);
+            
+            const notification = {
+                id: orderId,
+                type: 'order',
+                title: 'New Order Received',
+                message: `From ${userName} • ${itemsSummary}`,
+                icon: 'shopping-cart',
+                iconColor: 'text-success',
+                timestamp: orderTime,
+                timeAgo: timeAgo(orderTime),
+                isNew: true,
+                total: formatCurrency(orderData.total || 0),
+                orderId: orderId.substring(0, 8).toUpperCase(),
+                status: orderData.status || 'pending',
+                userName: userName
+            };
+            
+            // Add to beginning of notifications array
+            notifications.unshift(notification);
+            
+            // Keep only last 50 notifications
+            if (notifications.length > 50) {
+                notifications = notifications.slice(0, 50);
+            }
+            
+            // Mark as processed
+            processedOrderIds.add(orderId);
+            unreadCount++;
+            
+            // Update UI
+            updateNotificationBadge();
+            renderNotifications();
+            
+            // Play sound and show indicator
+            playNotificationSound();
+            showAutoRefreshIndicator(`New order from ${userName}!`);
+            
+            // Show browser notification if supported
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('New Order Received!', {
+                    body: `Order #${notification.orderId} from ${userName} - ${notification.total}`,
+                    icon: 'public/images/UK PJ Logo.png',
+                    badge: 'public/images/UK PJ Logo.png',
+                    tag: orderId,
+                    requireInteraction: true
+                });
+            }
+            
+            console.log('New order notification processed:', orderId);
+            
+        } catch (error) {
+            console.error('Error processing new order notification:', error);
         }
     }
+
+    // Initialize real-time order listener
+    function initializeOrderListener() {
+        try {
+            // Create query for recent orders
+            const ordersQuery = query(
+                collection(db, 'orders'),
+                orderBy('createdAt', 'desc'),
+                limit(20)
+            );
+
+            // Set up real-time listener
+            const unsubscribe = onSnapshot(ordersQuery, (snapshot) => {
+                let newOrdersCount = 0;
+                
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const orderData = change.doc.data();
+                        const orderId = change.doc.id;
+                        
+                        // Check if this is a genuinely new order (created in last 2 minutes)
+                        if (orderData.createdAt) {
+                            const orderTime = orderData.createdAt.toDate();
+                            const now = new Date();
+                            const timeDiffMinutes = (now - orderTime) / (1000 * 60);
+                            
+                            // Only process very recent orders and those we haven't seen before
+                            if (timeDiffMinutes < 2 && !processedOrderIds.has(orderId)) {
+                                processNewOrder(orderData, orderId);
+                                newOrdersCount++;
+                            } else if (!processedOrderIds.has(orderId)) {
+                                // Add older orders to processed list without notification
+                                processedOrderIds.add(orderId);
+                            }
+                        }
+                    }
+                    
+                    // Handle order updates (status changes, etc.)
+                    if (change.type === 'modified') {
+                        const orderId = change.doc.id;
+                        const orderData = change.doc.data();
+                        
+                        // Find existing notification and update it
+                        const existingNotification = notifications.find(n => n.id === orderId);
+                        if (existingNotification) {
+                            existingNotification.status = orderData.status;
+                            existingNotification.timeAgo = timeAgo(existingNotification.timestamp);
+                            renderNotifications();
+                        }
+                    }
+                });
+                
+                if (newOrdersCount > 0) {
+                    console.log(`Processed ${newOrdersCount} new orders`);
+                }
+                
+            }, (error) => {
+                console.error('Error in order listener:', error);
+                showAutoRefreshIndicator('Connection error - retrying...');
+                
+                // Retry connection after 5 seconds
+                setTimeout(() => {
+                    initializeOrderListener();
+                }, 5000);
+            });
+
+            return unsubscribe;
+            
+        } catch (error) {
+            console.error('Error initializing order listener:', error);
+        }
+    }
+
+    // Request notification permission
+    function requestNotificationPermission() {
+        if ('Notification' in window) {
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        console.log('Notification permission granted');
+                    }
+                });
+            }
+        }
+    }
+
+    // Toggle sound notifications
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        localStorage.setItem('notificationSound', soundEnabled);
+        
+        const soundToggle = document.getElementById('soundToggle');
+        const icon = soundToggle.querySelector('i');
+        
+        if (soundEnabled) {
+            icon.className = 'fas fa-volume-up';
+            soundToggle.title = 'Disable sound notifications';
+            soundToggle.classList.remove('btn-outline-secondary');
+            soundToggle.classList.add('btn-outline-success');
+        } else {
+            icon.className = 'fas fa-volume-mute';
+            soundToggle.title = 'Enable sound notifications';
+            soundToggle.classList.remove('btn-outline-success');
+            soundToggle.classList.add('btn-outline-secondary');
+        }
+    }
+
+    // Update profile statistics
+    function updateProfileStats() {
+        // Get last login time (current session start)
+        const sessionStart = sessionStorage.getItem('sessionStart');
+        let lastLoginTime = 'Today';
+        
+        if (sessionStart) {
+            const loginDate = new Date(sessionStart);
+            const now = new Date();
+            const diffInHours = Math.floor((now - loginDate) / (1000 * 60 * 60));
+            
+            if (diffInHours < 1) {
+                lastLoginTime = 'Just now';
+            } else if (diffInHours < 24) {
+                lastLoginTime = `${diffInHours}h ago`;
+            } else {
+                const diffInDays = Math.floor(diffInHours / 24);
+                lastLoginTime = `${diffInDays}d ago`;
+            }
+        } else {
+            sessionStorage.setItem('sessionStart', new Date().toISOString());
+        }
+        
+        const activeSinceYear = localStorage.getItem('userActiveSince') || new Date().getFullYear();
+        const isActive = true;
+        const statusText = isActive ? 'Online' : 'Offline';
+        const statusColor = isActive ? 'text-success' : 'text-danger';
+        const statusIcon = isActive ? 'fas fa-circle text-success' : 'fas fa-circle text-danger';
+        
+        // Update DOM elements
+        document.getElementById('lastLoginTime').textContent = lastLoginTime;
+        document.getElementById('activeSinceDate').textContent = activeSinceYear;
+        document.getElementById('userStatus').textContent = statusText;
+        document.getElementById('userStatus').className = `small fw-semibold ${statusColor}`;
+        document.getElementById('statusIcon').className = statusIcon;
+        
+        if (!localStorage.getItem('userActiveSince')) {
+            localStorage.setItem('userActiveSince', new Date().getFullYear());
+        }
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Initializing admin dashboard...');
+        
+        // Initialize clock
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+        
+        // Request notification permission
+        requestNotificationPermission();
+        
+        // Initialize Firebase listeners
+        const unsubscribe = initializeOrderListener();
+        
+        // Store unsubscribe function for cleanup
+        window.unsubscribeOrderListener = unsubscribe;
+
+        // Set up sound toggle
+        const soundToggle = document.getElementById('soundToggle');
+        soundToggle.addEventListener('click', toggleSound);
+        
+        // Initialize sound toggle state
+        if (!soundEnabled) {
+            soundToggle.querySelector('i').className = 'fas fa-volume-mute';
+            soundToggle.title = 'Enable sound notifications';
+            soundToggle.classList.add('btn-outline-secondary');
+        } else {
+            soundToggle.classList.add('btn-outline-success');
+        }
+
+        // Mark all as read
+        document.getElementById('markAllRead').addEventListener('click', function(e) {
+            e.preventDefault();
+            notifications.forEach(notification => notification.isNew = false);
+            unreadCount = 0;
+            updateNotificationBadge();
+            renderNotifications();
+            
+            // Show confirmation
+            showAutoRefreshIndicator('All notifications marked as read');
+        });
+
+        // Notification click handler
+        document.addEventListener('click', function(e) {
+            const notificationItem = e.target.closest('.notification-item');
+            if (notificationItem) {
+                e.preventDefault();
+                const notificationId = notificationItem.dataset.notificationId;
+                
+                if (notificationId) {
+                    // Mark as read
+                    const notification = notifications.find(n => n.id === notificationId);
+                    if (notification && notification.isNew) {
+                        notification.isNew = false;
+                        unreadCount = Math.max(0, unreadCount - 1);
+                        updateNotificationBadge();
+                        renderNotifications();
+                    }
+                    
+                    // Navigate to orders page
+                    window.location.href = `index.php?page=orders&highlight=${notificationId}`;
+                }
+            }
+        });
+
+        // Profile modal event
+        const profileModal = document.getElementById('profileModal');
+        profileModal.addEventListener('shown.bs.modal', function () {
+            updateProfileStats();
+        });
+
+        // Update time ago every minute
+        setInterval(() => {
+            let updated = false;
+            notifications.forEach(notification => {
+                const newTimeAgo = timeAgo(notification.timestamp);
+                if (newTimeAgo !== notification.timeAgo) {
+                    notification.timeAgo = newTimeAgo;
+                    updated = true;
+                }
+            });
+            if (updated) {
+                renderNotifications();
+            }
+        }, 5000);
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (window.unsubscribeOrderListener) {
+                window.unsubscribeOrderListener();
+            }
+        });
+
+        // Listen for new feedbacks
+        const feedbacksQuery = query(
+            collection(db, 'feedbacks'),
+            orderBy('createdAt', 'desc'),
+            limit(10)
+        );
+
+        onSnapshot(feedbacksQuery, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === 'added') {
+                    const feedbackData = change.doc.data();
+                    const feedbackId = change.doc.id;
+                    
+                    // Only process recent feedback
+                    const feedbackTime = feedbackData.createdAt.toDate();
+                    const now = new Date();
+                    const timeDiff = (now - feedbackTime) / 1000 / 60; // minutes
+                    
+                    if (timeDiff < 5) {
+                        processNewFeedback(feedbackData, feedbackId);
+                    }
+                }
+            });
+        });
 
     // Process new feedback
     async function processNewFeedback(feedbackData, feedbackId) {
@@ -554,177 +1056,6 @@
             });
         }
     }
-
-    // Initialize real-time listeners
-    function initializeNotificationListeners() {
-        // Listen for new orders
-        const ordersQuery = query(
-            collection(db, 'orders'),
-            orderBy('createdAt', 'desc'),
-            limit(10)
-        );
-
-        onSnapshot(ordersQuery, (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                if (change.type === 'added') {
-                    const orderData = change.doc.data();
-                    const orderId = change.doc.id;
-                    
-                    // Only process if it's a recent order (within last 5 minutes)
-                    const orderTime = orderData.createdAt.toDate();
-                    const now = new Date();
-                    const timeDiff = (now - orderTime) / 1000 / 60; // minutes
-                    
-                    if (timeDiff < 5) {
-                        processNewOrder(orderData, orderId);
-                    }
-                }
-            });
-        });
-
-        // Listen for new feedbacks
-        const feedbacksQuery = query(
-            collection(db, 'feedbacks'),
-            orderBy('createdAt', 'desc'),
-            limit(10)
-        );
-
-        onSnapshot(feedbacksQuery, (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                if (change.type === 'added') {
-                    const feedbackData = change.doc.data();
-                    const feedbackId = change.doc.id;
-                    
-                    // Only process recent feedback
-                    const feedbackTime = feedbackData.createdAt.toDate();
-                    const now = new Date();
-                    const timeDiff = (now - feedbackTime) / 1000 / 60; // minutes
-                    
-                    if (timeDiff < 5) {
-                        processNewFeedback(feedbackData, feedbackId);
-                    }
-                }
-            });
-        });
-    }
-
-    // Request notification permission
-    function requestNotificationPermission() {
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
-    }
-    }
-
-    // Update profile statistics
-    function updateProfileStats() {
-        // Get last login time (current session start)
-        const sessionStart = sessionStorage.getItem('sessionStart');
-        let lastLoginTime = 'Today';
-        
-        if (sessionStart) {
-            const loginDate = new Date(sessionStart);
-            const now = new Date();
-            const diffInHours = Math.floor((now - loginDate) / (1000 * 60 * 60));
-            
-            if (diffInHours < 1) {
-                lastLoginTime = 'Just now';
-            } else if (diffInHours < 24) {
-                lastLoginTime = `${diffInHours}h ago`;
-            } else {
-                const diffInDays = Math.floor(diffInHours / 24);
-                lastLoginTime = `${diffInDays}d ago`;
-            }
-        } else {
-            // Set session start if not exists
-            sessionStorage.setItem('sessionStart', new Date().toISOString());
-        }
-        
-        // Get active since date (simulate from user creation or default to this year)
-        const activeSinceYear = localStorage.getItem('userActiveSince') || new Date().getFullYear();
-        const activeSinceDate = activeSinceYear;
-        
-        // Set user status based on activity (simulate online status)
-        const isActive = true; // Since they're currently logged in
-        const statusText = isActive ? 'Online' : 'Offline';
-        const statusColor = isActive ? 'text-success' : 'text-danger';
-        const statusIcon = isActive ? 'fas fa-circle text-success' : 'fas fa-circle text-danger';
-        
-        // Update the DOM elements
-        document.getElementById('lastLoginTime').textContent = lastLoginTime;
-        document.getElementById('activeSinceDate').textContent = activeSinceDate;
-        document.getElementById('userStatus').textContent = statusText;
-        document.getElementById('userStatus').className = `small fw-semibold ${statusColor}`;
-        document.getElementById('statusIcon').className = statusIcon;
-        
-        // Store active since year if not exists
-        if (!localStorage.getItem('userActiveSince')) {
-            localStorage.setItem('userActiveSince', new Date().getFullYear());
-        }
-    }
-
-    // Event listeners
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize clock
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
-        
-        // Request notification permission
-        requestNotificationPermission();
-        
-        // Initialize Firebase listeners
-        initializeNotificationListeners();
-
-        // Mark all as read
-        document.getElementById('markAllRead').addEventListener('click', function() {
-            notifications.forEach(notification => notification.isNew = false);
-            unreadCount = 0;
-            updateNotificationBadge();
-            renderNotifications();
-        });
-
-        // Notification click handler
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.notification-item')) {
-                const notificationId = e.target.closest('[data-notification-id]')?.dataset.notificationId;
-                if (notificationId) {
-                    // Find and mark as read
-                    const notification = notifications.find(n => n.id === notificationId);
-                    if (notification && notification.isNew) {
-                        notification.isNew = false;
-                        unreadCount--;
-                        updateNotificationBadge();
-                        renderNotifications();
-                    }
-                    
-                    // Handle navigation based on notification type
-                    if (notification.type === 'order') {
-                        window.location.href = 'index.php?page=orders';
-                    } else if (notification.type === 'feedback') {
-                        window.location.href = 'index.php?page=reviews';
-                    }
-                }
-            }
-        });
-
-        // Sidebar toggle functionality
-        document.getElementById('sidebarCollapse')?.addEventListener('click', function() {
-            console.log('Sidebar toggle clicked');
-        });
-
-        // Profile modal event
-        const profileModal = document.getElementById('profileModal');
-        profileModal.addEventListener('shown.bs.modal', function () {
-            console.log('Profile modal opened');
-            updateProfileStats();
-        });
-
-        // Update time ago every minute
-        setInterval(() => {
-            notifications.forEach(notification => {
-                notification.timeAgo = timeAgo(notification.timestamp);
-            });
-            renderNotifications();
-        }, 60000);
     });
 </script>
 
@@ -733,6 +1064,11 @@
 function handleLogout(event) {
     event.preventDefault();
     if (confirm('Are you sure you want to logout?')) {
+        // Clean up Firebase listeners
+        if (window.unsubscribeOrderListener) {
+            window.unsubscribeOrderListener();
+        }
+        
         if (typeof logout === 'function') {
             logout();
         } else {

@@ -648,10 +648,10 @@
             // Get top items (items with orders > 0)
             const topItems = sortedItems.filter(item => item.orders > 0).slice(0, 5);
 
-            // Get low demand items (items with 0 orders or very low orders)
+            // Get low demand items (items with 0 orders or very low orders) - Show only first 5
             const lowDemandItems = sortedItems
                 .filter(item => item.orders <= 2) // 0, 1, or 2 orders
-                .slice(0, 10); // Show top 10 low demand items
+                .slice(0, 5); // Show only first 5 low demand items
 
             return {
                 topItems,
