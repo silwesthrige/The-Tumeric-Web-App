@@ -1,3 +1,4 @@
+
     <style>
         .nav-pills .nav-link {
             color: #666;
@@ -109,6 +110,14 @@
             background-color: #fff;
             border: 1px solid #6c757d;
             color: #6c757d;
+            border-radius: 0.5rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            padding: 0.35rem 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.3s ease;
         }
         .btn-custom-outline:hover {
             background-color: #6c757d;
@@ -215,7 +224,7 @@
                                         <button type="submit" class="btn-custom">
                                             <i class="fas fa-save"></i> Save Restaurant Info
                                         </button>
-                                        <button type="button" class="btn-custom btn-custom-outline" id="loadRestaurantBtn">
+                                        <button type="button" class="btn-custom-outline" id="loadRestaurantBtn">
                                             <i class="fas fa-sync"></i> Reload
                                         </button>
                                     </div>
@@ -294,7 +303,7 @@
                                         <button type="submit" class="btn-custom">
                                             <i class="fas fa-save"></i> Save Payment Settings
                                         </button>
-                                        <button type="button" class="btn btn-outline-secondary" id="loadPaymentBtn">
+                                        <button type="button" class="btn-custom-outline" id="loadPaymentBtn">
                                             <i class="fas fa-sync me-1"></i>Reload
                                         </button>
                                     </div>
@@ -345,7 +354,7 @@
                                         <button type="submit" class="btn-custom">
                                             <i class="fas fa-save"></i> Save Delivery Settings
                                         </button>
-                                        <button type="button" class="btn btn-outline-secondary" id="loadDeliveryBtn">
+                                        <button type="button" class="btn-custom-outline" id="loadDeliveryBtn">
                                             <i class="fas fa-sync me-1"></i>Reload
                                         </button>
                                     </div>
@@ -653,9 +662,9 @@
                 showLoading();
                 const deliveryData = {
                     deliveryRadius: parseFloat(formData.deliveryRadius) || 10,
-                    minOrderValue: parseFloat(formData.minOrderValue) || 200,
-                    deliveryCharge: parseFloat(formData.deliveryCharge) || 30,
-                    freeDeliveryAbove: parseFloat(formData.freeDeliveryAbove) || 500,
+                    minOrderValue: parseFloat(formData.minOrderValue) || 20,
+                    deliveryCharge: parseFloat(formData.deliveryCharge) || 3,
+                    freeDeliveryAbove: parseFloat(formData.freeDeliveryAbove) || 25,
                     avgDeliveryTime: parseInt(formData.avgDeliveryTime) || 30,
                     maxDeliveryTime: parseInt(formData.maxDeliveryTime) || 60,
                     updatedAt: serverTimestamp()
@@ -679,9 +688,9 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     document.getElementById('deliveryRadius').value = data.deliveryRadius || 10;
-                    document.getElementById('minOrderValue').value = data.minOrderValue || 200;
-                    document.getElementById('deliveryCharge').value = data.deliveryCharge || 30;
-                    document.getElementById('freeDeliveryAbove').value = data.freeDeliveryAbove || 500;
+                    document.getElementById('minOrderValue').value = data.minOrderValue || 20;
+                    document.getElementById('deliveryCharge').value = data.deliveryCharge || 3;
+                    document.getElementById('freeDeliveryAbove').value = data.freeDeliveryAbove || 25;
                     document.getElementById('avgDeliveryTime').value = data.avgDeliveryTime || 30;
                     document.getElementById('maxDeliveryTime').value = data.maxDeliveryTime || 60;
                 }
