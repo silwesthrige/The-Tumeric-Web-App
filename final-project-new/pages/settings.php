@@ -34,6 +34,12 @@
             object-fit: cover;
         }
 
+        .delivery-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
         .upload-area {
             border: 2px dashed #dee2e6;
             border-radius: 8px;
@@ -84,6 +90,15 @@
             font-weight: 400;
             line-height: 1.2;
             color: #495057;
+        }
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .availability-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
         }
         .btn-custom {
             border-radius: 0.5rem;
@@ -159,6 +174,9 @@
                             </button>
                             <button class="nav-link" id="users-tab" data-bs-toggle="pill" data-bs-target="#users" type="button" role="tab">
                                 <i class="fas fa-users me-2"></i>User Management
+                            </button>
+                             <button class="nav-link" id="delivery-personnel-tab" data-bs-toggle="pill" data-bs-target="#delivery-personnel" type="button" role="tab">
+                                <i class="fas fa-motorcycle me-2"></i>Delivery Personnel
                             </button>
                             <button class="nav-link" id="payment-tab" data-bs-toggle="pill" data-bs-target="#payment" type="button" role="tab">
                                 <i class="fas fa-credit-card me-2"></i>Payment Settings
@@ -271,6 +289,243 @@
                             </div>
                         </div>
                     </div>
+
+                      <!-- Delivery Personnel Management -->
+                    <div class="tab-pane fade" id="delivery-personnel" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Delivery Personnel Management</h5>
+                                    <button type="button" class="btn-custom" data-bs-toggle="modal" data-bs-target="#addDeliveryPersonnelModal">
+                                        <i class="fas fa-user-plus"></i> Add Delivery Personnel
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="deliveryPersonnelLoadingIndicator" class="text-center py-4" style="display: none;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Loading delivery personnel...</p>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="deliveryPersonnelTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Photo</th>
+                                                <th>Personnel ID</th>
+                                                <th>Name</th>
+                                                <th>Phone</th>
+                                                <th>Email</th>
+                                                <th>Status</th>
+                                                <th>Availability</th>
+                                                <th>Active Orders</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="deliveryPersonnelTableBody">
+                                            <!-- Dynamic content will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Delivery Personnel Modal -->
+        <div class="modal fade" id="addDeliveryPersonnelModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New Delivery Personnel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="needs-validation" id="addDeliveryPersonnelForm" novalidate>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="deliveryPersonnelId" class="form-label">Personnel ID</label>
+                                    <input type="text" class="form-control" id="deliveryPersonnelId" required placeholder="DP001">
+                                    <div class="invalid-feedback">Please provide a valid personnel ID.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="deliveryPersonnelName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="deliveryPersonnelName" required>
+                                    <div class="invalid-feedback">Please provide a valid name.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="deliveryPersonnelEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="deliveryPersonnelEmail" required>
+                                    <div class="invalid-feedback">Please provide a valid email address.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="deliveryPersonnelPhone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="deliveryPersonnelPhone" required>
+                                    <div class="invalid-feedback">Please provide a valid phone number.</div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="deliveryPersonnelPassword" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="deliveryPersonnelPassword" required minlength="6">
+                                    <div class="invalid-feedback">Password must be at least 6 characters long.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="deliveryPersonnelVehicleType" class="form-label">Vehicle Type</label>
+                                    <select class="form-select" id="deliveryPersonnelVehicleType" required>
+                                        <option value="">Select Vehicle</option>
+                                        <option value="motorcycle">Motorcycle</option>
+                                        <option value="bicycle">Bicycle</option>
+                                        <option value="car">Car</option>
+                                        <option value="scooter">Scooter</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a vehicle type.</div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="deliveryPersonnelLicenseNumber" class="form-label">License Number</label>
+                                    <input type="text" class="form-control" id="deliveryPersonnelLicenseNumber" required>
+                                    <div class="invalid-feedback">Please provide a license number.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="deliveryPersonnelAddress" class="form-label">Address</label>
+                                    <textarea class="form-control" id="deliveryPersonnelAddress" rows="2" required></textarea>
+                                    <div class="invalid-feedback">Please provide an address.</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="deliveryPersonnelImageUpload" class="form-label">Profile Picture</label>
+                                <div class="upload-area" id="deliveryPersonnelUploadArea">
+                                    <i class="fas fa-user-circle fa-3x text-muted mb-2"></i>
+                                    <p class="mb-2">Click to upload profile picture</p>
+                                    <input type="file" class="form-control" id="deliveryPersonnelImageUpload" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('deliveryPersonnelImageUpload').click()">
+                                        Choose File
+                                    </button>
+                                </div>
+                                <img id="deliveryPersonnelImagePreview" class="image-preview" style="display: none;" alt="Preview">
+                                <div class="form-text">Upload a profile picture (JPG, PNG, GIF - Max 2MB)</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-custom" form="addDeliveryPersonnelForm" id="addDeliveryPersonnelBtn">Add Personnel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Delivery Personnel Modal -->
+        <div class="modal fade" id="editDeliveryPersonnelModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Delivery Personnel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="needs-validation" id="editDeliveryPersonnelForm" novalidate>
+                            <input type="hidden" id="editDeliveryPersonnelDocId">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="editDeliveryPersonnelId" class="form-label">Personnel ID</label>
+                                    <input type="text" class="form-control" id="editDeliveryPersonnelId" required readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="editDeliveryPersonnelName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="editDeliveryPersonnelName" required>
+                                    <div class="invalid-feedback">Please provide a valid name.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="editDeliveryPersonnelEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="editDeliveryPersonnelEmail" required>
+                                    <div class="invalid-feedback">Please provide a valid email address.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="editDeliveryPersonnelPhone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="editDeliveryPersonnelPhone" required>
+                                    <div class="invalid-feedback">Please provide a valid phone number.</div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="editDeliveryPersonnelPassword" class="form-label">Password (Leave empty to keep current)</label>
+                                    <input type="password" class="form-control" id="editDeliveryPersonnelPassword" minlength="6">
+                                    <div class="invalid-feedback">Password must be at least 6 characters long.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="editDeliveryPersonnelVehicleType" class="form-label">Vehicle Type</label>
+                                    <select class="form-select" id="editDeliveryPersonnelVehicleType" required>
+                                        <option value="">Select Vehicle</option>
+                                        <option value="motorcycle">Motorcycle</option>
+                                        <option value="bicycle">Bicycle</option>
+                                        <option value="car">Car</option>
+                                        <option value="scooter">Scooter</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a vehicle type.</div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="editDeliveryPersonnelStatus" class="form-label">Status</label>
+                                    <select class="form-select" id="editDeliveryPersonnelStatus" required>
+                                        <option value="available">Available</option>
+                                        <option value="busy">Busy</option>
+                                        <option value="offline">Offline</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="editDeliveryPersonnelAvailability" class="form-label">Availability</label>
+                                    <select class="form-select" id="editDeliveryPersonnelAvailability" required>
+                                        <option value="active">Active</option>
+                                        <option value="on_break">On Break</option>
+                                        <option value="off_duty">Off Duty</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Current Profile Picture</label>
+                                <img id="editCurrentDeliveryPersonnelImage" class="image-preview mb-2" style="display: block;" alt="Current image">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="editDeliveryPersonnelImageUpload" class="form-label">Update Profile Picture (Optional)</label>
+                                <div class="upload-area" id="editDeliveryPersonnelUploadArea">
+                                    <i class="fas fa-user-circle fa-3x text-muted mb-2"></i>
+                                    <p class="mb-2">Click to upload new profile picture</p>
+                                    <input type="file" class="form-control" id="editDeliveryPersonnelImageUpload" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('editDeliveryPersonnelImageUpload').click()">
+                                        Choose File
+                                    </button>
+                                </div>
+                                <img id="editDeliveryPersonnelImagePreview" class="image-preview" style="display: none;" alt="Preview">
+                                <div class="form-text">Upload a new profile picture to replace the current one (JPG, PNG, GIF - Max 2MB)</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-custom" form="editDeliveryPersonnelForm" id="editDeliveryPersonnelBtn">Update Personnel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+
 
                     <!-- Payment Settings -->
                     <div class="tab-pane fade" id="payment" role="tabpanel">
@@ -515,7 +770,11 @@
             deleteDoc,
             getDoc,
             serverTimestamp,
-            setDoc
+            setDoc,
+            query,
+            where,
+            arrayUnion,
+            arrayRemove
         } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
         import { 
             getStorage, 
@@ -543,6 +802,7 @@
 
         // Global variables
         let allUsers = [];
+        let allDeliveryPersonnel = [];
 
         // Utility functions
         function showLoading() {
@@ -824,7 +1084,7 @@
             }
         }
 
-        // Image upload functionality
+        // Image upload functionality for users
         function setupUserImageUpload(uploadAreaId, fileInputId, previewId) {
             const uploadArea = document.getElementById(uploadAreaId);
             const fileInput = document.getElementById(fileInputId);
@@ -877,6 +1137,303 @@
                     preview.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
+            }
+        }
+
+        // Delivery Personnel Management Functions
+        async function loadDeliveryPersonnel() {
+            const loadingIndicator = document.getElementById('deliveryPersonnelLoadingIndicator');
+            const tableBody = document.getElementById('deliveryPersonnelTableBody');
+            
+            try {
+                loadingIndicator.style.display = 'block';
+                tableBody.innerHTML = '';
+                
+                const querySnapshot = await getDocs(collection(db, "deliveryPersonnel"));
+                
+                if (querySnapshot.empty) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="9" class="text-center py-4 text-muted">
+                                <i class="fas fa-motorcycle fa-2x mb-3 d-block"></i>
+                                No delivery personnel found. Add your first delivery person!
+                            </td>
+                        </tr>`;
+                    allDeliveryPersonnel = [];
+                    return;
+                }
+                
+                allDeliveryPersonnel = [];
+                querySnapshot.forEach((doc) => {
+                    const personnel = doc.data();
+                    personnel.docId = doc.id;
+                    allDeliveryPersonnel.push(personnel);
+                    const row = createDeliveryPersonnelRow(doc.id, personnel);
+                    tableBody.appendChild(row);
+                });
+                
+            } catch (error) {
+                console.error("Error loading delivery personnel: ", error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-danger">
+                            <i class="fas fa-exclamation-triangle fa-2x mb-3 d-block"></i>
+                            Error loading delivery personnel. Please try again.
+                        </td>
+                    </tr>`;
+                allDeliveryPersonnel = [];
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        function createDeliveryPersonnelRow(docId, personnel) {
+            const row = document.createElement('tr');
+            const createdDate = personnel.createdAt ? new Date(personnel.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
+            
+            const getStatusBadge = (status) => {
+                const badges = {
+                    'online': 'bg-success',
+                    'offline': 'bg-secondary'
+                };
+                return badges[status] || 'bg-secondary';
+            };
+
+            const getAvailabilityBadge = (availability) => {
+                const badges = {
+                    'active': 'bg-success',
+                    'on_break': 'bg-warning',
+                    'off_duty': 'bg-danger'
+                };
+                return badges[availability] || 'bg-secondary';
+            };
+
+            const formatStatusText = (status) => {
+                if (!status) return 'Offline';
+                return status.charAt(0).toUpperCase() + status.slice(1);
+            };
+
+            const formatAvailabilityText = (availability) => {
+                if (!availability) return 'Unknown';
+                return availability.replace(/_/g, ' ')
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ');
+            };
+
+            row.innerHTML = `
+                <td>
+                    <img src="${personnel.profileImageUrl || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop'}" 
+                         alt="${personnel.fullName}" class="delivery-avatar"
+                         onerror="this.src='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop'">
+                </td>
+                <td><strong>${personnel.personnelId}</strong></td>
+                <td>${personnel.fullName}</td>
+                <td>${personnel.phoneNumber}</td>
+                <td>${personnel.email}</td>
+                <td><span class="badge status-badge ${getStatusBadge(personnel.status || 'offline')}">${formatStatusText(personnel.status || 'offline')}</span></td>
+                <td><span class="badge availability-badge ${getAvailabilityBadge(personnel.availability || 'off_duty')}">${formatAvailabilityText(personnel.availability || 'off_duty')}</span></td>
+                <td><span class="badge bg-info">${personnel.currentOrders ? personnel.currentOrders.length : 0}</span></td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" onclick="editDeliveryPersonnel('${docId}')" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="deleteDeliveryPersonnel('${docId}')" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn btn-outline-${personnel.isActive ? 'warning' : 'success'}" onclick="toggleDeliveryPersonnelStatus('${docId}', ${personnel.isActive})" title="${personnel.isActive ? 'Deactivate' : 'Activate'}">
+                            <i class="fas fa-${personnel.isActive ? 'user-slash' : 'user-check'}"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            return row;
+        }
+
+        async function deleteDeliveryPersonnel(docId) {
+            if (!confirm("Are you sure you want to delete this delivery personnel? This action cannot be undone.")) {
+                return;
+            }
+
+            try {
+                showLoading();
+                await deleteDoc(doc(db, "deliveryPersonnel", docId));
+                allDeliveryPersonnel = allDeliveryPersonnel.filter(personnel => personnel.docId !== docId);
+                loadDeliveryPersonnel();
+                showNotification("Delivery personnel deleted successfully!");
+            } catch (error) {
+                console.error("Error removing delivery personnel: ", error);
+                showNotification("Failed to delete delivery personnel", 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function editDeliveryPersonnel(docId) {
+            try {
+                const personnelDoc = await getDoc(doc(db, "deliveryPersonnel", docId));
+                if (personnelDoc.exists()) {
+                    const personnel = personnelDoc.data();
+                    
+                    // Set form values with error checking
+                    const setValueSafely = (id, value) => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.value = value || '';
+                        }
+                    };
+
+                    setValueSafely('editDeliveryPersonnelDocId', docId);
+                    setValueSafely('editDeliveryPersonnelId', personnel.personnelId);
+                    setValueSafely('editDeliveryPersonnelName', personnel.fullName);
+                    setValueSafely('editDeliveryPersonnelEmail', personnel.email);
+                    setValueSafely('editDeliveryPersonnelPhone', personnel.phoneNumber);
+                    setValueSafely('editDeliveryPersonnelPassword', '');
+                    setValueSafely('editDeliveryPersonnelVehicleType', personnel.vehicleType);
+                    setValueSafely('editDeliveryPersonnelLicenseNumber', personnel.licenseNumber);
+                    setValueSafely('editDeliveryPersonnelAddress', personnel.address);
+                    setValueSafely('editDeliveryPersonnelStatus', personnel.status);
+                    setValueSafely('editDeliveryPersonnelAvailability', personnel.availability);
+                    
+                    const currentImage = document.getElementById('editCurrentDeliveryPersonnelImage');
+                    if (currentImage) {
+                        currentImage.src = personnel.profileImageUrl || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200&h=150&fit=crop';
+                        currentImage.style.display = 'block';
+                    }
+                    
+                    const imagePreview = document.getElementById('editDeliveryPersonnelImagePreview');
+                    if (imagePreview) {
+                        imagePreview.style.display = 'none';
+                    }
+                    
+                    const imageUpload = document.getElementById('editDeliveryPersonnelImageUpload');
+                    if (imageUpload) {
+                        imageUpload.value = '';
+                    }
+                    
+                    const editModalElement = document.getElementById('editDeliveryPersonnelModal');
+                    if (editModalElement) {
+                        const editModal = new bootstrap.Modal(editModalElement);
+                        editModal.show();
+                    } else {
+                        showNotification("Edit modal not found!", 'error');
+                    }
+                } else {
+                    showNotification("Delivery personnel not found!", 'error');
+                }
+            } catch (error) {
+                console.error("Error loading delivery personnel for edit: ", error);
+                showNotification("Failed to load delivery personnel details", 'error');
+            }
+        }
+
+        async function toggleDeliveryPersonnelStatus(docId, currentStatus) {
+            try {
+                const newStatus = !currentStatus;
+                const updateData = {
+                    isActive: newStatus,
+                    updatedAt: serverTimestamp()
+                };
+
+                if (newStatus) {
+                    // When activating, only set availability to active (don't change status)
+                    updateData.availability = 'active';
+                } else {
+                    // When deactivating, set availability to off_duty (don't change status)
+                    updateData.availability = 'off_duty';
+                }
+
+                await updateDoc(doc(db, "deliveryPersonnel", docId), updateData);
+                
+                // Force a complete reload of the table
+                setTimeout(async () => {
+                    await loadDeliveryPersonnel();
+                }, 100);
+                
+                showNotification(`Delivery personnel ${newStatus ? 'activated' : 'deactivated'} successfully!`);
+            } catch (error) {
+                console.error("Error updating delivery personnel status: ", error);
+                showNotification("Failed to update status", 'error');
+            }
+        }
+
+        // Image upload functionality for delivery personnel
+        function setupDeliveryPersonnelImageUpload(uploadAreaId, fileInputId, previewId) {
+            const uploadArea = document.getElementById(uploadAreaId);
+            const fileInput = document.getElementById(fileInputId);
+            const preview = document.getElementById(previewId);
+
+            if (!uploadArea || !fileInput || !preview) return;
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleDeliveryPersonnelFileSelect(files[0], preview);
+                    fileInput.files = files;
+                }
+            });
+
+            uploadArea.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'BUTTON') {
+                    fileInput.click();
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleDeliveryPersonnelFileSelect(e.target.files[0], preview);
+                }
+            });
+        }
+
+        function handleDeliveryPersonnelFileSelect(file, preview) {
+            if (file && file.type.startsWith('image/')) {
+                if (file.size > 2 * 1024 * 1024) {
+                    showNotification('File size must be less than 2MB', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Generate unique personnel ID
+        async function generatePersonnelId() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "deliveryPersonnel"));
+                const existingIds = new Set();
+                querySnapshot.forEach((doc) => {
+                    existingIds.add(doc.data().personnelId);
+                });
+
+                let newId;
+                let counter = 1;
+                do {
+                    newId = `DP${counter.toString().padStart(3, '0')}`;
+                    counter++;
+                } while (existingIds.has(newId));
+
+                return newId;
+            } catch (error) {
+                console.error("Error generating personnel ID: ", error);
+                return `DP${Date.now().toString().substr(-3)}`;
             }
         }
 
@@ -1021,6 +1578,167 @@
             }
         });
 
+        // Add delivery personnel form submission
+        document.getElementById("addDeliveryPersonnelForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            const addBtn = document.getElementById("addDeliveryPersonnelBtn");
+            addBtn.disabled = true;
+            addBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding Personnel...';
+
+            const personnelId = document.getElementById("deliveryPersonnelId").value.trim();
+            const fullName = document.getElementById("deliveryPersonnelName").value.trim();
+            const email = document.getElementById("deliveryPersonnelEmail").value.trim();
+            const phoneNumber = document.getElementById("deliveryPersonnelPhone").value.trim();
+            const password = document.getElementById("deliveryPersonnelPassword").value.trim();
+            const vehicleType = document.getElementById("deliveryPersonnelVehicleType").value;
+            const licenseNumber = document.getElementById("deliveryPersonnelLicenseNumber").value.trim();
+            const address = document.getElementById("deliveryPersonnelAddress").value.trim();
+            const imageFile = document.getElementById("deliveryPersonnelImageUpload").files[0];
+
+            try {
+                // Check if personnel ID already exists
+                const existingQuery = query(collection(db, "deliveryPersonnel"), where("personnelId", "==", personnelId));
+                const existingDocs = await getDocs(existingQuery);
+                if (!existingDocs.empty) {
+                    showNotification("Personnel ID already exists! Please choose a different ID.", 'error');
+                    addBtn.disabled = false;
+                    addBtn.innerHTML = 'Add Personnel';
+                    return;
+                }
+
+                let profileImageUrl = "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop";
+
+                if (imageFile) {
+                    const imageRef = ref(storage, `delivery-personnel-images/${Date.now()}_${imageFile.name}`);
+                    const uploadResult = await uploadBytes(imageRef, imageFile);
+                    profileImageUrl = await getDownloadURL(uploadResult.ref);
+                }
+
+                const docRef = await addDoc(collection(db, "deliveryPersonnel"), {
+                    personnelId: personnelId,
+                    fullName: fullName,
+                    email: email,
+                    phoneNumber: phoneNumber,
+                    password: password,
+                    vehicleType: vehicleType,
+                    licenseNumber: licenseNumber,
+                    address: address,
+                    profileImageUrl: profileImageUrl,
+                    status: 'available', // available, busy, offline
+                    availability: 'active', // active, on_break, off_duty
+                    isActive: true,
+                    currentOrders: [], // Array to store order IDs
+                    totalDeliveries: 0,
+                    rating: 0,
+                    joiningDate: serverTimestamp(),
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+
+                showNotification("Delivery personnel added successfully!");
+                
+                this.reset();
+                this.classList.remove('was-validated');
+                document.getElementById('deliveryPersonnelImagePreview').style.display = 'none';
+                bootstrap.Modal.getInstance(document.getElementById("addDeliveryPersonnelModal")).hide();
+                
+                loadDeliveryPersonnel();
+
+            } catch (error) {
+                console.error("Error adding delivery personnel: ", error);
+                showNotification("Failed to add delivery personnel. Please try again.", 'error');
+            } finally {
+                addBtn.disabled = false;
+                addBtn.innerHTML = 'Add Personnel';
+            }
+        });
+
+        // Edit delivery personnel form submission
+        document.getElementById("editDeliveryPersonnelForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            const editBtn = document.getElementById("editDeliveryPersonnelBtn");
+            editBtn.disabled = true;
+            editBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+
+            const docId = document.getElementById("editDeliveryPersonnelDocId").value;
+            const fullName = document.getElementById("editDeliveryPersonnelName").value.trim();
+            const email = document.getElementById("editDeliveryPersonnelEmail").value.trim();
+            const phoneNumber = document.getElementById("editDeliveryPersonnelPhone").value.trim();
+            const password = document.getElementById("editDeliveryPersonnelPassword").value.trim();
+            const vehicleType = document.getElementById("editDeliveryPersonnelVehicleType").value;
+            const licenseNumber = document.getElementById("editDeliveryPersonnelLicenseNumber").value.trim();
+            const address = document.getElementById("editDeliveryPersonnelAddress").value.trim();
+            const status = document.getElementById("editDeliveryPersonnelStatus").value;
+            const availability = document.getElementById("editDeliveryPersonnelAvailability").value;
+            const imageFile = document.getElementById("editDeliveryPersonnelImageUpload").files[0];
+
+            try {
+                let updateData = {
+                    fullName: fullName,
+                    email: email,
+                    phoneNumber: phoneNumber,
+                    vehicleType: vehicleType,
+                    licenseNumber: licenseNumber,
+                    address: address,
+                    status: status,
+                    availability: availability,
+                    updatedAt: serverTimestamp()
+                };
+
+                if (password) {
+                    updateData.password = password;
+                }
+
+                if (imageFile) {
+                    const imageRef = ref(storage, `delivery-personnel-images/${Date.now()}_${imageFile.name}`);
+                    const uploadResult = await uploadBytes(imageRef, imageFile);
+                    updateData.profileImageUrl = await getDownloadURL(uploadResult.ref);
+                }
+
+                const personnelRef = doc(db, "deliveryPersonnel", docId);
+                await updateDoc(personnelRef, updateData);
+
+                showNotification("Delivery personnel updated successfully!");
+                
+                this.reset();
+                this.classList.remove('was-validated');
+                document.getElementById('editDeliveryPersonnelImagePreview').style.display = 'none';
+                bootstrap.Modal.getInstance(document.getElementById("editDeliveryPersonnelModal")).hide();
+                
+                loadDeliveryPersonnel();
+
+            } catch (error) {
+                console.error("Error updating delivery personnel: ", error);
+                showNotification("Failed to update delivery personnel. Please try again.", 'error');
+            } finally {
+                editBtn.disabled = false;
+                editBtn.innerHTML = 'Update Personnel';
+            }
+        });
+
+        // Auto-generate personnel ID when modal opens
+        document.getElementById('addDeliveryPersonnelModal').addEventListener('show.bs.modal', async function () {
+            const personnelIdInput = document.getElementById('deliveryPersonnelId');
+            if (!personnelIdInput.value) {
+                const newId = await generatePersonnelId();
+                personnelIdInput.value = newId;
+            }
+        });
+
         // Save all settings button
         document.getElementById('saveAllBtn').addEventListener('click', async function() {
             try {
@@ -1084,11 +1802,17 @@
         window.loadUsers = loadUsers;
         window.deleteUser = deleteUser;
         window.editUser = editUser;
+        window.loadDeliveryPersonnel = loadDeliveryPersonnel;
+        window.deleteDeliveryPersonnel = deleteDeliveryPersonnel;
+        window.editDeliveryPersonnel = editDeliveryPersonnel;
+        window.toggleDeliveryPersonnelStatus = toggleDeliveryPersonnelStatus;
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             setupUserImageUpload('userUploadArea', 'userImageUpload', 'userImagePreview');
             setupUserImageUpload('editUserUploadArea', 'editUserImageUpload', 'editUserImagePreview');
+            setupDeliveryPersonnelImageUpload('deliveryPersonnelUploadArea', 'deliveryPersonnelImageUpload', 'deliveryPersonnelImagePreview');
+            setupDeliveryPersonnelImageUpload('editDeliveryPersonnelUploadArea', 'editDeliveryPersonnelImageUpload', 'editDeliveryPersonnelImagePreview');
             
             // Load all settings
             loadRestaurantInfo();
@@ -1101,6 +1825,12 @@
         document.getElementById('users-tab').addEventListener('click', function() {
             loadUsers();
         });
+
+        // Load delivery personnel when tab is clicked
+        document.getElementById('delivery-personnel-tab').addEventListener('click', function() {
+            loadDeliveryPersonnel();
+        });
+
     </script>
 </body>
 </html>

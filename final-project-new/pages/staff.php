@@ -1,4 +1,3 @@
-
 <body>
     <div class="container-fluid">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -69,7 +68,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row" id="departmentOverview">
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <div class="department-card">
                                     <div class="card border-primary">
                                         <div class="card-body text-center">
@@ -83,21 +82,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="department-card">
-                                    <div class="card border-success">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-motorcycle fa-2x text-success mb-2"></i>
-                                            <h6>Delivery</h6>
-                                            <div class="d-flex justify-content-between">
-                                                <small>Total: <span id="delivery-total">0</span></small>
-                                                <small class="text-success">Active: <span id="delivery-active">0</span></small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <div class="department-card">
                                     <div class="card border-info">
                                         <div class="card-body text-center">
@@ -111,7 +96,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <div class="department-card">
                                     <div class="card border-warning">
                                         <div class="card-body text-center">
@@ -144,7 +129,6 @@
                         <div class="btn-group btn-group-sm me-2">
                             <button class="btn btn-outline-secondary active" data-filter="all">All</button>
                             <button class="btn btn-outline-secondary" data-filter="kitchen">Kitchen</button>
-                            <button class="btn btn-outline-secondary" data-filter="delivery">Delivery</button>
                             <button class="btn btn-outline-secondary" data-filter="service">Service</button>
                             <button class="btn btn-outline-secondary" data-filter="management">Management</button>
                         </div>
@@ -239,7 +223,6 @@
                                 <select class="form-select" id="staffDepartment" required>
                                     <option value="">Select Department</option>
                                     <option value="kitchen">Kitchen</option>
-                                    <option value="delivery">Delivery</option>
                                     <option value="service">Customer Service</option>
                                     <option value="management">Management</option>
                                 </select>
@@ -249,7 +232,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="staffRole" class="form-label">Role</label>
-                                <input type="text" class="form-control" id="staffRole" placeholder="e.g., Chef, Delivery Executive" required>
+                                <input type="text" class="form-control" id="staffRole" placeholder="e.g., Chef, Manager" required>
                                 <div class="invalid-feedback">Please provide a role.</div>
                             </div>
                             <div class="col-md-6">
@@ -345,7 +328,6 @@
                                 <select class="form-select" id="editStaffDepartment" required>
                                     <option value="">Select Department</option>
                                     <option value="kitchen">Kitchen</option>
-                                    <option value="delivery">Delivery</option>
                                     <option value="service">Customer Service</option>
                                     <option value="management">Management</option>
                                 </select>
@@ -408,7 +390,6 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-warning" id="editFromDetailsBtn">Edit Details</button>
-                    <button type="button" class="btn btn-info">View Full Report</button>
                 </div>
             </div>
         </div>
@@ -858,13 +839,11 @@
         function getDepartmentBadge(department) {
             const badges = {
                 'kitchen': 'bg-primary',
-                'delivery': 'bg-success',
                 'service': 'bg-info',
                 'management': 'bg-warning'
             };
             const displayNames = {
                 'kitchen': 'Kitchen',
-                'delivery': 'Delivery',
                 'service': 'Customer Service',
                 'management': 'Management'
             };
@@ -1147,7 +1126,7 @@
 
         // Update department overview
         function updateDepartmentOverview() {
-            const departments = ['kitchen', 'delivery', 'service', 'management'];
+            const departments = ['kitchen', 'service', 'management'];
             
             departments.forEach(dept => {
                 const deptStaff = allStaff.filter(staff => staff.department === dept);
