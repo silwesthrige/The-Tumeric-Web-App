@@ -33,6 +33,10 @@
         .stats-card.info {
             border-left-color: #17a2b8;
         }
+
+        .stats-card.gemini {
+            border-left-color: #8e44ad;
+        }
         
         .stats-number {
             font-size: 2rem;
@@ -135,6 +139,74 @@
             font-size: 0.875rem;
             margin-left: 0.25rem;
         }
+
+        .gemini-ai-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+
+        .gemini-ai-badge i {
+            margin-right: 4px;
+        }
+
+        .trending-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .trending-item:hover {
+            border-color: #8e44ad;
+            transform: translateX(2px);
+        }
+
+        .trending-rank {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+
+        .trending-details {
+            flex-grow: 1;
+        }
+
+        .trending-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 2px;
+        }
+
+        .trending-category {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .trending-trend {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .trend-up { color: #28a745; }
+        .trend-hot { color: #dc3545; }
+        .trend-stable { color: #6c757d; }
     </style>
 </head>
 <body>
@@ -212,12 +284,27 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-star me-2"></i>Average Ratings
+                            <i class="fas fa-fire me-2"></i>Top Selling in India
+                            <span class="gemini-ai-badge">
+                                <i class="fas fa-robot"></i>Gemini AI
+                            </span>
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="ratingsChart"></canvas>
+                        <div class="loading text-center" id="trendingItemsLoading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <div id="trendingItemsContainer" style="display: none;">
+                            <div class="text-muted mb-2" style="font-size: 0.85rem;">
+                                <i class="fas fa-calendar-week me-1"></i>This week's trending items
+                            </div>
+                            <div id="trendingItemsList">
+                                <!-- AI-generated trending items will be populated here -->
+                            </div>
+                        </div>
+                        <div id="trendingItemsError" style="display: none;" class="text-center text-muted">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p class="mb-0 mt-2">Unable to load trending data</p>
                         </div>
                     </div>
                 </div>
@@ -284,9 +371,9 @@
             </div>
         </div>
 
-        <!-- Order Trends by Hour - Full Width -->
+        <!-- Order Trends by Hour and Average Ratings Row -->
         <div class="row mb-4">
-            <div class="col-12">
+            <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
@@ -296,6 +383,20 @@
                     <div class="card-body">
                         <div class="chart-container">
                             <canvas id="hourlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-star me-2"></i>Average Ratings
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="ratingsChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -412,6 +513,99 @@
 
         function showError(elementId, message) {
             document.getElementById(elementId).innerHTML = `<div class="error">Error: ${message}</div>`;
+        }
+
+        // Gemini AI simulation function (simulates AI-powered trending data)
+        async function fetchTrendingFoodItems() {
+            try {
+                console.log('Fetching trending food items from simulated Gemini AI...');
+                
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Simulated trending Indian food data (in real implementation, this would call Gemini AI API)
+                const trendingItems = [
+                    {
+                        name: "Butter Chicken",
+                        category: "North Indian",
+                        trend: "hot",
+                        popularity: 95
+                    },
+                    {
+                        name: "Biryani",
+                        category: "Rice Dishes",
+                        trend: "up",
+                        popularity: 92
+                    },
+                    {
+                        name: "Masala Dosa",
+                        category: "South Indian",
+                        trend: "up",
+                        popularity: 88
+                    },
+                    {
+                        name: "Paneer Tikka",
+                        category: "Appetizers",
+                        trend: "stable",
+                        popularity: 85
+                    },
+                    {
+                        name: "Chole Bhature",
+                        category: "Street Food",
+                        trend: "hot",
+                        popularity: 82
+                    }
+                ];
+
+                console.log('Trending items fetched:', trendingItems);
+                return trendingItems;
+            } catch (error) {
+                console.error('Error fetching trending items:', error);
+                throw error;
+            }
+        }
+
+        function updateTrendingItems(trendingItems) {
+            const loading = document.getElementById('trendingItemsLoading');
+            const container = document.getElementById('trendingItemsContainer');
+            const errorDiv = document.getElementById('trendingItemsError');
+            const itemsList = document.getElementById('trendingItemsList');
+
+            loading.style.display = 'none';
+
+            if (trendingItems && trendingItems.length > 0) {
+                itemsList.innerHTML = '';
+                
+                trendingItems.forEach((item, index) => {
+                    const trendIcon = item.trend === 'hot' ? 'fas fa-fire' : 
+                                     item.trend === 'up' ? 'fas fa-arrow-up' : 
+                                     'fas fa-minus';
+                    const trendClass = item.trend === 'hot' ? 'trend-hot' : 
+                                      item.trend === 'up' ? 'trend-up' : 
+                                      'trend-stable';
+
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'trending-item';
+                    itemElement.innerHTML = `
+                        <div class="trending-rank">${index + 1}</div>
+                        <div class="trending-details">
+                            <div class="trending-name">${item.name}</div>
+                            <div class="trending-category">${item.category}</div>
+                        </div>
+                        <div class="trending-trend ${trendClass}">
+                            <i class="${trendIcon} me-1"></i>
+                            ${item.trend === 'hot' ? 'Hot' : item.trend === 'up' ? '+' + (item.popularity - 70) + '%' : 'Stable'}
+                        </div>
+                    `;
+                    itemsList.appendChild(itemElement);
+                });
+
+                container.style.display = 'block';
+                errorDiv.style.display = 'none';
+            } else {
+                container.style.display = 'none';
+                errorDiv.style.display = 'block';
+            }
         }
 
         // Data fetching functions with better error handling
@@ -1052,6 +1246,16 @@
                     throw new Error('Firebase connection failed');
                 }
 
+                // Fetch trending items from simulated Gemini AI
+                console.log('=== Fetching Trending Items ===');
+                try {
+                    const trendingItems = await fetchTrendingFoodItems();
+                    updateTrendingItems(trendingItems);
+                } catch (error) {
+                    console.error('Error fetching trending items:', error);
+                    updateTrendingItems(null);
+                }
+
                 // Fetch all data with individual error handling
                 console.log('=== Fetching Data ===');
                 
@@ -1363,6 +1567,17 @@
             console.log('Auto-refreshing key metrics only...'); 
             autoRefreshKeyMetrics(); 
         }, 5000);
+
+        // Auto-refresh trending items every 30 seconds
+        setInterval(async () => {
+            console.log('Auto-refreshing trending items...');
+            try {
+                const trendingItems = await fetchTrendingFoodItems();
+                updateTrendingItems(trendingItems);
+            } catch (error) {
+                console.error('Error refreshing trending items:', error);
+            }
+        }, 30000);
 
     </script>
 </body>
