@@ -938,7 +938,7 @@
             updatePromotionsTable();
         }
 
-        // Update active promotions cards - MODIFIED for horizontal scrolling
+        // Update active promotions cards - FIXED for text overflow
         function updateActivePromotionsCards() {
             const container = document.getElementById('activePromotionsContainer');
             const activePromotions = allPromotions.filter(promo => getPromotionStatus(promo) === 'active');
@@ -969,7 +969,7 @@
                             <div class="card-body">
                                 ${promotion.imageUrl ? `<img src="${promotion.imageUrl}" alt="Promotion Image" class="mb-3 rounded" style="max-height: 100px; object-fit: contain; display: block; margin-left: auto; margin-right: auto;">` : ''}
                                 <h5 class="card-title text-gray-900">${promotion.name}</h5>
-                                <p class="card-text text-gray-600">${promotion.description}</p>
+                                <p class="card-text text-gray-600" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; max-height: 3em; line-height: 1.5em; word-wrap: break-word;">${promotion.description}</p>
                                 <div class="mb-2">
                                     <small class="text-muted">
                                         <i class="fas fa-calendar me-1"></i>Valid until: ${formatDate(promotion.endDate)}
