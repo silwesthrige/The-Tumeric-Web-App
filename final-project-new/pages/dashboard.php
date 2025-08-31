@@ -397,8 +397,10 @@
             // Today's Orders Count
             document.getElementById('todayOrders').textContent = todayOrders.length.toLocaleString();
 
-            // Today's Revenue
-            const todayRevenue = todayOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+            // Today's Revenue - exclude rejected orders
+            const todayRevenue = todayOrders
+                .filter(order => order.status?.toLowerCase() !== 'rejected')
+                .reduce((sum, order) => sum + (order.total || 0), 0);
             document.getElementById('todayRevenue').textContent = '£' + todayRevenue.toLocaleString();
 
             // Pending Deliveries (all pending orders, not just today's)

@@ -758,10 +758,12 @@
             const thirtyDaysAgo = getDateDaysAgo(30);
             const sixtyDaysAgo = getDateDaysAgo(60);
 
-            // Current month orders
-            const currentMonthOrders = orders.filter(order => order.createdAt >= thirtyDaysAgo);
+            // Current month orders - exclude rejected orders
+            const currentMonthOrders = orders.filter(order => 
+                order.createdAt >= thirtyDaysAgo && order.status?.toLowerCase() !== 'rejected'
+            );
             const previousMonthOrders = orders.filter(order => 
-                order.createdAt >= sixtyDaysAgo && order.createdAt < thirtyDaysAgo
+                order.createdAt >= sixtyDaysAgo && order.createdAt < thirtyDaysAgo && order.status?.toLowerCase() !== 'rejected'
             );
 
             // Total revenue

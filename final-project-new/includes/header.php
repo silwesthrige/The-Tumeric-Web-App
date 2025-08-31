@@ -525,7 +525,29 @@
     let lastOrderCheck = new Date();
 
     // Sound for notifications
-    const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IAAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwFJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiw=');
+    const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IAAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwFJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiw=');
+
+    // Helper function to safely convert string date to Date object
+    function parseDate(dateValue) {
+        if (!dateValue) return new Date();
+        
+        // If it's already a Date object
+        if (dateValue instanceof Date) return dateValue;
+        
+        // If it's a Firestore Timestamp
+        if (dateValue && typeof dateValue.toDate === 'function') {
+            return dateValue.toDate();
+        }
+        
+        // If it's a string, try to parse it
+        if (typeof dateValue === 'string') {
+            const parsed = new Date(dateValue);
+            return isNaN(parsed.getTime()) ? new Date() : parsed;
+        }
+        
+        // Fallback to current date
+        return new Date();
+    }
 
     // Real-time clock function
     function updateDateTime() {
@@ -546,7 +568,8 @@
     // Format time ago
     function timeAgo(date) {
         const now = new Date();
-        const diffInMinutes = Math.floor((now - date) / 60000);
+        const validDate = parseDate(date);
+        const diffInMinutes = Math.floor((now - validDate) / 60000);
         
         if (diffInMinutes < 1) return 'Just now';
         if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
@@ -557,12 +580,14 @@
         const diffInDays = Math.floor(diffInHours / 24);
         if (diffInDays < 7) return `${diffInDays}d ago`;
         
-        return date.toLocaleDateString();
+        return validDate.toLocaleDateString();
     }
 
     // Get user name from users collection
     async function getUserName(userId) {
         try {
+            if (!userId) return 'Customer';
+            
             const userDoc = await getDoc(doc(db, 'users', userId));
             return userDoc.exists() ? (userDoc.data().name || userDoc.data().username || 'Customer') : 'Customer';
         } catch (error) {
@@ -586,22 +611,25 @@
 
     // Format currency
     function formatCurrency(amount) {
+        const numAmount = typeof amount === 'string' ? parseFloat(amount) : (amount || 0);
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: 'USD'
-        }).format(amount);
+        }).format(numAmount);
     }
 
     // Show auto-refresh indicator
     function showAutoRefreshIndicator(message = 'Checking for new orders...') {
         const indicator = document.getElementById('autoRefreshIndicator');
         const text = document.getElementById('refreshText');
-        text.textContent = message;
-        indicator.classList.add('show');
-        
-        setTimeout(() => {
-            indicator.classList.remove('show');
-        }, 2000);
+        if (indicator && text) {
+            text.textContent = message;
+            indicator.classList.add('show');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
     }
 
     // Play notification sound
@@ -622,37 +650,50 @@
         const totalCount = document.getElementById('totalNotificationCount');
         const bellIcon = document.getElementById('notificationBellIcon');
         
-        totalCount.textContent = notifications.length;
+        if (totalCount) totalCount.textContent = notifications.length;
         
         if (unreadCount > 0) {
-            badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-            badge.style.display = 'block';
-            badge.classList.add('notification-badge-animate');
-            markAllBtn.style.display = 'block';
-            bellIcon.classList.add('notification-bell-shake');
-            
-            // Remove shake animation after it completes
-            setTimeout(() => {
-                bellIcon.classList.remove('notification-bell-shake');
-            }, 500);
+            if (badge) {
+                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                badge.style.display = 'block';
+                badge.classList.add('notification-badge-animate');
+            }
+            if (markAllBtn) markAllBtn.style.display = 'block';
+            if (bellIcon) {
+                bellIcon.classList.add('notification-bell-shake');
+                
+                // Remove shake animation after it completes
+                setTimeout(() => {
+                    bellIcon.classList.remove('notification-bell-shake');
+                }, 500);
+            }
         } else {
-            badge.style.display = 'none';
-            badge.classList.remove('notification-badge-animate');
-            markAllBtn.style.display = 'none';
+            if (badge) {
+                badge.style.display = 'none';
+                badge.classList.remove('notification-badge-animate');
+            }
+            if (markAllBtn) markAllBtn.style.display = 'none';
         }
     }
 
     // Get order items summary
     function getOrderItemsSummary(items) {
-        if (!items || items.length === 0) return 'No items';
-        if (items.length === 1) return items[0].name;
-        if (items.length === 2) return `${items[0].name}, ${items[1].name}`;
-        return `${items[0].name} and ${items.length - 1} more items`;
+        if (!items || !Array.isArray(items) || items.length === 0) return 'No items';
+        
+        try {
+            if (items.length === 1) return items[0].name || 'Unknown item';
+            if (items.length === 2) return `${items[0].name || 'Item'}, ${items[1].name || 'Item'}`;
+            return `${items[0].name || 'Item'} and ${items.length - 1} more items`;
+        } catch (error) {
+            console.error('Error processing order items:', error);
+            return `${items.length} items`;
+        }
     }
 
     // Render notifications
     function renderNotifications() {
         const notificationsList = document.getElementById('notificationsList');
+        if (!notificationsList) return;
         
         if (notifications.length === 0) {
             notificationsList.innerHTML = `
@@ -701,8 +742,11 @@
 
         try {
             const userName = await getUserName(orderData.userId);
-            const orderTime = orderData.createdAt?.toDate() || new Date();
+            const orderTime = parseDate(orderData.createdAt); // Fixed: handle string dates
             const itemsSummary = getOrderItemsSummary(orderData.items);
+            
+            // Safely get orderId - use the document ID if orderData.orderId is not available
+            const displayOrderId = orderData.orderId || orderId;
             
             const notification = {
                 id: orderId,
@@ -714,8 +758,8 @@
                 timestamp: orderTime,
                 timeAgo: timeAgo(orderTime),
                 isNew: true,
-                total: formatCurrency(orderData.total || 0),
-                orderId: orderId.substring(0, 8).toUpperCase(),
+                total: formatCurrency(orderData.total),
+                orderId: displayOrderId.toString().substring(0, 8).toUpperCase(),
                 status: orderData.status || 'pending',
                 userName: userName
             };
@@ -779,7 +823,7 @@
                         
                         // Check if this is a genuinely new order (created in last 2 minutes)
                         if (orderData.createdAt) {
-                            const orderTime = orderData.createdAt.toDate();
+                            const orderTime = parseDate(orderData.createdAt); // Fixed: handle string dates
                             const now = new Date();
                             const timeDiffMinutes = (now - orderTime) / (1000 * 60);
                             
@@ -849,6 +893,8 @@
         localStorage.setItem('notificationSound', soundEnabled);
         
         const soundToggle = document.getElementById('soundToggle');
+        if (!soundToggle) return;
+        
         const icon = soundToggle.querySelector('i');
         
         if (soundEnabled) {
@@ -893,15 +939,62 @@
         const statusColor = isActive ? 'text-success' : 'text-danger';
         const statusIcon = isActive ? 'fas fa-circle text-success' : 'fas fa-circle text-danger';
         
-        // Update DOM elements
-        document.getElementById('lastLoginTime').textContent = lastLoginTime;
-        document.getElementById('activeSinceDate').textContent = activeSinceYear;
-        document.getElementById('userStatus').textContent = statusText;
-        document.getElementById('userStatus').className = `small fw-semibold ${statusColor}`;
-        document.getElementById('statusIcon').className = statusIcon;
+        // Update DOM elements with null checks
+        const lastLoginElement = document.getElementById('lastLoginTime');
+        const activeSinceElement = document.getElementById('activeSinceDate');
+        const userStatusElement = document.getElementById('userStatus');
+        const statusIconElement = document.getElementById('statusIcon');
+        
+        if (lastLoginElement) lastLoginElement.textContent = lastLoginTime;
+        if (activeSinceElement) activeSinceElement.textContent = activeSinceYear;
+        if (userStatusElement) {
+            userStatusElement.textContent = statusText;
+            userStatusElement.className = `small fw-semibold ${statusColor}`;
+        }
+        if (statusIconElement) statusIconElement.className = statusIcon;
         
         if (!localStorage.getItem('userActiveSince')) {
             localStorage.setItem('userActiveSince', new Date().getFullYear());
+        }
+    }
+
+    // Process new feedback
+    async function processNewFeedback(feedbackData, feedbackId) {
+        try {
+            const userName = await getUserName(feedbackData.userId);
+            const feedbackTime = parseDate(feedbackData.createdAt); // Fixed: handle string dates
+            
+            const notification = {
+                id: `feedback_${feedbackId}`,
+                type: 'feedback',
+                title: 'New Review Posted',
+                message: `${userName} left a ${feedbackData.rating || 'N/A'}-star review`,
+                icon: 'star',
+                iconColor: 'text-warning',
+                timestamp: feedbackTime,
+                timeAgo: timeAgo(feedbackTime),
+                isNew: true
+            };
+            
+            notifications.unshift(notification);
+            
+            if (notifications.length > 50) {
+                notifications = notifications.slice(0, 50);
+            }
+            
+            unreadCount++;
+            updateNotificationBadge();
+            renderNotifications();
+            
+            // Show browser notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('New Review Posted', {
+                    body: notification.message,
+                    icon: 'public/images/UK PJ Logo.png'
+                });
+            }
+        } catch (error) {
+            console.error('Error processing new feedback notification:', error);
         }
     }
 
@@ -924,28 +1017,34 @@
 
         // Set up sound toggle
         const soundToggle = document.getElementById('soundToggle');
-        soundToggle.addEventListener('click', toggleSound);
-        
-        // Initialize sound toggle state
-        if (!soundEnabled) {
-            soundToggle.querySelector('i').className = 'fas fa-volume-mute';
-            soundToggle.title = 'Enable sound notifications';
-            soundToggle.classList.add('btn-outline-secondary');
-        } else {
-            soundToggle.classList.add('btn-outline-success');
+        if (soundToggle) {
+            soundToggle.addEventListener('click', toggleSound);
+            
+            // Initialize sound toggle state
+            if (!soundEnabled) {
+                const icon = soundToggle.querySelector('i');
+                if (icon) icon.className = 'fas fa-volume-mute';
+                soundToggle.title = 'Enable sound notifications';
+                soundToggle.classList.add('btn-outline-secondary');
+            } else {
+                soundToggle.classList.add('btn-outline-success');
+            }
         }
 
         // Mark all as read
-        document.getElementById('markAllRead').addEventListener('click', function(e) {
-            e.preventDefault();
-            notifications.forEach(notification => notification.isNew = false);
-            unreadCount = 0;
-            updateNotificationBadge();
-            renderNotifications();
-            
-            // Show confirmation
-            showAutoRefreshIndicator('All notifications marked as read');
-        });
+        const markAllBtn = document.getElementById('markAllRead');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                notifications.forEach(notification => notification.isNew = false);
+                unreadCount = 0;
+                updateNotificationBadge();
+                renderNotifications();
+                
+                // Show confirmation
+                showAutoRefreshIndicator('All notifications marked as read');
+            });
+        }
 
         // Notification click handler
         document.addEventListener('click', function(e) {
@@ -972,9 +1071,11 @@
 
         // Profile modal event
         const profileModal = document.getElementById('profileModal');
-        profileModal.addEventListener('shown.bs.modal', function () {
-            updateProfileStats();
-        });
+        if (profileModal) {
+            profileModal.addEventListener('shown.bs.modal', function () {
+                updateProfileStats();
+            });
+        }
 
         // Update time ago every minute
         setInterval(() => {
@@ -999,63 +1100,36 @@
         });
 
         // Listen for new feedbacks
-        const feedbacksQuery = query(
-            collection(db, 'feedbacks'),
-            orderBy('createdAt', 'desc'),
-            limit(10)
-        );
+        try {
+            const feedbacksQuery = query(
+                collection(db, 'feedbacks'),
+                orderBy('createdAt', 'desc'),
+                limit(10)
+            );
 
-        onSnapshot(feedbacksQuery, (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                if (change.type === 'added') {
-                    const feedbackData = change.doc.data();
-                    const feedbackId = change.doc.id;
-                    
-                    // Only process recent feedback
-                    const feedbackTime = feedbackData.createdAt.toDate();
-                    const now = new Date();
-                    const timeDiff = (now - feedbackTime) / 1000 / 60; // minutes
-                    
-                    if (timeDiff < 5) {
-                        processNewFeedback(feedbackData, feedbackId);
+            onSnapshot(feedbacksQuery, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const feedbackData = change.doc.data();
+                        const feedbackId = change.doc.id;
+                        
+                        // Only process recent feedback
+                        const feedbackTime = parseDate(feedbackData.createdAt); // Fixed: handle string dates
+                        const now = new Date();
+                        const timeDiff = (now - feedbackTime) / 1000 / 60; // minutes
+                        
+                        if (timeDiff < 5) {
+                            processNewFeedback(feedbackData, feedbackId);
+                        }
                     }
-                }
+                });
+            }, (error) => {
+                console.error('Error in feedback listener:', error);
             });
-        });
+        } catch (error) {
+            console.error('Error setting up feedback listener:', error);
+        }
 
-    // Process new feedback
-    async function processNewFeedback(feedbackData, feedbackId) {
-        const userName = await getUserName(feedbackData.userId);
-        const notification = {
-            id: `feedback_${feedbackId}`,
-            type: 'feedback',
-            title: 'New Review Posted',
-            message: `${userName} left a ${feedbackData.rating}-star review`,
-            icon: 'star',
-            iconColor: 'text-warning',
-            timestamp: feedbackData.createdAt.toDate(),
-            timeAgo: timeAgo(feedbackData.createdAt.toDate()),
-            isNew: true
-        };
-        
-        notifications.unshift(notification);
-        
-        if (notifications.length > 50) {
-            notifications = notifications.slice(0, 50);
-        }
-        
-        unreadCount++;
-        updateNotificationBadge();
-        renderNotifications();
-        
-        // Show browser notification
-        if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('New Review Posted', {
-                body: notification.message,
-                icon: 'public/images/UK PJ Logo.png'
-            });
-        }
-    }
     });
 </script>
 

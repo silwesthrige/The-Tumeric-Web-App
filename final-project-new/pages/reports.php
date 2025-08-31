@@ -542,23 +542,25 @@
             const { collection, getDocs, query, where, orderBy, Timestamp } = window.dbModules;
             const db = window.db;
             
-            const startTimestamp = Timestamp.fromDate(new Date(startDate));
-            const endTimestamp = Timestamp.fromDate(new Date(endDate + 'T23:59:59'));
-            
             let data = {};
             
             try {
                 switch (reportType) {
                     case 'sales':
-                        // Fetch orders data
-                        const ordersQuery = query(
-                            collection(db, 'orders'),
-                            where('createdAt', '>=', startTimestamp),
-                            where('createdAt', '<=', endTimestamp),
-                            orderBy('createdAt', 'desc')
-                        );
-                        const ordersSnapshot = await getDocs(ordersQuery);
-                        data.orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        // Fetch orders data - since createdAt is stored as string, fetch all and filter in memory
+                        const ordersSnapshot = await getDocs(collection(db, 'orders'));
+                        const allOrders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        
+                        // Filter orders by date range (createdAt is string)
+                        const startDateStr = startDate;
+                        const endDateStr = endDate;
+                        
+                        data.orders = allOrders.filter(order => {
+                            if (!order.createdAt) return false;
+                            // Extract date part from createdAt string (assuming format like "2024-01-15" or "2024-01-15T10:30:00")
+                            const orderDate = order.createdAt.split('T')[0];
+                            return orderDate >= startDateStr && orderDate <= endDateStr;
+                        });
                         
                         // Fetch menu data for item details
                         const menusSnapshot = await getDocs(collection(db, 'menus'));
@@ -570,14 +572,15 @@
                         const menuSnapshot = await getDocs(collection(db, 'menus'));
                         data.menus = menuSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                         
-                        // Fetch orders for menu analysis
-                        const menuOrdersQuery = query(
-                            collection(db, 'orders'),
-                            where('createdAt', '>=', startTimestamp),
-                            where('createdAt', '<=', endTimestamp)
-                        );
-                        const menuOrdersSnapshot = await getDocs(menuOrdersQuery);
-                        data.orders = menuOrdersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        // Fetch orders for menu analysis - filter by date
+                        const allMenuOrdersSnapshot = await getDocs(collection(db, 'orders'));
+                        const allMenuOrders = allMenuOrdersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        
+                        data.orders = allMenuOrders.filter(order => {
+                            if (!order.createdAt) return false;
+                            const orderDate = order.createdAt.split('T')[0];
+                            return orderDate >= startDate && orderDate <= endDate;
+                        });
                         break;
                         
                     case 'customer':
@@ -585,26 +588,35 @@
                         const usersSnapshot = await getDocs(collection(db, 'users'));
                         data.users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                         
-                        // Fetch orders for customer analysis
-                        const customerOrdersQuery = query(
-                            collection(db, 'orders'),
-                            where('createdAt', '>=', startTimestamp),
-                            where('createdAt', '<=', endTimestamp)
-                        );
-                        const customerOrdersSnapshot = await getDocs(customerOrdersQuery);
-                        data.orders = customerOrdersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        // Fetch orders for customer analysis - filter by date
+                        const allCustomerOrdersSnapshot = await getDocs(collection(db, 'orders'));
+                        const allCustomerOrders = allCustomerOrdersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        
+                        data.orders = allCustomerOrders.filter(order => {
+                            if (!order.createdAt) return false;
+                            const orderDate = order.createdAt.split('T')[0];
+                            return orderDate >= startDate && orderDate <= endDate;
+                        });
                         break;
                         
                     case 'feedback':
-                        // Fetch feedback data
-                        const feedbackQuery = query(
-                            collection(db, 'feedbacks'),
-                            where('createdAt', '>=', startTimestamp),
-                            where('createdAt', '<=', endTimestamp),
-                            orderBy('createdAt', 'desc')
-                        );
-                        const feedbackSnapshot = await getDocs(feedbackQuery);
-                        data.feedbacks = feedbackSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        // Fetch feedback data - since createdAt might be string here too
+                        const feedbackSnapshot = await getDocs(collection(db, 'feedbacks'));
+                        const allFeedbacks = feedbackSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        
+                        data.feedbacks = allFeedbacks.filter(feedback => {
+                            if (!feedback.createdAt) return false;
+                            // Handle both string and Timestamp
+                            let feedbackDate;
+                            if (typeof feedback.createdAt === 'string') {
+                                feedbackDate = feedback.createdAt.split('T')[0];
+                            } else if (feedback.createdAt?.toDate) {
+                                feedbackDate = feedback.createdAt.toDate().toISOString().split('T')[0];
+                            } else {
+                                return false;
+                            }
+                            return feedbackDate >= startDate && feedbackDate <= endDate;
+                        });
                         
                         // Fetch users for feedback analysis
                         const feedbackUsersSnapshot = await getDocs(collection(db, 'users'));
@@ -639,22 +651,29 @@
             const menus = data.menus || [];
             
             // Calculate metrics
-            const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+            const totalRevenue = orders.reduce((sum, order) => sum + (parseFloat(order.total) || 0), 0);
             const totalOrders = orders.length;
             const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
             
             // Status distribution
             const statusCounts = orders.reduce((acc, order) => {
-                acc[order.status] = (acc[order.status] || 0) + 1;
+                const status = order.status || 'unknown';
+                acc[status] = (acc[status] || 0) + 1;
                 return acc;
             }, {});
             
             // Popular items
             const itemCounts = {};
+            const itemRevenue = {};
             orders.forEach(order => {
-                if (order.items) {
+                if (order.items && Array.isArray(order.items)) {
                     order.items.forEach(item => {
-                        itemCounts[item.name] = (itemCounts[item.name] || 0) + item.qty;
+                        const itemName = item.name || 'Unknown Item';
+                        const qty = parseInt(item.qty) || 0;
+                        const price = parseFloat(item.price) || 0;
+                        
+                        itemCounts[itemName] = (itemCounts[itemName] || 0) + qty;
+                        itemRevenue[itemName] = (itemRevenue[itemName] || 0) + (price * qty);
                     });
                 }
             });
@@ -674,7 +693,7 @@
                         <div class="col-md-3">
                             <div class="card text-center">
                                 <div class="card-body">
-                                    <h4 class="text-primary">£${totalRevenue.toLocaleString()}</h4>
+                                    <h4 class="text-primary">£${totalRevenue.toFixed(2)}</h4>
                                     <p class="text-muted">Total Revenue</p>
                                 </div>
                             </div>
@@ -690,7 +709,7 @@
                         <div class="col-md-3">
                             <div class="card text-center">
                                 <div class="card-body">
-                                    <h4 class="text-warning">£${Math.round(avgOrderValue)}</h4>
+                                    <h4 class="text-warning">£${avgOrderValue.toFixed(2)}</h4>
                                     <p class="text-muted">Avg Order Value</p>
                                 </div>
                             </div>
@@ -710,7 +729,7 @@
                         ${Object.entries(statusCounts).map(([status, count]) => `
                             <div class="d-flex justify-content-between">
                                 <span>${status.charAt(0).toUpperCase() + status.slice(1)}:</span>
-                                <strong>${count}</strong>
+                                <strong>${count} orders</strong>
                             </div>
                         `).join('')}
                     </div>
@@ -722,16 +741,18 @@
                                 <th>Rank</th>
                                 <th>Item Name</th>
                                 <th>Quantity Sold</th>
+                                <th>Revenue</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${popularItems.map(([name, qty], index) => `
+                            ${popularItems.length > 0 ? popularItems.map(([name, qty], index) => `
                                 <tr>
                                     <td>${index + 1}</td>
                                     <td>${name}</td>
                                     <td>${qty}</td>
+                                    <td>£${(itemRevenue[name] || 0).toFixed(2)}</td>
                                 </tr>
-                            `).join('')}
+                            `).join('') : '<tr><td colspan="4" class="text-center text-muted">No items sold in this period</td></tr>'}
                         </tbody>
                     </table>
                     
@@ -743,17 +764,19 @@
                                 <th>Date</th>
                                 <th>Total</th>
                                 <th>Status</th>
+                                <th>Items</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${orders.slice(0, 20).map(order => `
+                            ${orders.length > 0 ? orders.slice(0, 20).map(order => `
                                 <tr>
                                     <td>${order.orderId || 'N/A'}</td>
-                                    <td>${order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString() : 'N/A'}</td>
-                                    <td>£${order.total || 0}</td>
+                                    <td>${order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}</td>
+                                    <td>£${parseFloat(order.total || 0).toFixed(2)}</td>
                                     <td><span class="badge bg-secondary">${order.status || 'N/A'}</span></td>
+                                    <td>${order.items ? order.items.length : 0} items</td>
                                 </tr>
-                            `).join('')}
+                            `).join('') : '<tr><td colspan="5" class="text-center text-muted">No orders found in this period</td></tr>'}
                         </tbody>
                     </table>
                 </div>
@@ -767,20 +790,32 @@
             // Calculate item performance
             const itemStats = {};
             orders.forEach(order => {
-                if (order.items) {
+                if (order.items && Array.isArray(order.items)) {
                     order.items.forEach(item => {
-                        if (!itemStats[item.foodId]) {
-                            itemStats[item.foodId] = {
-                                name: item.name,
+                        const foodId = item.foodId || item.name;
+                        if (!itemStats[foodId]) {
+                            itemStats[foodId] = {
+                                name: item.name || 'Unknown',
                                 totalSold: 0,
                                 totalRevenue: 0
                             };
                         }
-                        itemStats[item.foodId].totalSold += item.qty;
-                        itemStats[item.foodId].totalRevenue += item.price * item.qty;
+                        itemStats[foodId].totalSold += parseInt(item.qty) || 0;
+                        itemStats[foodId].totalRevenue += (parseFloat(item.price) || 0) * (parseInt(item.qty) || 0);
                     });
                 }
             });
+
+            // Calculate category stats
+            const categoryStats = menus.reduce((acc, item) => {
+                const category = item.category || 'Uncategorized';
+                if (!acc[category]) {
+                    acc[category] = { count: 0, totalPrice: 0 };
+                }
+                acc[category].count++;
+                acc[category].totalPrice += parseFloat(item.price) || 0;
+                return acc;
+            }, {});
 
             return `
                 <div class="report-content">
@@ -789,9 +824,40 @@
                     <hr>
                     
                     <h3>Menu Overview</h3>
-                    <p><strong>Total Menu Items:</strong> ${menus.length}</p>
-                    <p><strong>Active Items:</strong> ${menus.filter(item => item.status === 'active').length}</p>
-                    <p><strong>Inactive Items:</strong> ${menus.filter(item => item.status !== 'active').length}</p>
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-primary">${menus.length}</h4>
+                                    <p class="text-muted">Total Menu Items</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-success">${menus.filter(item => item.status === 'active' || !item.status).length}</h4>
+                                    <p class="text-muted">Active Items</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-warning">${menus.filter(item => item.status === 'inactive').length}</h4>
+                                    <p class="text-muted">Inactive Items</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h4 class="text-info">${Object.keys(categoryStats).length}</h4>
+                                    <p class="text-muted">Categories</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <h3>Items by Category</h3>
                     <table class="table table-striped">
@@ -803,18 +869,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${Object.entries(menus.reduce((acc, item) => {
-                                if (!acc[item.category]) {
-                                    acc[item.category] = { count: 0, totalPrice: 0 };
-                                }
-                                acc[item.category].count++;
-                                acc[item.category].totalPrice += item.price || 0;
-                                return acc;
-                            }, {})).map(([category, stats]) => `
+                            ${Object.entries(categoryStats).map(([category, stats]) => `
                                 <tr>
                                     <td>${category}</td>
                                     <td>${stats.count}</td>
-                                    <td>£${Math.round(stats.totalPrice / stats.count)}</td>
+                                    <td>£${(stats.totalPrice / stats.count).toFixed(2)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -830,16 +889,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${Object.entries(itemStats)
-                                .sort(([,a], [,b]) => b.totalSold - a.totalSold)
-                                .slice(0, 20)
-                                .map(([foodId, stats]) => `
-                                <tr>
-                                    <td>${stats.name}</td>
-                                    <td>${stats.totalSold}</td>
-                                    <td>£${stats.totalRevenue.toLocaleString()}</td>
-                                </tr>
-                            `).join('')}
+                            ${Object.keys(itemStats).length > 0 ? 
+                                Object.entries(itemStats)
+                                    .sort(([,a], [,b]) => b.totalSold - a.totalSold)
+                                    .slice(0, 20)
+                                    .map(([foodId, stats]) => `
+                                    <tr>
+                                        <td>${stats.name}</td>
+                                        <td>${stats.totalSold}</td>
+                                        <td>£${stats.totalRevenue.toFixed(2)}</td>
+                                    </tr>
+                                `).join('') : 
+                                '<tr><td colspan="3" class="text-center text-muted">No sales data available for this period</td></tr>'
+                            }
                         </tbody>
                     </table>
                     
@@ -857,11 +919,11 @@
                         <tbody>
                             ${menus.map(item => `
                                 <tr>
-                                    <td>${item.foodName || 'N/A'}</td>
+                                    <td>${item.foodName || item.name || 'N/A'}</td>
                                     <td>${item.category || 'N/A'}</td>
-                                    <td>£${item.price || 0}</td>
-                                    <td><span class="badge bg-${item.status === 'active' ? 'success' : 'secondary'}">${item.status || 'N/A'}</span></td>
-                                    <td>${item.cookedTime || 'N/A'} min</td>
+                                    <td>£${parseFloat(item.price || 0).toFixed(2)}</td>
+                                    <td><span class="badge bg-${item.status === 'active' || !item.status ? 'success' : 'secondary'}">${item.status || 'active'}</span></td>
+                                    <td>${item.cookedTime || item.cookTime || 'N/A'} min</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -876,16 +938,17 @@
             
             // Calculate customer metrics
             const customerOrders = orders.reduce((acc, order) => {
-                if (!acc[order.userId]) {
-                    acc[order.userId] = [];
+                const userId = order.userId || 'unknown';
+                if (!acc[userId]) {
+                    acc[userId] = [];
                 }
-                acc[order.userId].push(order);
+                acc[userId].push(order);
                 return acc;
             }, {});
             
             const customerStats = Object.entries(customerOrders).map(([userId, userOrders]) => {
-                const user = users.find(u => u.userId === userId) || {};
-                const totalSpent = userOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+                const user = users.find(u => u.userId === userId || u.id === userId) || {};
+                const totalSpent = userOrders.reduce((sum, order) => sum + (parseFloat(order.total) || 0), 0);
                 return {
                     userId,
                     name: user.name || 'Unknown',
@@ -932,7 +995,7 @@
                         <div class="col-md-3">
                             <div class="card text-center">
                                 <div class="card-body">
-                                    <h4 class="text-info">£${customerStats.length > 0 ? Math.round(customerStats.reduce((sum, c) => sum + c.avgOrderValue, 0) / customerStats.length) : 0}</h4>
+                                    <h4 class="text-info">£${customerStats.length > 0 ? (customerStats.reduce((sum, c) => sum + c.avgOrderValue, 0) / customerStats.length).toFixed(2) : '0.00'}</h4>
                                     <p class="text-muted">Avg Customer Value</p>
                                 </div>
                             </div>
@@ -953,17 +1016,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${customerStats.slice(0, 20).map((customer, index) => `
+                            ${customerStats.length > 0 ? customerStats.slice(0, 20).map((customer, index) => `
                                 <tr>
                                     <td>${index + 1}</td>
                                     <td>${customer.name}</td>
                                     <td>${customer.email}</td>
                                     <td>${customer.phone}</td>
                                     <td>${customer.orderCount}</td>
-                                    <td>£${customer.totalSpent.toLocaleString()}</td>
-                                    <td>£${Math.round(customer.avgOrderValue)}</td>
+                                    <td>£${customer.totalSpent.toFixed(2)}</td>
+                                    <td>£${customer.avgOrderValue.toFixed(2)}</td>
                                 </tr>
-                            `).join('')}
+                            `).join('') : '<tr><td colspan="7" class="text-center text-muted">No customer data available for this period</td></tr>'}
                         </tbody>
                     </table>
                     
@@ -1000,22 +1063,24 @@
             
             // Calculate feedback metrics
             const avgRating = feedbacks.length > 0 ? 
-                feedbacks.reduce((sum, feedback) => sum + (feedback.rating || 0), 0) / feedbacks.length : 0;
+                feedbacks.reduce((sum, feedback) => sum + (parseFloat(feedback.rating) || 0), 0) / feedbacks.length : 0;
             
             const ratingDistribution = feedbacks.reduce((acc, feedback) => {
-                const rating = Math.floor(feedback.rating || 0);
+                const rating = Math.floor(parseFloat(feedback.rating) || 0);
                 acc[rating] = (acc[rating] || 0) + 1;
                 return acc;
             }, {});
             
             const categoryFeedback = feedbacks.reduce((acc, feedback) => {
-                feedback.categories?.forEach(category => {
-                    if (!acc[category]) {
-                        acc[category] = { count: 0, totalRating: 0 };
-                    }
-                    acc[category].count++;
-                    acc[category].totalRating += feedback.rating || 0;
-                });
+                if (feedback.categories && Array.isArray(feedback.categories)) {
+                    feedback.categories.forEach(category => {
+                        if (!acc[category]) {
+                            acc[category] = { count: 0, totalRating: 0 };
+                        }
+                        acc[category].count++;
+                        acc[category].totalRating += parseFloat(feedback.rating) || 0;
+                    });
+                }
                 return acc;
             }, {});
 
@@ -1095,13 +1160,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${Object.entries(categoryFeedback).map(([category, stats]) => `
+                            ${Object.keys(categoryFeedback).length > 0 ? 
+                                Object.entries(categoryFeedback).map(([category, stats]) => `
                                 <tr>
                                     <td>${category}</td>
                                     <td>${stats.count}</td>
                                     <td>${(stats.totalRating / stats.count).toFixed(1)} ⭐</td>
                                 </tr>
-                            `).join('')}
+                            `).join('') : 
+                            '<tr><td colspan="3" class="text-center text-muted">No category data available</td></tr>'
+                            }
                         </tbody>
                     </table>
                     
@@ -1117,18 +1185,26 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${feedbacks.slice(0, 20).map(feedback => {
-                                const user = users.find(u => u.userId === feedback.userId) || {};
+                            ${feedbacks.length > 0 ? feedbacks.slice(0, 20).map(feedback => {
+                                const user = users.find(u => u.userId === feedback.userId || u.id === feedback.userId) || {};
+                                let feedbackDate = 'N/A';
+                                if (feedback.createdAt) {
+                                    if (typeof feedback.createdAt === 'string') {
+                                        feedbackDate = new Date(feedback.createdAt).toLocaleDateString();
+                                    } else if (feedback.createdAt?.toDate) {
+                                        feedbackDate = feedback.createdAt.toDate().toLocaleDateString();
+                                    }
+                                }
                                 return `
                                     <tr>
-                                        <td>${feedback.createdAt?.toDate ? feedback.createdAt.toDate().toLocaleDateString() : 'N/A'}</td>
+                                        <td>${feedbackDate}</td>
                                         <td>${feedback.isAnonymous ? 'Anonymous' : (user.name || 'Unknown')}</td>
-                                        <td>${feedback.rating || 0} ⭐</td>
+                                        <td>${parseFloat(feedback.rating || 0).toFixed(1)} ⭐</td>
                                         <td>${Array.isArray(feedback.categories) ? feedback.categories.join(', ') : 'N/A'}</td>
                                         <td>${feedback.comment || 'No comment'}</td>
                                     </tr>
                                 `;
-                            }).join('')}
+                            }).join('') : '<tr><td colspan="5" class="text-center text-muted">No feedback available for this period</td></tr>'}
                         </tbody>
                     </table>
                 </div>
@@ -1373,6 +1449,7 @@
         }
 
         // Make functions globally available
+        window.generateReport = generateReport;
         window.downloadReport = downloadReport;
         window.viewReport = viewReport;
         window.shareReport = shareReport;
