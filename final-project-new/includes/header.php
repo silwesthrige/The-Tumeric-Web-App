@@ -17,6 +17,7 @@
             border: 1px solid rgba(0, 0, 0, 0.1);
             max-height: 400px;
             overflow-y: auto;
+            border-radius: 12px;
         }
         
         .rounded-pill {
@@ -42,24 +43,30 @@
         .notification-item {
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
+            cursor: pointer;
         }
 
         .notification-item:hover {
-            background-color: #f8f9fa;
+            background-color: #f8f9fa !important;
             transform: translateX(2px);
         }
 
         .notification-new {
-            background-color: #e3f2fd;
-            border-left: 4px solid #2196f3;
+            background-color: #e3f2fd !important;
+            border-left: 4px solid #2196f3 !important;
+        }
+
+        .notification-read {
+            background-color: #fafafa;
+            opacity: 0.85;
         }
 
         .notification-order {
-            border-left-color: #28a745;
+            border-left-color: #28a745 !important;
         }
 
         .notification-feedback {
-            border-left-color: #ffc107;
+            border-left-color: #ffc107 !important;
         }
 
         .notification-time {
@@ -76,27 +83,15 @@
         }
 
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         @keyframes shake {
-            0%, 100% {
-                transform: translateX(0);
-            }
-            10%, 30%, 50%, 70%, 90% {
-                transform: translateX(-2px);
-            }
-            20%, 40%, 60%, 80% {
-                transform: translateX(2px);
-            }
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+            20%, 40%, 60%, 80% { transform: translateX(2px); }
         }
 
         .no-notifications {
@@ -108,6 +103,7 @@
         .notification-header {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-bottom: 1px solid #dee2e6;
+            border-radius: 12px 12px 0 0;
         }
 
         /* Order specific notification styles */
@@ -134,25 +130,11 @@
         }
 
         /* Status indicators */
-        .status-pending {
-            color: #ffc107;
-        }
-
-        .status-confirmed {
-            color: #17a2b8;
-        }
-
-        .status-preparing {
-            color: #fd7e14;
-        }
-
-        .status-ready {
-            color: #28a745;
-        }
-
-        .status-completed {
-            color: #6c757d;
-        }
+        .status-pending { color: #ffc107; }
+        .status-confirmed { color: #17a2b8; }
+        .status-preparing { color: #fd7e14; }
+        .status-ready { color: #28a745; }
+        .status-completed { color: #6c757d; }
 
         /* Auto-refresh indicator */
         .auto-refresh-indicator {
@@ -264,8 +246,63 @@
 
         .notification-sound-toggle {
             font-size: 0.8rem;
-            padding: 2px 8px;
+            padding: 4px 8px;
             border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .notification-sound-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Enhanced notification item styling */
+        .notification-item .dropdown-item {
+            border-radius: 8px;
+            margin: 2px 4px;
+            transition: all 0.3s ease;
+        }
+
+        .notification-item .dropdown-item:hover {
+            background-color: rgba(0, 123, 255, 0.1) !important;
+            transform: translateX(3px);
+        }
+
+        /* Read notification styling */
+        .notification-read .dropdown-item {
+            background-color: rgba(248, 249, 250, 0.5) !important;
+        }
+
+        .notification-read .notification-icon {
+            opacity: 0.6;
+        }
+
+        .notification-read .fw-semibold {
+            font-weight: normal !important;
+        }
+
+        /* Improved badge styling */
+        .notification-badge {
+            background: linear-gradient(45deg, #dc3545, #c82333) !important;
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+            font-size: 0.7rem;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Loading state */
+        .notification-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .notification-loading .spinner-border {
+            width: 2rem;
+            height: 2rem;
         }
 
         @media (max-width: 768px) {
@@ -286,6 +323,38 @@
                 font-size: 0.8rem;
                 padding: 6px 12px;
             }
+
+            .dropdown-menu {
+                width: 350px !important;
+                max-width: 90vw !important;
+            }
+        }
+
+        /* Connection status indicator */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 1060;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .connection-status.show {
+            opacity: 1;
+        }
+
+        .connection-status.online {
+            background: #28a745;
+            color: white;
+        }
+
+        .connection-status.offline {
+            background: #dc3545;
+            color: white;
         }
     </style>
 </head>
@@ -295,6 +364,12 @@
 <div id="autoRefreshIndicator" class="auto-refresh-indicator">
     <i class="fas fa-sync-alt me-1"></i>
     <span id="refreshText">Checking for new orders...</span>
+</div>
+
+<!-- Connection status indicator -->
+<div id="connectionStatus" class="connection-status">
+    <i class="fas fa-wifi me-1"></i>
+    <span>Connected</span>
 </div>
 
 <!-- Navigation Bar -->
@@ -329,7 +404,7 @@
                         data-bs-toggle="dropdown" 
                         aria-expanded="false">
                     <i class="fas fa-bell text-warning" id="notificationBellIcon"></i>
-                    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" 
+                    <span class="badge notification-badge rounded-pill position-absolute top-0 start-100 translate-middle" 
                           id="notificationBadge" style="display: none;">0</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="width: 380px;">
@@ -340,7 +415,7 @@
                                 <span class="badge bg-secondary ms-2" id="totalNotificationCount">0</span>
                             </h6>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-sm notification-sound-toggle" 
+                                <button class="btn btn-sm notification-sound-toggle btn-outline-success" 
                                         id="soundToggle" 
                                         title="Toggle sound notifications">
                                     <i class="fas fa-volume-up"></i>
@@ -349,16 +424,16 @@
                                         id="markAllRead" 
                                         style="display: none;"
                                         title="Mark all as read">
-                                    <i class="fas fa-check-double me-1"></i>Mark All Read
+                                    <i class="fas fa-check-double me-1"></i>All Read
                                 </button>
                             </div>
                         </div>
                     </li>
                     <div id="notificationsList">
-                        <li class="no-notifications">
-                            <i class="fas fa-bell-slash mb-2 text-muted"></i>
-                            <div>No notifications</div>
-                            <small class="text-muted">New orders will appear here</small>
+                        <li class="notification-loading">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
                         </li>
                     </div>
                     <li class="border-top">
@@ -417,8 +492,8 @@
                             <div class="profile-avatar mb-3">
                                 <img src="<?php echo !empty($_SESSION['user_image']) ? $_SESSION['user_image'] : 'public/images/profile.png'; ?>" 
                                      class="rounded-circle profile-img" 
-                                     width="100" 
-                                     height="100" 
+                                     width="180" 
+                                     height="180" 
                                      alt="User" 
                                      id="profileImage">
                             </div>
@@ -517,70 +592,174 @@
         Timestamp
     } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-    // Notification management
+    // Notification management with persistent storage
     let notifications = [];
     let unreadCount = 0;
     let processedOrderIds = new Set();
+    let processedFeedbackIds = new Set();
+    let readNotifications = new Set(); // Track read notifications
     let soundEnabled = localStorage.getItem('notificationSound') !== 'false';
     let lastOrderCheck = new Date();
+    let isInitialized = false;
+
+    // Storage keys
+    const STORAGE_KEYS = {
+        NOTIFICATIONS: 'admin_notifications',
+        READ_NOTIFICATIONS: 'admin_read_notifications',
+        PROCESSED_ORDERS: 'admin_processed_orders',
+        PROCESSED_FEEDBACK: 'admin_processed_feedback',
+        SOUND_ENABLED: 'notificationSound'
+    };
 
     // Sound for notifications
-    const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IAAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwFJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiw=');
+    const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IAAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwFJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiwGJHfH8N2QQAoUXrTp66hVFApGn+PoxGUrBSV+zPLZfiw=');
+
+    // Load data from localStorage
+    function loadStoredData() {
+        try {
+            // Load notifications
+            const storedNotifications = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+            if (storedNotifications) {
+                notifications = JSON.parse(storedNotifications);
+                // Convert timestamp strings back to Date objects
+                notifications.forEach(notification => {
+                    if (typeof notification.timestamp === 'string') {
+                        notification.timestamp = new Date(notification.timestamp);
+                    }
+                });
+            }
+
+            // Load read notifications
+            const storedReadNotifications = localStorage.getItem(STORAGE_KEYS.READ_NOTIFICATIONS);
+            if (storedReadNotifications) {
+                readNotifications = new Set(JSON.parse(storedReadNotifications));
+            }
+
+            // Load processed orders
+            const storedProcessedOrders = localStorage.getItem(STORAGE_KEYS.PROCESSED_ORDERS);
+            if (storedProcessedOrders) {
+                processedOrderIds = new Set(JSON.parse(storedProcessedOrders));
+            }
+
+            // Load processed feedback
+            const storedProcessedFeedback = localStorage.getItem(STORAGE_KEYS.PROCESSED_FEEDBACK);
+            if (storedProcessedFeedback) {
+                processedFeedbackIds = new Set(JSON.parse(storedProcessedFeedback));
+            }
+
+            // Load sound preference
+            soundEnabled = localStorage.getItem(STORAGE_KEYS.SOUND_ENABLED) !== 'false';
+
+            console.log(`Loaded ${notifications.length} notifications, ${readNotifications.size} read notifications`);
+        } catch (error) {
+            console.error('Error loading stored data:', error);
+            // Reset to default values on error
+            notifications = [];
+            readNotifications = new Set();
+            processedOrderIds = new Set();
+            processedFeedbackIds = new Set();
+        }
+    }
+
+    // Save data to localStorage
+    function saveStoredData() {
+        try {
+            // Save notifications
+            localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifications));
+            
+            // Save read notifications
+            localStorage.setItem(STORAGE_KEYS.READ_NOTIFICATIONS, JSON.stringify([...readNotifications]));
+            
+            // Save processed orders
+            localStorage.setItem(STORAGE_KEYS.PROCESSED_ORDERS, JSON.stringify([...processedOrderIds]));
+            
+            // Save processed feedback
+            localStorage.setItem(STORAGE_KEYS.PROCESSED_FEEDBACK, JSON.stringify([...processedFeedbackIds]));
+            
+            // Save sound preference
+            localStorage.setItem(STORAGE_KEYS.SOUND_ENABLED, soundEnabled);
+            
+        } catch (error) {
+            console.error('Error saving data:', error);
+        }
+    }
 
     // Helper function to safely convert string date to Date object
     function parseDate(dateValue) {
         if (!dateValue) return new Date();
         
-        // If it's already a Date object
-        if (dateValue instanceof Date) return dateValue;
-        
-        // If it's a Firestore Timestamp
-        if (dateValue && typeof dateValue.toDate === 'function') {
-            return dateValue.toDate();
+        try {
+            // If it's already a Date object
+            if (dateValue instanceof Date) return dateValue;
+            
+            // If it's a Firestore Timestamp
+            if (dateValue && typeof dateValue.toDate === 'function') {
+                return dateValue.toDate();
+            }
+            
+            // If it's a string, try to parse it
+            if (typeof dateValue === 'string') {
+                const parsed = new Date(dateValue);
+                return isNaN(parsed.getTime()) ? new Date() : parsed;
+            }
+            
+            // If it's a number (timestamp)
+            if (typeof dateValue === 'number') {
+                return new Date(dateValue);
+            }
+            
+            // Fallback to current date
+            return new Date();
+        } catch (error) {
+            console.error('Error parsing date:', error);
+            return new Date();
         }
-        
-        // If it's a string, try to parse it
-        if (typeof dateValue === 'string') {
-            const parsed = new Date(dateValue);
-            return isNaN(parsed.getTime()) ? new Date() : parsed;
-        }
-        
-        // Fallback to current date
-        return new Date();
     }
 
     // Real-time clock function
     function updateDateTime() {
-        const now = new Date();
-        const options = {
-            weekday: 'short',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
-        };
-        document.getElementById("dateTimeText").textContent = now.toLocaleString('en-US', options);
+        try {
+            const now = new Date();
+            const options = {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            };
+            const dateTimeElement = document.getElementById("dateTimeText");
+            if (dateTimeElement) {
+                dateTimeElement.textContent = now.toLocaleString('en-US', options);
+            }
+        } catch (error) {
+            console.error('Error updating date time:', error);
+        }
     }
 
     // Format time ago
     function timeAgo(date) {
-        const now = new Date();
-        const validDate = parseDate(date);
-        const diffInMinutes = Math.floor((now - validDate) / 60000);
-        
-        if (diffInMinutes < 1) return 'Just now';
-        if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-        
-        const diffInHours = Math.floor(diffInMinutes / 60);
-        if (diffInHours < 24) return `${diffInHours}h ago`;
-        
-        const diffInDays = Math.floor(diffInHours / 24);
-        if (diffInDays < 7) return `${diffInDays}d ago`;
-        
-        return validDate.toLocaleDateString();
+        try {
+            const now = new Date();
+            const validDate = parseDate(date);
+            const diffInMinutes = Math.floor((now - validDate) / 60000);
+            
+            if (diffInMinutes < 1) return 'Just now';
+            if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+            
+            const diffInHours = Math.floor(diffInMinutes / 60);
+            if (diffInHours < 24) return `${diffInHours}h ago`;
+            
+            const diffInDays = Math.floor(diffInHours / 24);
+            if (diffInDays < 7) return `${diffInDays}d ago`;
+            
+            return validDate.toLocaleDateString();
+        } catch (error) {
+            console.error('Error calculating time ago:', error);
+            return 'Unknown';
+        }
     }
 
     // Get user name from users collection
@@ -589,7 +768,11 @@
             if (!userId) return 'Customer';
             
             const userDoc = await getDoc(doc(db, 'users', userId));
-            return userDoc.exists() ? (userDoc.data().name || userDoc.data().username || 'Customer') : 'Customer';
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                return userData.name || userData.username || userData.firstName || 'Customer';
+            }
+            return 'Customer';
         } catch (error) {
             console.error('Error fetching user:', error);
             return 'Customer';
@@ -599,36 +782,28 @@
     // Get status color class
     function getStatusColorClass(status) {
         const statusColors = {
-            'pending': 'status-pending',
-            'confirmed': 'status-confirmed',
-            'preparing': 'status-preparing',
-            'ready': 'status-ready',
-            'completed': 'status-completed',
-            'cancelled': 'text-danger'
+            'pending': 'text-warning',
+            'confirmed': 'text-info',
+            'preparing': 'text-primary',
+            'ready': 'text-success',
+            'completed': 'text-success',
+            'cancelled': 'text-danger',
+            'delivered': 'text-success'
         };
         return statusColors[status?.toLowerCase()] || 'text-muted';
     }
 
     // Format currency
     function formatCurrency(amount) {
-        const numAmount = typeof amount === 'string' ? parseFloat(amount) : (amount || 0);
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(numAmount);
-    }
-
-    // Show auto-refresh indicator
-    function showAutoRefreshIndicator(message = 'Checking for new orders...') {
-        const indicator = document.getElementById('autoRefreshIndicator');
-        const text = document.getElementById('refreshText');
-        if (indicator && text) {
-            text.textContent = message;
-            indicator.classList.add('show');
-            
-            setTimeout(() => {
-                indicator.classList.remove('show');
-            }, 2000);
+        try {
+            const numAmount = typeof amount === 'string' ? parseFloat(amount) : (amount || 0);
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(numAmount);
+        } catch (error) {
+            console.error('Error formatting currency:', error);
+            return '$0.00';
         }
     }
 
@@ -636,6 +811,7 @@
     function playNotificationSound() {
         if (soundEnabled) {
             try {
+                notificationSound.currentTime = 0;
                 notificationSound.play().catch(e => console.log('Sound play failed:', e));
             } catch (error) {
                 console.log('Audio not supported:', error);
@@ -643,110 +819,154 @@
         }
     }
 
+    // Calculate unread count
+    function calculateUnreadCount() {
+        unreadCount = notifications.filter(notification => !readNotifications.has(notification.id)).length;
+        return unreadCount;
+    }
+
     // Update notification badge
     function updateNotificationBadge() {
-        const badge = document.getElementById('notificationBadge');
-        const markAllBtn = document.getElementById('markAllRead');
-        const totalCount = document.getElementById('totalNotificationCount');
-        const bellIcon = document.getElementById('notificationBellIcon');
-        
-        if (totalCount) totalCount.textContent = notifications.length;
-        
-        if (unreadCount > 0) {
-            if (badge) {
-                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-                badge.style.display = 'block';
-                badge.classList.add('notification-badge-animate');
-            }
-            if (markAllBtn) markAllBtn.style.display = 'block';
-            if (bellIcon) {
-                bellIcon.classList.add('notification-bell-shake');
-                
-                // Remove shake animation after it completes
-                setTimeout(() => {
+        try {
+            calculateUnreadCount();
+            
+            const badge = document.getElementById('notificationBadge');
+            const markAllBtn = document.getElementById('markAllRead');
+            const totalCount = document.getElementById('totalNotificationCount');
+            const bellIcon = document.getElementById('notificationBellIcon');
+            
+            if (totalCount) totalCount.textContent = notifications.length;
+            
+            if (unreadCount > 0) {
+                if (badge) {
+                    badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                    badge.style.display = 'inline-block';
+                    badge.classList.add('notification-badge-animate');
+                }
+                if (markAllBtn) markAllBtn.style.display = 'block';
+                if (bellIcon) {
+                    bellIcon.classList.add('notification-bell-shake');
+                    
+                    // Remove shake animation after it completes
+                    setTimeout(() => {
+                        bellIcon.classList.remove('notification-bell-shake');
+                    }, 600);
+                }
+            } else {
+                if (badge) {
+                    badge.style.display = 'none';
+                    badge.classList.remove('notification-badge-animate');
+                }
+                if (markAllBtn) markAllBtn.style.display = 'none';
+                if (bellIcon) {
                     bellIcon.classList.remove('notification-bell-shake');
-                }, 500);
+                }
             }
-        } else {
-            if (badge) {
-                badge.style.display = 'none';
-                badge.classList.remove('notification-badge-animate');
-            }
-            if (markAllBtn) markAllBtn.style.display = 'none';
+        } catch (error) {
+            console.error('Error updating notification badge:', error);
         }
     }
 
     // Get order items summary
     function getOrderItemsSummary(items) {
-        if (!items || !Array.isArray(items) || items.length === 0) return 'No items';
-        
         try {
-            if (items.length === 1) return items[0].name || 'Unknown item';
-            if (items.length === 2) return `${items[0].name || 'Item'}, ${items[1].name || 'Item'}`;
-            return `${items[0].name || 'Item'} and ${items.length - 1} more items`;
+            if (!items || !Array.isArray(items) || items.length === 0) return 'No items';
+            
+            if (items.length === 1) {
+                return items[0].name || items[0].itemName || 'Unknown item';
+            }
+            if (items.length === 2) {
+                const item1 = items[0].name || items[0].itemName || 'Item';
+                const item2 = items[1].name || items[1].itemName || 'Item';
+                return `${item1}, ${item2}`;
+            }
+            const firstItem = items[0].name || items[0].itemName || 'Item';
+            return `${firstItem} and ${items.length - 1} more items`;
         } catch (error) {
             console.error('Error processing order items:', error);
-            return `${items.length} items`;
+            return `${items?.length || 0} items`;
         }
     }
 
     // Render notifications
     function renderNotifications() {
-        const notificationsList = document.getElementById('notificationsList');
-        if (!notificationsList) return;
-        
-        if (notifications.length === 0) {
-            notificationsList.innerHTML = `
-                <li class="no-notifications">
-                    <i class="fas fa-bell-slash mb-2 text-muted"></i>
-                    <div>No notifications</div>
-                    <small class="text-muted">New orders will appear here</small>
-                </li>
-            `;
-            return;
-        }
-
-        const notificationHTML = notifications.map(notification => `
-            <li class="notification-item ${notification.type === 'order' ? 'notification-order' : ''} ${notification.isNew ? 'notification-new' : ''}" 
-                data-notification-id="${notification.id}">
-                <a class="dropdown-item py-3" href="#" style="text-decoration: none;">
-                    <div class="d-flex align-items-start">
-                        <div class="me-3">
-                            <i class="fas fa-${notification.icon} ${notification.iconColor} notification-icon"></i>
+        try {
+            const notificationsList = document.getElementById('notificationsList');
+            if (!notificationsList) return;
+            
+            if (notifications.length === 0) {
+                notificationsList.innerHTML = `
+                    <li class="dropdown-item-text text-center py-4">
+                        <div class="text-muted">
+                            <i class="fas fa-bell-slash mb-2 fa-2x d-block"></i>
+                            <div class="fw-semibold">No notifications</div>
+                            <small>New orders will appear here</small>
                         </div>
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <div class="fw-semibold">${notification.title}</div>
-                                <div class="order-total">${notification.total || ''}</div>
+                    </li>
+                `;
+                return;
+            }
+
+            const notificationHTML = notifications.slice(0, 10).map(notification => {
+                const isRead = readNotifications.has(notification.id);
+                const readClass = isRead ? 'notification-read' : '';
+                const newClass = !isRead ? 'notification-new' : '';
+                
+                return `
+                    <li class="notification-item ${notification.type === 'order' ? 'notification-order' : ''} ${newClass} ${readClass}" 
+                        data-notification-id="${notification.id}">
+                        <a class="dropdown-item py-3 border-bottom" href="#" style="text-decoration: none;">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    <i class="fas fa-${notification.icon} ${notification.iconColor} notification-icon fs-5"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <div class="${isRead ? 'text-muted' : 'fw-semibold text-dark'}">${notification.title}</div>
+                                        ${notification.total ? `<div class="text-success fw-semibold">${notification.total}</div>` : ''}
+                                    </div>
+                                    <div class="text-muted small mb-1">${notification.message}</div>
+                                    ${notification.orderId ? `<div class="text-primary small mb-1 fw-semibold">#${notification.orderId}</div>` : ''}
+                                    ${notification.status ? `<div class="small ${getStatusColorClass(notification.status)} fw-semibold text-capitalize">Status: ${notification.status}</div>` : ''}
+                                    <div class="text-muted small">${notification.timeAgo}</div>
+                                </div>
+                                ${!isRead ? '<div class="ms-2"><span class="badge bg-success rounded-pill">New</span></div>' : ''}
                             </div>
-                            <div class="text-muted small mb-1">${notification.message}</div>
-                            ${notification.orderId ? `<div class="order-id mb-1">#${notification.orderId}</div>` : ''}
-                            ${notification.status ? `<div class="small ${getStatusColorClass(notification.status)}">Status: ${notification.status}</div>` : ''}
-                            <div class="notification-time">${notification.timeAgo}</div>
-                        </div>
-                        ${notification.isNew ? '<div class="ms-2"><span class="badge bg-success rounded-pill">New</span></div>' : ''}
-                    </div>
-                </a>
-            </li>
-        `).join('');
+                        </a>
+                    </li>
+                `;
+            }).join('');
 
-        notificationsList.innerHTML = notificationHTML;
+            if (notifications.length > 10) {
+                notificationsList.innerHTML = notificationHTML + `
+                    <li class="dropdown-item-text text-center py-2 border-top">
+                        <small class="text-muted">Showing 10 of ${notifications.length} notifications</small>
+                    </li>
+                `;
+            } else {
+                notificationsList.innerHTML = notificationHTML;
+            }
+        } catch (error) {
+            console.error('Error rendering notifications:', error);
+        }
     }
 
     // Process new order notification
     async function processNewOrder(orderData, orderId) {
-        // Check if we've already processed this order
-        if (processedOrderIds.has(orderId)) {
-            return;
-        }
-
         try {
-            const userName = await getUserName(orderData.userId);
-            const orderTime = parseDate(orderData.createdAt); // Fixed: handle string dates
-            const itemsSummary = getOrderItemsSummary(orderData.items);
+            // Check if we've already processed this order
+            if (processedOrderIds.has(orderId)) {
+                return;
+            }
+
+            console.log('Processing new order:', orderId, orderData);
+
+            const userName = await getUserName(orderData.userId || orderData.customerId);
+            const orderTime = parseDate(orderData.createdAt || orderData.timestamp);
+            const itemsSummary = getOrderItemsSummary(orderData.items || orderData.orderItems);
             
             // Safely get orderId - use the document ID if orderData.orderId is not available
-            const displayOrderId = orderData.orderId || orderId;
+            const displayOrderId = orderData.orderId || orderData.orderNumber || orderId;
             
             const notification = {
                 id: orderId,
@@ -757,8 +977,7 @@
                 iconColor: 'text-success',
                 timestamp: orderTime,
                 timeAgo: timeAgo(orderTime),
-                isNew: true,
-                total: formatCurrency(orderData.total),
+                total: formatCurrency(orderData.total || orderData.totalAmount || orderData.amount),
                 orderId: displayOrderId.toString().substring(0, 8).toUpperCase(),
                 status: orderData.status || 'pending',
                 userName: userName
@@ -774,28 +993,29 @@
             
             // Mark as processed
             processedOrderIds.add(orderId);
-            unreadCount++;
+            
+            // Save to localStorage
+            saveStoredData();
             
             // Update UI
             updateNotificationBadge();
             renderNotifications();
             
-            // Play sound and show indicator
+            // Play sound
             playNotificationSound();
-            showAutoRefreshIndicator(`New order from ${userName}!`);
             
             // Show browser notification if supported
             if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('New Order Received!', {
                     body: `Order #${notification.orderId} from ${userName} - ${notification.total}`,
-                    icon: 'public/images/UK PJ Logo.png',
-                    badge: 'public/images/UK PJ Logo.png',
+                    icon: '/favicon.ico',
+                    badge: '/favicon.ico',
                     tag: orderId,
-                    requireInteraction: true
+                    requireInteraction: false
                 });
             }
             
-            console.log('New order notification processed:', orderId);
+            console.log('New order notification processed successfully:', orderId);
             
         } catch (error) {
             console.error('Error processing new order notification:', error);
@@ -805,72 +1025,84 @@
     // Initialize real-time order listener
     function initializeOrderListener() {
         try {
+            console.log('Initializing order listener...');
+            
             // Create query for recent orders
             const ordersQuery = query(
                 collection(db, 'orders'),
                 orderBy('createdAt', 'desc'),
-                limit(20)
+                limit(30)
             );
 
             // Set up real-time listener
             const unsubscribe = onSnapshot(ordersQuery, (snapshot) => {
-                let newOrdersCount = 0;
-                
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === 'added') {
+                try {
+                    let newOrdersCount = 0;
+                    
+                    snapshot.docChanges().forEach((change) => {
                         const orderData = change.doc.data();
                         const orderId = change.doc.id;
                         
-                        // Check if this is a genuinely new order (created in last 2 minutes)
-                        if (orderData.createdAt) {
-                            const orderTime = parseDate(orderData.createdAt); // Fixed: handle string dates
-                            const now = new Date();
-                            const timeDiffMinutes = (now - orderTime) / (1000 * 60);
-                            
-                            // Only process very recent orders and those we haven't seen before
-                            if (timeDiffMinutes < 2 && !processedOrderIds.has(orderId)) {
-                                processNewOrder(orderData, orderId);
-                                newOrdersCount++;
+                        if (change.type === 'added') {
+                            // Check if this is a genuinely new order (created in last 5 minutes)
+                            if (orderData.createdAt) {
+                                const orderTime = parseDate(orderData.createdAt);
+                                const now = new Date();
+                                const timeDiffMinutes = (now - orderTime) / (1000 * 60);
+                                
+                                // Only process very recent orders and those we haven't seen before
+                                if (timeDiffMinutes < 5 && !processedOrderIds.has(orderId)) {
+                                    processNewOrder(orderData, orderId);
+                                    newOrdersCount++;
+                                } else if (!processedOrderIds.has(orderId)) {
+                                    // Add older orders to processed list without notification
+                                    processedOrderIds.add(orderId);
+                                    saveStoredData();
+                                }
                             } else if (!processedOrderIds.has(orderId)) {
-                                // Add older orders to processed list without notification
+                                // Handle orders without createdAt timestamp
                                 processedOrderIds.add(orderId);
+                                saveStoredData();
                             }
                         }
-                    }
-                    
-                    // Handle order updates (status changes, etc.)
-                    if (change.type === 'modified') {
-                        const orderId = change.doc.id;
-                        const orderData = change.doc.data();
                         
-                        // Find existing notification and update it
-                        const existingNotification = notifications.find(n => n.id === orderId);
-                        if (existingNotification) {
-                            existingNotification.status = orderData.status;
-                            existingNotification.timeAgo = timeAgo(existingNotification.timestamp);
-                            renderNotifications();
+                        // Handle order updates (status changes, etc.)
+                        if (change.type === 'modified') {
+                            const existingNotification = notifications.find(n => n.id === orderId);
+                            if (existingNotification) {
+                                existingNotification.status = orderData.status || 'pending';
+                                existingNotification.timeAgo = timeAgo(existingNotification.timestamp);
+                                saveStoredData();
+                                renderNotifications();
+                            }
                         }
+                    });
+                    
+                    if (newOrdersCount > 0) {
+                        console.log(`Processed ${newOrdersCount} new orders`);
                     }
-                });
-                
-                if (newOrdersCount > 0) {
-                    console.log(`Processed ${newOrdersCount} new orders`);
+                } catch (error) {
+                    console.error('Error processing snapshot changes:', error);
                 }
                 
             }, (error) => {
                 console.error('Error in order listener:', error);
-                showAutoRefreshIndicator('Connection error - retrying...');
+                showConnectionStatus(false);
                 
                 // Retry connection after 5 seconds
                 setTimeout(() => {
+                    console.log('Retrying order listener connection...');
                     initializeOrderListener();
                 }, 5000);
             });
 
+            // Don't show connection status on initial load
             return unsubscribe;
             
         } catch (error) {
             console.error('Error initializing order listener:', error);
+            showConnectionStatus(false);
+            return null;
         }
     }
 
@@ -881,88 +1113,135 @@
                 Notification.requestPermission().then(permission => {
                     if (permission === 'granted') {
                         console.log('Notification permission granted');
+                        
+                        // Show test notification
+                        new Notification('Notifications Enabled', {
+                            body: 'You will now receive order notifications',
+                            icon: '/favicon.ico'
+                        });
                     }
+                }).catch(error => {
+                    console.error('Error requesting notification permission:', error);
                 });
             }
         }
     }
 
+    // Show connection status
+    function showConnectionStatus(isOnline) {
+        try {
+            const statusElement = document.getElementById('connectionStatus');
+            if (!statusElement) return;
+            
+            statusElement.className = `connection-status ${isOnline ? 'online' : 'offline'} show`;
+            statusElement.innerHTML = `
+                <i class="fas fa-${isOnline ? 'wifi' : 'exclamation-triangle'} me-1"></i>
+                <span>${isOnline ? 'Connected' : 'Connection Lost'}</span>
+            `;
+            
+            // Hide after 3 seconds if online, keep visible if offline
+            if (isOnline) {
+                setTimeout(() => {
+                    statusElement.classList.remove('show');
+                }, 3000);
+            }
+        } catch (error) {
+            console.error('Error showing connection status:', error);
+        }
+    }
+
     // Toggle sound notifications
     function toggleSound() {
-        soundEnabled = !soundEnabled;
-        localStorage.setItem('notificationSound', soundEnabled);
-        
-        const soundToggle = document.getElementById('soundToggle');
-        if (!soundToggle) return;
-        
-        const icon = soundToggle.querySelector('i');
-        
-        if (soundEnabled) {
-            icon.className = 'fas fa-volume-up';
-            soundToggle.title = 'Disable sound notifications';
-            soundToggle.classList.remove('btn-outline-secondary');
-            soundToggle.classList.add('btn-outline-success');
-        } else {
-            icon.className = 'fas fa-volume-mute';
-            soundToggle.title = 'Enable sound notifications';
-            soundToggle.classList.remove('btn-outline-success');
-            soundToggle.classList.add('btn-outline-secondary');
+        try {
+            soundEnabled = !soundEnabled;
+            saveStoredData();
+            
+            const soundToggle = document.getElementById('soundToggle');
+            if (!soundToggle) return;
+            
+            const icon = soundToggle.querySelector('i');
+            
+            if (soundEnabled) {
+                if (icon) icon.className = 'fas fa-volume-up';
+                soundToggle.title = 'Disable sound notifications';
+                soundToggle.classList.remove('btn-outline-secondary');
+                soundToggle.classList.add('btn-outline-success');
+                
+                // Play test sound
+                playNotificationSound();
+            } else {
+                if (icon) icon.className = 'fas fa-volume-mute';
+                soundToggle.title = 'Enable sound notifications';
+                soundToggle.classList.remove('btn-outline-success');
+                soundToggle.classList.add('btn-outline-secondary');
+            }
+        } catch (error) {
+            console.error('Error toggling sound:', error);
         }
     }
 
     // Update profile statistics
     function updateProfileStats() {
-        // Get last login time (current session start)
-        const sessionStart = sessionStorage.getItem('sessionStart');
-        let lastLoginTime = 'Today';
-        
-        if (sessionStart) {
-            const loginDate = new Date(sessionStart);
-            const now = new Date();
-            const diffInHours = Math.floor((now - loginDate) / (1000 * 60 * 60));
+        try {
+            // Get last login time (current session start)
+            const sessionStart = sessionStorage.getItem('sessionStart');
+            let lastLoginTime = 'Today';
             
-            if (diffInHours < 1) {
-                lastLoginTime = 'Just now';
-            } else if (diffInHours < 24) {
-                lastLoginTime = `${diffInHours}h ago`;
+            if (sessionStart) {
+                const loginDate = new Date(sessionStart);
+                const now = new Date();
+                const diffInHours = Math.floor((now - loginDate) / (1000 * 60 * 60));
+                
+                if (diffInHours < 1) {
+                    lastLoginTime = 'Just now';
+                } else if (diffInHours < 24) {
+                    lastLoginTime = `${diffInHours}h ago`;
+                } else {
+                    const diffInDays = Math.floor(diffInHours / 24);
+                    lastLoginTime = `${diffInDays}d ago`;
+                }
             } else {
-                const diffInDays = Math.floor(diffInHours / 24);
-                lastLoginTime = `${diffInDays}d ago`;
+                sessionStorage.setItem('sessionStart', new Date().toISOString());
             }
-        } else {
-            sessionStorage.setItem('sessionStart', new Date().toISOString());
-        }
-        
-        const activeSinceYear = localStorage.getItem('userActiveSince') || new Date().getFullYear();
-        const isActive = true;
-        const statusText = isActive ? 'Online' : 'Offline';
-        const statusColor = isActive ? 'text-success' : 'text-danger';
-        const statusIcon = isActive ? 'fas fa-circle text-success' : 'fas fa-circle text-danger';
-        
-        // Update DOM elements with null checks
-        const lastLoginElement = document.getElementById('lastLoginTime');
-        const activeSinceElement = document.getElementById('activeSinceDate');
-        const userStatusElement = document.getElementById('userStatus');
-        const statusIconElement = document.getElementById('statusIcon');
-        
-        if (lastLoginElement) lastLoginElement.textContent = lastLoginTime;
-        if (activeSinceElement) activeSinceElement.textContent = activeSinceYear;
-        if (userStatusElement) {
-            userStatusElement.textContent = statusText;
-            userStatusElement.className = `small fw-semibold ${statusColor}`;
-        }
-        if (statusIconElement) statusIconElement.className = statusIcon;
-        
-        if (!localStorage.getItem('userActiveSince')) {
-            localStorage.setItem('userActiveSince', new Date().getFullYear());
+            
+            const activeSinceYear = localStorage.getItem('userActiveSince') || new Date().getFullYear();
+            const isActive = true;
+            const statusText = isActive ? 'Online' : 'Offline';
+            const statusColor = isActive ? 'text-success' : 'text-danger';
+            const statusIcon = isActive ? 'fas fa-circle text-success' : 'fas fa-circle text-danger';
+            
+            // Update DOM elements with null checks
+            const lastLoginElement = document.getElementById('lastLoginTime');
+            const activeSinceElement = document.getElementById('activeSinceDate');
+            const userStatusElement = document.getElementById('userStatus');
+            const statusIconElement = document.getElementById('statusIcon');
+            
+            if (lastLoginElement) lastLoginElement.textContent = lastLoginTime;
+            if (activeSinceElement) activeSinceElement.textContent = activeSinceYear;
+            if (userStatusElement) {
+                userStatusElement.textContent = statusText;
+                userStatusElement.className = `small fw-semibold ${statusColor}`;
+            }
+            if (statusIconElement) statusIconElement.className = statusIcon;
+            
+            if (!localStorage.getItem('userActiveSince')) {
+                localStorage.setItem('userActiveSince', new Date().getFullYear());
+            }
+        } catch (error) {
+            console.error('Error updating profile stats:', error);
         }
     }
 
     // Process new feedback
     async function processNewFeedback(feedbackData, feedbackId) {
         try {
-            const userName = await getUserName(feedbackData.userId);
-            const feedbackTime = parseDate(feedbackData.createdAt); // Fixed: handle string dates
+            // Check if we've already processed this feedback
+            if (processedFeedbackIds.has(feedbackId)) {
+                return;
+            }
+
+            const userName = await getUserName(feedbackData.userId || feedbackData.customerId);
+            const feedbackTime = parseDate(feedbackData.createdAt || feedbackData.timestamp);
             
             const notification = {
                 id: `feedback_${feedbackId}`,
@@ -972,8 +1251,7 @@
                 icon: 'star',
                 iconColor: 'text-warning',
                 timestamp: feedbackTime,
-                timeAgo: timeAgo(feedbackTime),
-                isNew: true
+                timeAgo: timeAgo(feedbackTime)
             };
             
             notifications.unshift(notification);
@@ -982,7 +1260,8 @@
                 notifications = notifications.slice(0, 50);
             }
             
-            unreadCount++;
+            processedFeedbackIds.add(feedbackId);
+            saveStoredData();
             updateNotificationBadge();
             renderNotifications();
             
@@ -990,7 +1269,7 @@
             if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('New Review Posted', {
                     body: notification.message,
-                    icon: 'public/images/UK PJ Logo.png'
+                    icon: '/favicon.ico'
                 });
             }
         } catch (error) {
@@ -998,113 +1277,13 @@
         }
     }
 
-    // Event listeners
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Initializing admin dashboard...');
-        
-        // Initialize clock
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
-        
-        // Request notification permission
-        requestNotificationPermission();
-        
-        // Initialize Firebase listeners
-        const unsubscribe = initializeOrderListener();
-        
-        // Store unsubscribe function for cleanup
-        window.unsubscribeOrderListener = unsubscribe;
-
-        // Set up sound toggle
-        const soundToggle = document.getElementById('soundToggle');
-        if (soundToggle) {
-            soundToggle.addEventListener('click', toggleSound);
-            
-            // Initialize sound toggle state
-            if (!soundEnabled) {
-                const icon = soundToggle.querySelector('i');
-                if (icon) icon.className = 'fas fa-volume-mute';
-                soundToggle.title = 'Enable sound notifications';
-                soundToggle.classList.add('btn-outline-secondary');
-            } else {
-                soundToggle.classList.add('btn-outline-success');
-            }
-        }
-
-        // Mark all as read
-        const markAllBtn = document.getElementById('markAllRead');
-        if (markAllBtn) {
-            markAllBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                notifications.forEach(notification => notification.isNew = false);
-                unreadCount = 0;
-                updateNotificationBadge();
-                renderNotifications();
-                
-                // Show confirmation
-                showAutoRefreshIndicator('All notifications marked as read');
-            });
-        }
-
-        // Notification click handler
-        document.addEventListener('click', function(e) {
-            const notificationItem = e.target.closest('.notification-item');
-            if (notificationItem) {
-                e.preventDefault();
-                const notificationId = notificationItem.dataset.notificationId;
-                
-                if (notificationId) {
-                    // Mark as read
-                    const notification = notifications.find(n => n.id === notificationId);
-                    if (notification && notification.isNew) {
-                        notification.isNew = false;
-                        unreadCount = Math.max(0, unreadCount - 1);
-                        updateNotificationBadge();
-                        renderNotifications();
-                    }
-                    
-                    // Navigate to orders page
-                    window.location.href = `index.php?page=orders&highlight=${notificationId}`;
-                }
-            }
-        });
-
-        // Profile modal event
-        const profileModal = document.getElementById('profileModal');
-        if (profileModal) {
-            profileModal.addEventListener('shown.bs.modal', function () {
-                updateProfileStats();
-            });
-        }
-
-        // Update time ago every minute
-        setInterval(() => {
-            let updated = false;
-            notifications.forEach(notification => {
-                const newTimeAgo = timeAgo(notification.timestamp);
-                if (newTimeAgo !== notification.timeAgo) {
-                    notification.timeAgo = newTimeAgo;
-                    updated = true;
-                }
-            });
-            if (updated) {
-                renderNotifications();
-            }
-        }, 5000);
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', function() {
-            if (window.unsubscribeOrderListener) {
-                window.unsubscribeOrderListener();
-            }
-        });
-
-        // Listen for new feedbacks
+    // Initialize feedback listener
+    function initializeFeedbackListener() {
         try {
             const feedbacksQuery = query(
                 collection(db, 'feedbacks'),
                 orderBy('createdAt', 'desc'),
-                limit(10)
+                limit(20)
             );
 
             onSnapshot(feedbacksQuery, (snapshot) => {
@@ -1113,13 +1292,16 @@
                         const feedbackData = change.doc.data();
                         const feedbackId = change.doc.id;
                         
-                        // Only process recent feedback
-                        const feedbackTime = parseDate(feedbackData.createdAt); // Fixed: handle string dates
+                        // Only process recent feedback (last 5 minutes)
+                        const feedbackTime = parseDate(feedbackData.createdAt);
                         const now = new Date();
                         const timeDiff = (now - feedbackTime) / 1000 / 60; // minutes
                         
-                        if (timeDiff < 5) {
+                        if (timeDiff < 5 && !processedFeedbackIds.has(feedbackId)) {
                             processNewFeedback(feedbackData, feedbackId);
+                        } else if (!processedFeedbackIds.has(feedbackId)) {
+                            processedFeedbackIds.add(feedbackId);
+                            saveStoredData();
                         }
                     }
                 });
@@ -1129,27 +1311,413 @@
         } catch (error) {
             console.error('Error setting up feedback listener:', error);
         }
+    }
 
+    // Mark notification as read
+    function markNotificationAsRead(notificationId) {
+        try {
+            if (!readNotifications.has(notificationId)) {
+                readNotifications.add(notificationId);
+                saveStoredData();
+                updateNotificationBadge();
+                renderNotifications();
+                console.log('Notification marked as read:', notificationId);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error marking notification as read:', error);
+            return false;
+        }
+    }
+
+    // Mark all notifications as read
+    function markAllNotificationsAsRead() {
+        try {
+            notifications.forEach(notification => {
+                readNotifications.add(notification.id);
+            });
+            saveStoredData();
+            updateNotificationBadge();
+            renderNotifications();
+            console.log('All notifications marked as read');
+        } catch (error) {
+            console.error('Error marking all notifications as read:', error);
+        }
+    }
+
+    // Clear all notifications
+    function clearAllNotifications() {
+        try {
+            notifications = [];
+            readNotifications.clear();
+            saveStoredData();
+            updateNotificationBadge();
+            renderNotifications();
+            console.log('All notifications cleared');
+        } catch (error) {
+            console.error('Error clearing notifications:', error);
+        }
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Initializing admin dashboard...');
+        
+        try {
+            // Load stored data first
+            loadStoredData();
+            
+            // Initialize clock
+            setInterval(updateDateTime, 1000);
+            updateDateTime();
+            
+            // Request notification permission
+            requestNotificationPermission();
+            
+            // Initialize Firebase listeners
+            const orderUnsubscribe = initializeOrderListener();
+            const feedbackUnsubscribe = initializeFeedbackListener();
+            
+            // Store unsubscribe functions for cleanup
+            window.unsubscribeOrderListener = orderUnsubscribe;
+            window.unsubscribeFeedbackListener = feedbackUnsubscribe;
+
+            // Set up sound toggle
+            const soundToggle = document.getElementById('soundToggle');
+            if (soundToggle) {
+                soundToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleSound();
+                });
+                
+                // Initialize sound toggle state
+                if (!soundEnabled) {
+                    const icon = soundToggle.querySelector('i');
+                    if (icon) icon.className = 'fas fa-volume-mute';
+                    soundToggle.title = 'Enable sound notifications';
+                    soundToggle.classList.add('btn-outline-secondary');
+                    soundToggle.classList.remove('btn-outline-success');
+                } else {
+                    const icon = soundToggle.querySelector('i');
+                    if (icon) icon.className = 'fas fa-volume-up';
+                    soundToggle.title = 'Disable sound notifications';
+                    soundToggle.classList.add('btn-outline-success');
+                    soundToggle.classList.remove('btn-outline-secondary');
+                }
+            }
+
+            // Mark all as read button
+            const markAllBtn = document.getElementById('markAllRead');
+            if (markAllBtn) {
+                markAllBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    markAllNotificationsAsRead();
+                });
+            }
+
+            // Notification click handler
+            document.addEventListener('click', function(e) {
+                const notificationItem = e.target.closest('.notification-item');
+                if (notificationItem) {
+                    e.preventDefault();
+                    const notificationId = notificationItem.dataset.notificationId;
+                    
+                    if (notificationId) {
+                        // Mark as read
+                        markNotificationAsRead(notificationId);
+                        
+                        // Navigate based on notification type
+                        const notification = notifications.find(n => n.id === notificationId);
+                        if (notification) {
+                            if (notification.type === 'order') {
+                                window.location.href = `index.php?page=orders&highlight=${notificationId}`;
+                            } else if (notification.type === 'feedback') {
+                                window.location.href = `index.php?page=reviews&highlight=${notificationId}`;
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Profile modal event
+            const profileModal = document.getElementById('profileModal');
+            if (profileModal) {
+                profileModal.addEventListener('shown.bs.modal', function () {
+                    updateProfileStats();
+                });
+            }
+
+            // Initial render
+            updateNotificationBadge();
+            renderNotifications();
+
+            // Update time ago every 30 seconds
+            setInterval(() => {
+                try {
+                    let updated = false;
+                    notifications.forEach(notification => {
+                        const newTimeAgo = timeAgo(notification.timestamp);
+                        if (newTimeAgo !== notification.timeAgo) {
+                            notification.timeAgo = newTimeAgo;
+                            updated = true;
+                        }
+                    });
+                    if (updated) {
+                        saveStoredData();
+                        renderNotifications();
+                    }
+                } catch (error) {
+                    console.error('Error updating time ago:', error);
+                }
+            }, 30000);
+
+            // Connection status handlers
+            window.addEventListener('online', function() {
+                console.log('Connection restored');
+                showConnectionStatus(true);
+                // Reinitialize listeners if needed
+                if (!window.unsubscribeOrderListener) {
+                    window.unsubscribeOrderListener = initializeOrderListener();
+                }
+            });
+
+            window.addEventListener('offline', function() {
+                console.log('Connection lost');
+                showConnectionStatus(false);
+            });
+
+            // Cleanup on page unload
+            window.addEventListener('beforeunload', function() {
+                try {
+                    if (window.unsubscribeOrderListener) {
+                        window.unsubscribeOrderListener();
+                    }
+                    if (window.unsubscribeFeedbackListener) {
+                        window.unsubscribeFeedbackListener();
+                    }
+                } catch (error) {
+                    console.error('Error during cleanup:', error);
+                }
+            });
+
+            // Handle page visibility change (pause/resume listeners when tab is hidden/shown)
+            document.addEventListener('visibilitychange', function() {
+                try {
+                    if (document.hidden) {
+                        console.log('Page hidden - notifications will continue in background');
+                    } else {
+                        console.log('Page visible - refreshing notifications');
+                        renderNotifications();
+                        updateNotificationBadge();
+                    }
+                } catch (error) {
+                    console.error('Error handling visibility change:', error);
+                }
+            });
+
+            // Clean up old notifications (older than 7 days)
+            const cleanupOldNotifications = () => {
+                try {
+                    const sevenDaysAgo = new Date();
+                    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                    
+                    const beforeCount = notifications.length;
+                    notifications = notifications.filter(notification => {
+                        const notificationDate = parseDate(notification.timestamp);
+                        return notificationDate > sevenDaysAgo;
+                    });
+                    
+                    if (notifications.length !== beforeCount) {
+                        console.log(`Cleaned up ${beforeCount - notifications.length} old notifications`);
+                        saveStoredData();
+                        updateNotificationBadge();
+                        renderNotifications();
+                    }
+                } catch (error) {
+                    console.error('Error cleaning up old notifications:', error);
+                }
+            };
+
+            // Run cleanup on initialization and then every hour
+            cleanupOldNotifications();
+            setInterval(cleanupOldNotifications, 60 * 60 * 1000);
+
+            // Mark as initialized
+            isInitialized = true;
+            console.log('Admin dashboard initialized successfully');
+            
+        } catch (error) {
+            console.error('Error initializing dashboard:', error);
+        }
     });
+
+    // Global functions for external access
+    window.adminNotifications = {
+        toggleSound: toggleSound,
+        updateNotificationBadge: updateNotificationBadge,
+        renderNotifications: renderNotifications,
+        markNotificationAsRead: markNotificationAsRead,
+        markAllNotificationsAsRead: markAllNotificationsAsRead,
+        clearAllNotifications: clearAllNotifications,
+        playNotificationSound: playNotificationSound,
+        getNotificationCount: () => notifications.length,
+        getUnreadCount: () => calculateUnreadCount(),
+        getNotifications: () => notifications.slice(),
+        loadStoredData: loadStoredData,
+        saveStoredData: saveStoredData
+    };
+
+    // Expose key functions globally for debugging
+    window.debugNotifications = {
+        notifications: () => notifications,
+        readNotifications: () => Array.from(readNotifications),
+        processedOrderIds: () => Array.from(processedOrderIds),
+        processedFeedbackIds: () => Array.from(processedFeedbackIds),
+        unreadCount: () => calculateUnreadCount(),
+        soundEnabled: () => soundEnabled,
+        isInitialized: () => isInitialized,
+        clearStorage: () => {
+            Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+            console.log('All notification storage cleared');
+        },
+        testNotification: () => {
+            const testNotification = {
+                id: 'test_' + Date.now(),
+                type: 'order',
+                title: 'Test Notification',
+                message: 'This is a test notification',
+                icon: 'bell',
+                iconColor: 'text-primary',
+                timestamp: new Date(),
+                timeAgo: 'Just now',
+                total: '$25.99',
+                orderId: 'TEST123',
+                status: 'pending'
+            };
+            notifications.unshift(testNotification);
+            saveStoredData();
+            updateNotificationBadge();
+            renderNotifications();
+            playNotificationSound();
+            console.log('Test notification added');
+        }
+    };
+
 </script>
 
 <script>
 // Single logout function to prevent double confirmation
 function handleLogout(event) {
-    event.preventDefault();
-    if (confirm('Are you sure you want to logout?')) {
-        // Clean up Firebase listeners
-        if (window.unsubscribeOrderListener) {
-            window.unsubscribeOrderListener();
+    try {
+        event.preventDefault();
+        if (confirm('Are you sure you want to logout?')) {
+            // Clean up Firebase listeners
+            if (window.unsubscribeOrderListener) {
+                window.unsubscribeOrderListener();
+            }
+            if (window.unsubscribeFeedbackListener) {
+                window.unsubscribeFeedbackListener();
+            }
+            
+            // Clear session data
+            sessionStorage.clear();
+            
+            // Redirect to logout
+            if (typeof logout === 'function') {
+                logout();
+            } else {
+                window.location.href = 'logout.php';
+            }
         }
-        
-        if (typeof logout === 'function') {
-            logout();
-        } else {
-            window.location.href = 'logout.php';
-        }
+    } catch (error) {
+        console.error('Error during logout:', error);
+        window.location.href = 'logout.php';
     }
 }
+
+// Additional utility functions
+function refreshDashboard() {
+    try {
+        console.log('Refreshing dashboard...');
+        if (window.adminNotifications) {
+            window.adminNotifications.renderNotifications();
+            window.adminNotifications.updateNotificationBadge();
+        }
+        
+        // Refresh any charts or data if needed
+        if (typeof refreshCharts === 'function') {
+            refreshCharts();
+        }
+        
+        console.log('Dashboard refreshed');
+    } catch (error) {
+        console.error('Error refreshing dashboard:', error);
+    }
+}
+
+// Auto-refresh dashboard every 5 minutes
+setInterval(refreshDashboard, 5 * 60 * 1000);
+
+// Performance monitoring
+if ('performance' in window) {
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            const perfData = performance.getEntriesByType('navigation')[0];
+            if (perfData) {
+                console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
+            }
+        }, 0);
+    });
+}
+
+// Error handler for uncaught errors
+window.addEventListener('error', function(event) {
+    console.error('Global error caught:', event.error);
+    
+    // Try to maintain notification functionality even if other parts fail
+    try {
+        if (window.adminNotifications) {
+            window.adminNotifications.renderNotifications();
+        }
+    } catch (e) {
+        console.error('Could not recover notifications:', e);
+    }
+});
+
+// Storage quota management
+function checkStorageQuota() {
+    try {
+        if ('storage' in navigator && 'estimate' in navigator.storage) {
+            navigator.storage.estimate().then(quota => {
+                const usedPercentage = (quota.usage / quota.quota) * 100;
+                if (usedPercentage > 80) {
+                    console.warn(`Storage usage high: ${usedPercentage.toFixed(1)}%`);
+                    // Clean up old notifications if storage is getting full
+                    if (window.debugNotifications) {
+                        const notifications = window.debugNotifications.notifications();
+                        if (notifications.length > 20) {
+                            // Keep only the 20 most recent notifications
+                            const recentNotifications = notifications.slice(0, 20);
+                            localStorage.setItem('admin_notifications', JSON.stringify(recentNotifications));
+                            console.log('Cleaned up old notifications due to storage constraints');
+                        }
+                    }
+                }
+            }).catch(error => {
+                console.error('Error checking storage quota:', error);
+            });
+        }
+    } catch (error) {
+        console.error('Storage quota check failed:', error);
+    }
+}
+
+// Check storage quota periodically
+setInterval(checkStorageQuota, 10 * 60 * 1000); // Every 10 minutes
+
+// Initialize storage check
+setTimeout(checkStorageQuota, 5000);
 </script>
 
 </body>

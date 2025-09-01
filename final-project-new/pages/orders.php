@@ -7,6 +7,7 @@
             padding: 1.5rem;
             position: relative;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            height: 100%;
         }
         
         .stats-card.success {
@@ -21,7 +22,11 @@
             border-left: 4px solid #0dcaf0;
         }
         
-        .stats-card:not(.success):not(.warning):not(.info) {
+        .stats-card.accepted {
+            border-left: 4px solid #20c997;
+        }
+        
+        .stats-card:not(.success):not(.warning):not(.info):not(.accepted) {
             border-left: 4px solid #0d6efd;
         }
         
@@ -269,8 +274,8 @@
         </div>
 
         <!-- Order Stats -->
-        <div class="row mb-4">
-            <div class="col-xl-3 col-md-6 mb-4">
+        <div class="row mb-4 g-3">
+            <div class="col">
                 <div class="stats-card warning">
                     <div class="stats-number" id="pendingCount">
                         <div class="spinner-border spinner-border-sm" role="status">
@@ -281,7 +286,7 @@
                     <i class="fas fa-clock stats-icon"></i>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 mb-4">
+            <div class="col">
                 <div class="stats-card">
                     <div class="stats-number" id="preparingCount">
                          <div class="spinner-border spinner-border-sm" role="status">
@@ -292,7 +297,18 @@
                     <i class="fas fa-utensils stats-icon"></i>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 mb-4">
+            <div class="col">
+                <div class="stats-card accepted">
+                    <div class="stats-number" id="acceptedCount">
+                         <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="stats-label">Accepted Orders</div>
+                    <i class="fas fa-check-square stats-icon"></i>
+                </div>
+            </div>
+            <div class="col">
                 <div class="stats-card info">
                     <div class="stats-number" id="deliveryCount">
                          <div class="spinner-border spinner-border-sm" role="status">
@@ -303,7 +319,7 @@
                     <i class="fas fa-truck stats-icon"></i>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 mb-4">
+            <div class="col">
                 <div class="stats-card success">
                     <div class="stats-number" id="deliveredCount">
                          <div class="spinner-border spinner-border-sm" role="status">
@@ -331,6 +347,7 @@
                             <button class="btn btn-outline-secondary" data-filter="pending">Pending</button>
                             <button class="btn btn-outline-secondary" data-filter="confirmed">Confirmed</button>
                             <button class="btn btn-outline-secondary" data-filter="preparing">Preparing</button>
+                            <button class="btn btn-outline-secondary" data-filter="accepted">Accepted</button>
                             <button class="btn btn-outline-secondary" data-filter="out_for_delivery">Out for Delivery</button>
                             <button class="btn btn-outline-secondary" data-filter="delivered">Delivered</button>
                         </div>
@@ -348,6 +365,7 @@
                                 <th>Items</th>
                                 <th>Total(£)</th>
                                 <th>Status</th>
+                                <th>Delivery Personnel</th>
                                 <th>Order Time</th>
                                 <th>Actions</th>
                             </tr>
@@ -380,6 +398,14 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
+                                <label for="editDeliveryPersonnelSelect" class="form-label">Delivery Personnel</label>
+                                <select class="form-select" id="editDeliveryPersonnelSelect">
+                                    <option value="">Select Delivery Personnel</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
                                 <label for="editDeliveryAddress" class="form-label">Delivery Address</label>
                                 <textarea class="form-control" id="editDeliveryAddress" rows="2" required></textarea>
                             </div>
@@ -430,7 +456,41 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
+    <!-- Assign Delivery Personnel Modal -->
+    <div class="modal fade" id="assignPersonnelModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Assign Delivery Personnel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="assignPersonnelForm">
+                        <input type="hidden" id="assignOrderId">
+                        <div class="mb-3">
+                            <label for="personnelSelect" class="form-label">Select Delivery Personnel</label>
+                            <select class="form-select" id="personnelSelect" required>
+                                <option value="">Choose delivery personnel...</option>
+                            </select>
+                        </div>
+                        <div id="personnelInfo" class="d-none">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>Personnel Information</h6>
+                                    <p id="personnelDetails"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="assignPersonnelBtn">Assign Personnel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+   <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script type="module">
@@ -467,6 +527,7 @@
         let allOrders = [];
         let allUsers = [];
         let allMenuItems = [];
+        let allDeliveryPersonnel = [];
         let nextOrderId = 1;
         let isInitialLoad = true;
         let autoRefreshInterval;
@@ -483,6 +544,7 @@
         function showStatsLoading() {
             document.getElementById('pendingCount').innerHTML = '<div class="stats-loading"></div>';
             document.getElementById('preparingCount').innerHTML = '<div class="stats-loading"></div>';
+            document.getElementById('acceptedCount').innerHTML = '<div class="stats-loading"></div>';
             document.getElementById('deliveryCount').innerHTML = '<div class="stats-loading"></div>';
             document.getElementById('deliveredCount').innerHTML = '<div class="stats-loading"></div>';
         }
@@ -629,6 +691,7 @@
                 'pending': 'bg-warning',
                 'confirmed': 'bg-info',
                 'preparing': 'bg-primary',
+                'accepted': 'bg-success',
                 'out_for_delivery': 'bg-info',
                 'delivered': 'bg-success',
                 'cancelled': 'bg-danger',
@@ -638,6 +701,7 @@
                 'pending': 'Pending',
                 'confirmed': 'Confirmed',
                 'preparing': 'Preparing',
+                'accepted': 'Accepted',
                 'out_for_delivery': 'Out for Delivery',
                 'delivered': 'Delivered',
                 'cancelled': 'Cancelled',
@@ -662,6 +726,24 @@
                 populateCustomerSelects();
             } catch (error) {
                 console.error('Error loading users:', error);
+            }
+        }
+
+        async function loadDeliveryPersonnel() {
+            try {
+                const personnelRef = collection(db, 'deliveryPersonnel');
+                const querySnapshot = await getDocs(personnelRef);
+                
+                allDeliveryPersonnel = [];
+                querySnapshot.forEach((doc) => {
+                    const personnelData = { id: doc.id, ...doc.data() };
+                    personnelData.personnelId = personnelData.personnelId || doc.id;
+                    allDeliveryPersonnel.push(personnelData);
+                });
+                
+                populatePersonnelSelects();
+            } catch (error) {
+                console.error('Error loading delivery personnel:', error);
             }
         }
 
@@ -720,6 +802,7 @@
                             const statusMessages = {
                                 'confirmed': '✅ Order confirmed',
                                 'preparing': '👨‍🍳 Order is being prepared',
+                                'accepted': '✅ Order accepted',
                                 'out_for_delivery': '🚚 Order out for delivery',
                                 'delivered': '📦 Order delivered',
                                 'cancelled': '❌ Order cancelled',
@@ -727,7 +810,7 @@
                             };
                             
                             const message = statusMessages[updatedOrder.status] || `Status changed to ${updatedOrder.status}`;
-                            const notificationType = updatedOrder.status === 'delivered' ? 'success' : 
+                            const notificationType = updatedOrder.status === 'delivered' || updatedOrder.status === 'accepted' ? 'success' : 
                                                    updatedOrder.status === 'cancelled' || updatedOrder.status === 'rejected' ? 'warning' : 'info';
                             
                             showTopNotification(`${message} - Order #${updatedOrder.orderId}`, notificationType);
@@ -764,6 +847,45 @@
             }
         }
 
+        function populatePersonnelSelects() {
+            const editSelect = document.getElementById('editDeliveryPersonnelSelect');
+            const assignSelect = document.getElementById('personnelSelect');
+            
+            const populateSelect = (select) => {
+                if (!select) return;
+                
+                const originalValue = select.value;
+                select.innerHTML = '<option value="">Select Delivery Personnel</option>';
+                
+                // Filter for active and available personnel
+                const availablePersonnel = allDeliveryPersonnel.filter(personnel => 
+                    personnel.isActive && personnel.availability === 'available'
+                );
+                
+                if (availablePersonnel.length === 0) {
+                    select.innerHTML += '<option value="" disabled>No available personnel</option>';
+                    return;
+                }
+                
+                availablePersonnel.forEach(personnel => {
+                    const displayText = `${personnel.fullName} - ${personnel.vehicleType} (${personnel.phoneNumber})`;
+                    const option = document.createElement('option');
+                    option.value = personnel.personnelId;
+                    option.textContent = displayText;
+                    option.setAttribute('data-name', personnel.fullName);
+                    option.setAttribute('data-phone', personnel.phoneNumber);
+                    option.setAttribute('data-vehicle', personnel.vehicleType);
+                    option.setAttribute('data-rating', personnel.rating || 0);
+                    select.appendChild(option);
+                });
+                
+                select.value = originalValue;
+            };
+            
+            populateSelect(editSelect);
+            populateSelect(assignSelect);
+        }
+
         function populateFoodSelects() {
             document.querySelectorAll('.food-select').forEach(select => {
                 select.innerHTML = '<option value="">Select Item</option>';
@@ -792,24 +914,31 @@
                 const customerName = customer ? (customer.name || customer.username || 'Unknown Customer') : 'Unknown Customer';
                 const customerPhone = customer ? (customer.phone || customer.email || '') : 'N/A';
                 
-                let itemsDisplay = '';
-                let calculatedTotal = 0;
+                // Find delivery personnel using driverId (which contains deliveryPersonnel collection id)
+                const personnel = allDeliveryPersonnel.find(p => p.id === order.driverId);
+                const personnelDisplay = personnel ? 
+                    `<div><strong>${personnel.fullName}</strong><br><small class="text-muted">${personnel.phoneNumber}</small></div>` :
+                    '<span class="text-muted">Not assigned</span>';
                 
-                if (order.items && typeof order.items === 'object') {
-                    const itemKeys = Object.keys(order.items);
-                    itemKeys.forEach((key, index) => {
-                        const item = order.items[key];
-                        calculatedTotal += (item.price * item.qty);
-                        
-                        if (index === 0) {
-                            itemsDisplay = `${item.name} x${item.qty}`;
-                        } else if (index === 1) {
-                            itemsDisplay += `<br><small class="text-muted">+${itemKeys.length - 1} more items</small>`;
+                let itemsDisplay = '';
+                
+                // Handle items as array
+                if (order.items && Array.isArray(order.items)) {
+                    if (order.items.length > 0) {
+                        const firstItem = order.items[0];
+                        itemsDisplay = `${firstItem.name} x${firstItem.qty}`;
+                        if (order.items.length > 1) {
+                            itemsDisplay += `<br><small class="text-muted">+${order.items.length - 1} more items</small>`;
                         }
-                    });
+                    } else {
+                        itemsDisplay = 'No items';
+                    }
                 } else {
                     itemsDisplay = 'No items';
                 }
+                
+                // Use the total from database instead of calculating
+                const orderTotal = order.total || 0;
                 
                 tbody.innerHTML += `
                     <tr data-status="${order.status}" data-order-id="${order.orderId}">
@@ -823,8 +952,9 @@
                         <td>
                             <div>${itemsDisplay}</div>
                         </td>
-                        <td><strong>${formatCurrency(calculatedTotal)}</strong></td>
+                        <td><strong>${formatCurrency(orderTotal)}</strong></td>
                         <td>${getStatusBadge(order.status)}</td>
+                        <td>${personnelDisplay}</td>
                         <td>
                             <div>
                                 <strong>${formatDate(order.createdAt)}</strong><br>
@@ -869,6 +999,12 @@
                     `;
                 case 'preparing':
                     return `
+                        <button class="btn btn-outline-success" onclick="confirmStatusChange('${order.id}', 'accepted')" title="Accept Order">
+                            <i class="fas fa-check-square"></i>
+                        </button>
+                    `;
+                case 'accepted':
+                    return `
                         <button class="btn btn-outline-info" onclick="confirmStatusChange('${order.id}', 'out_for_delivery')" title="Out for Delivery">
                             <i class="fas fa-truck"></i>
                         </button>
@@ -889,6 +1025,7 @@
             
             const pending = allOrders.filter(order => order.status === 'pending').length;
             const preparing = allOrders.filter(order => order.status === 'preparing').length;
+            const accepted = allOrders.filter(order => order.status === 'accepted').length;
             const delivery = allOrders.filter(order => order.status === 'out_for_delivery').length;
             const delivered = allOrders.filter(order => 
                 order.status === 'delivered' && 
@@ -897,6 +1034,7 @@
 
             document.getElementById('pendingCount').textContent = pending;
             document.getElementById('preparingCount').textContent = preparing;
+            document.getElementById('acceptedCount').textContent = accepted;
             document.getElementById('deliveryCount').textContent = delivery;
             document.getElementById('deliveredCount').textContent = delivered;
         }
@@ -907,8 +1045,10 @@
                 await updateDoc(orderRef, {
                     deliveryAddress: orderData.deliveryAddress,
                     items: orderData.items,
+                    total: orderData.total,
                     updatedAt: new Date().toISOString(),
                     userId: orderData.userId
+                    // driverId is only updated by delivery app, not admin dashboard
                 });
                 
                 showToast('Order updated successfully!');
@@ -926,6 +1066,7 @@
                 'confirmed': 'Confirm',
                 'rejected': 'Reject',
                 'preparing': 'Start Preparing',
+                'accepted': 'Accept',
                 'out_for_delivery': 'Send Out for Delivery',
                 'delivered': 'Mark as Delivered',
                 'cancelled': 'Cancel'
@@ -956,6 +1097,11 @@
             }
         };
 
+        window.assignDeliveryPersonnel = function(orderId) {
+            // This function is removed as per new requirements
+            console.log('Assign delivery personnel function has been removed');
+        };
+
         window.deleteOrder = async function(id) {
             if (!confirm('Are you sure you want to delete this order?')) {
                 return;
@@ -978,14 +1124,13 @@
             document.getElementById('editOrderId').value = id;
             document.getElementById('editCustomerSelect').value = order.userId;
             document.getElementById('editDeliveryAddress').value = order.deliveryAddress;
+            // Removed delivery personnel selection from edit form
             
             const itemsContainer = document.getElementById('editOrderItems');
             itemsContainer.innerHTML = '';
             
-            if (order.items && typeof order.items === 'object') {
-                const itemKeys = Object.keys(order.items);
-                itemKeys.forEach((key, index) => {
-                    const item = order.items[key];
+            if (order.items && Array.isArray(order.items) && order.items.length > 0) {
+                order.items.forEach((item, index) => {
                     addEditOrderItem(item.foodId, item.qty, index === 0);
                 });
             } else {
@@ -1006,14 +1151,20 @@
             const customerName = customer ? (customer.name || customer.username || 'Unknown Customer') : 'Unknown Customer';
             const customerPhone = customer ? (customer.phone || customer.email || '') : 'N/A';
             
+            const personnel = allDeliveryPersonnel.find(p => p.id === order.driverId);
+            const personnelInfo = personnel ? 
+                `<p><strong>Delivery Personnel:</strong> ${personnel.fullName}</p>
+                 <p><strong>Personnel Phone:</strong> ${personnel.phoneNumber}</p>
+                 <p><strong>Vehicle:</strong> ${personnel.vehicleType}</p>` : 
+                '<p><strong>Delivery Personnel:</strong> Not assigned</p>';
+            
             document.getElementById('orderDetailsTitle').textContent = `Order Details - #${order.orderId}`;
             
             let itemsHtml = '';
             let subtotal = 0;
             
-            if (order.items && typeof order.items === 'object') {
-                Object.keys(order.items).forEach(key => {
-                    const item = order.items[key];
+            if (order.items && Array.isArray(order.items)) {
+                order.items.forEach(item => {
                     const itemTotal = item.price * item.qty;
                     subtotal += itemTotal;
                     
@@ -1028,6 +1179,9 @@
                 });
             }
             
+            // Use database total if available, otherwise use calculated subtotal
+            const finalTotal = order.total || subtotal;
+            
             document.getElementById('orderDetailsBody').innerHTML = `
                 <div class="row">
                     <div class="col-md-6">
@@ -1041,7 +1195,8 @@
                         <p><strong>Order ID:</strong> #${order.orderId}</p>
                         <p><strong>Status:</strong> ${getStatusBadge(order.status)}</p>
                         <p><strong>Order Time:</strong> ${formatDate(order.createdAt)}</p>
-                        <p><strong>Total:</strong> ${formatCurrency(subtotal)}</p>
+                        <p><strong>Total:</strong> ${formatCurrency(finalTotal)}</p>
+                        ${personnelInfo}
                     </div>
                 </div>
                 <hr>
@@ -1062,7 +1217,7 @@
                         <tfoot>
                             <tr>
                                 <th colspan="3">Total</th>
-                                <th>${formatCurrency(subtotal)}</th>
+                                <th>${formatCurrency(finalTotal)}</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -1083,12 +1238,29 @@
             const customerName = customer ? (customer.name || customer.username || 'Unknown Customer') : 'Unknown Customer';
             const customerPhone = customer ? (customer.phone || customer.email || '') : 'N/A';
             
+            const personnel = allDeliveryPersonnel.find(p => p.id === order.driverId);
+            const personnelSection = personnel ? `
+                <div class="receipt-section">
+                    <div class="receipt-row">
+                        <span><strong>Delivery Personnel:</strong></span>
+                        <span>${personnel.fullName}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span><strong>Personnel Phone:</strong></span>
+                        <span>${personnel.phoneNumber}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span><strong>Vehicle:</strong></span>
+                        <span>${personnel.vehicleType}</span>
+                    </div>
+                </div>
+            ` : '';
+            
             let itemsHtml = '';
             let subtotal = 0;
             
-            if (order.items && typeof order.items === 'object') {
-                Object.keys(order.items).forEach(key => {
-                    const item = order.items[key];
+            if (order.items && Array.isArray(order.items)) {
+                order.items.forEach(item => {
                     const itemTotal = item.price * item.qty;
                     subtotal += itemTotal;
                     
@@ -1100,6 +1272,9 @@
                     `;
                 });
             }
+            
+            // Use database total if available, otherwise use calculated subtotal
+            const finalTotal = order.total || subtotal;
             
             const receiptHtml = `
                 <div class="receipt-header">
@@ -1142,6 +1317,8 @@
                     </div>
                 </div>
                 
+                ${personnelSection}
+                
                 <div class="receipt-section">
                     <div class="receipt-row">
                         <span><strong>ITEMS ORDERED:</strong></span>
@@ -1153,7 +1330,7 @@
                 <div class="receipt-total">
                     <div class="receipt-row">
                         <span><strong>TOTAL:</strong></span>
-                        <span><strong>£${subtotal.toFixed(2)}</strong></span>
+                        <span><strong>£${finalTotal.toFixed(2)}</strong></span>
                     </div>
                 </div>
                 
@@ -1258,6 +1435,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadUsers();
             loadMenuItems();
+            loadDeliveryPersonnel();
             loadOrders();
             startAutoRefresh();
         });
@@ -1276,9 +1454,9 @@
                 btn.disabled = true;
                 spinner.classList.remove('d-none');
                 
-                const items = {};
+                const items = [];
                 let hasValidItems = false;
-                let itemIndex = 0;
+                let calculatedTotal = 0;
                 
                 document.querySelectorAll('#editOrderItems .order-item').forEach(item => {
                     const foodSelect = item.querySelector('.food-select');
@@ -1286,13 +1464,17 @@
                     const selectedOption = foodSelect.options[foodSelect.selectedIndex];
                     
                     if (foodSelect.value && quantityInput.value && selectedOption) {
-                        items[itemIndex.toString()] = {
+                        const itemPrice = parseFloat(selectedOption.getAttribute('data-price'));
+                        const itemQty = parseInt(quantityInput.value);
+                        
+                        items.push({
                             foodId: foodSelect.value,
                             name: selectedOption.getAttribute('data-name'),
-                            price: parseFloat(selectedOption.getAttribute('data-price')),
-                            qty: parseInt(quantityInput.value)
-                        };
-                        itemIndex++;
+                            price: itemPrice,
+                            qty: itemQty
+                        });
+                        
+                        calculatedTotal += (itemPrice * itemQty);
                         hasValidItems = true;
                     }
                 });
@@ -1307,7 +1489,9 @@
                 const orderData = {
                     deliveryAddress: document.getElementById('editDeliveryAddress').value,
                     items: items,
+                    total: calculatedTotal,
                     userId: document.getElementById('editCustomerSelect').value
+                    // Removed driverId assignment as it's only set by delivery app
                 };
                 
                 await updateOrder(orderId, orderData);
@@ -1328,6 +1512,8 @@
             addEditOrderItem();
         });
 
+        // Removed personnel assignment functionality as per new requirements
+        
         document.querySelectorAll('[data-filter]').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('[data-filter]').forEach(btn => btn.classList.remove('active'));

@@ -1579,86 +1579,88 @@
         });
 
         // Add delivery personnel form submission
-        document.getElementById("addDeliveryPersonnelForm").addEventListener("submit", async function (e) {
-            e.preventDefault();
+        // Add delivery personnel form submission
+document.getElementById("addDeliveryPersonnelForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-            if (!this.checkValidity()) {
-                e.stopPropagation();
-                this.classList.add('was-validated');
-                return;
-            }
+    if (!this.checkValidity()) {
+        e.stopPropagation();
+        this.classList.add('was-validated');
+        return;
+    }
 
-            const addBtn = document.getElementById("addDeliveryPersonnelBtn");
-            addBtn.disabled = true;
-            addBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding Personnel...';
+    const addBtn = document.getElementById("addDeliveryPersonnelBtn");
+    addBtn.disabled = true;
+    addBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding Personnel...';
 
-            const personnelId = document.getElementById("deliveryPersonnelId").value.trim();
-            const fullName = document.getElementById("deliveryPersonnelName").value.trim();
-            const email = document.getElementById("deliveryPersonnelEmail").value.trim();
-            const phoneNumber = document.getElementById("deliveryPersonnelPhone").value.trim();
-            const password = document.getElementById("deliveryPersonnelPassword").value.trim();
-            const vehicleType = document.getElementById("deliveryPersonnelVehicleType").value;
-            const licenseNumber = document.getElementById("deliveryPersonnelLicenseNumber").value.trim();
-            const address = document.getElementById("deliveryPersonnelAddress").value.trim();
-            const imageFile = document.getElementById("deliveryPersonnelImageUpload").files[0];
+    const personnelId = document.getElementById("deliveryPersonnelId").value.trim();
+    const fullName = document.getElementById("deliveryPersonnelName").value.trim();
+    const email = document.getElementById("deliveryPersonnelEmail").value.trim();
+    const phoneNumber = document.getElementById("deliveryPersonnelPhone").value.trim();
+    const password = document.getElementById("deliveryPersonnelPassword").value.trim();
+    const vehicleType = document.getElementById("deliveryPersonnelVehicleType").value;
+    const licenseNumber = document.getElementById("deliveryPersonnelLicenseNumber").value.trim();
+    const address = document.getElementById("deliveryPersonnelAddress").value.trim();
+    const imageFile = document.getElementById("deliveryPersonnelImageUpload").files[0];
 
-            try {
-                // Check if personnel ID already exists
-                const existingQuery = query(collection(db, "deliveryPersonnel"), where("personnelId", "==", personnelId));
-                const existingDocs = await getDocs(existingQuery);
-                if (!existingDocs.empty) {
-                    showNotification("Personnel ID already exists! Please choose a different ID.", 'error');
-                    addBtn.disabled = false;
-                    addBtn.innerHTML = 'Add Personnel';
-                    return;
-                }
+    try {
+        // Check if personnel ID already exists
+        const existingQuery = query(collection(db, "deliveryPersonnel"), where("personnelId", "==", personnelId));
+        const existingDocs = await getDocs(existingQuery);
+        if (!existingDocs.empty) {
+            showNotification("Personnel ID already exists! Please choose a different ID.", 'error');
+            addBtn.disabled = false;
+            addBtn.innerHTML = 'Add Personnel';
+            return;
+        }
 
-                let profileImageUrl = "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop";
+        let profileImageUrl = "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop";
 
-                if (imageFile) {
-                    const imageRef = ref(storage, `delivery-personnel-images/${Date.now()}_${imageFile.name}`);
-                    const uploadResult = await uploadBytes(imageRef, imageFile);
-                    profileImageUrl = await getDownloadURL(uploadResult.ref);
-                }
+        if (imageFile) {
+            const imageRef = ref(storage, `delivery-personnel-images/${Date.now()}_${imageFile.name}`);
+            const uploadResult = await uploadBytes(imageRef, imageFile);
+            profileImageUrl = await getDownloadURL(uploadResult.ref);
+        }
 
-                const docRef = await addDoc(collection(db, "deliveryPersonnel"), {
-                    personnelId: personnelId,
-                    fullName: fullName,
-                    email: email,
-                    phoneNumber: phoneNumber,
-                    password: password,
-                    vehicleType: vehicleType,
-                    licenseNumber: licenseNumber,
-                    address: address,
-                    profileImageUrl: profileImageUrl,
-                    status: 'available', // available, busy, offline
-                    availability: 'active', // active, on_break, off_duty
-                    isActive: true,
-                    currentOrders: [], // Array to store order IDs
-                    totalDeliveries: 0,
-                    rating: 0,
-                    joiningDate: serverTimestamp(),
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp()
-                });
-
-                showNotification("Delivery personnel added successfully!");
-                
-                this.reset();
-                this.classList.remove('was-validated');
-                document.getElementById('deliveryPersonnelImagePreview').style.display = 'none';
-                bootstrap.Modal.getInstance(document.getElementById("addDeliveryPersonnelModal")).hide();
-                
-                loadDeliveryPersonnel();
-
-            } catch (error) {
-                console.error("Error adding delivery personnel: ", error);
-                showNotification("Failed to add delivery personnel. Please try again.", 'error');
-            } finally {
-                addBtn.disabled = false;
-                addBtn.innerHTML = 'Add Personnel';
-            }
+        const docRef = await addDoc(collection(db, "deliveryPersonnel"), {
+            personnelId: personnelId,
+            fullName: fullName,
+            email: email,
+            phoneNumber: phoneNumber,
+            password: password,
+            vehicleType: vehicleType,
+            licenseNumber: licenseNumber,
+            address: address,
+            profileImageUrl: profileImageUrl,
+            status: 'available', // available, busy, offline
+            availability: 'active', // active, on_break, off_duty
+            isActive: true,
+            currentOrders: [], // Array to store current order IDs
+            orderHistory: [], // Array to store completed order history
+            totalDeliveries: 0,
+            rating: 0,
+            joiningDate: serverTimestamp(),
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
         });
+
+        showNotification("Delivery personnel added successfully!");
+        
+        this.reset();
+        this.classList.remove('was-validated');
+        document.getElementById('deliveryPersonnelImagePreview').style.display = 'none';
+        bootstrap.Modal.getInstance(document.getElementById("addDeliveryPersonnelModal")).hide();
+        
+        loadDeliveryPersonnel();
+
+        } catch (error) {
+            console.error("Error adding delivery personnel: ", error);
+            showNotification("Failed to add delivery personnel. Please try again.", 'error');
+        } finally {
+            addBtn.disabled = false;
+            addBtn.innerHTML = 'Add Personnel';
+        }
+    });
 
         // Edit delivery personnel form submission
         document.getElementById("editDeliveryPersonnelForm").addEventListener("submit", async function (e) {

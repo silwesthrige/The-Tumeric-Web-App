@@ -1211,7 +1211,8 @@
             `;
         }
 
-        function generatePDF(content, reportName) {
+        // Enhanced PDF generation with restaurant header
+        async function generatePDF(content, reportName) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
             
@@ -1221,6 +1222,99 @@
             const margin = 20;
             const maxWidth = pageWidth - (margin * 2);
             let currentY = margin;
+            
+            // Restaurant details
+            const restaurantName = 'THE TURMERIC INDIAN CUISINE RESTAURANTS';
+            const logoPath = 'public/images/UK PJ Logo.png';
+            
+            // Function to add restaurant header
+            async function addRestaurantHeader() {
+                try {
+                    // Try to load and add logo
+                    const logoImg = new Image();
+                    logoImg.crossOrigin = 'anonymous';
+                    
+                    await new Promise((resolve, reject) => {
+                        logoImg.onload = () => {
+                            try {
+                                // Create canvas to convert image to base64
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+                                canvas.width = logoImg.width;
+                                canvas.height = logoImg.height;
+                                ctx.drawImage(logoImg, 0, 0);
+                                
+                                const logoBase64 = canvas.toDataURL('image/png');
+                                
+                                // Add logo to PDF (30mm width, maintaining aspect ratio)
+                                const logoWidth = 30;
+                                const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
+                                doc.addImage(logoBase64, 'PNG', margin, currentY, logoWidth, logoHeight);
+                                
+                                // Add restaurant name next to logo
+                                doc.setFontSize(16);
+                                doc.setFont(undefined, 'bold');
+                                doc.setTextColor(139, 69, 19); // Brown color for Indian theme
+                                
+                                const textY = currentY + (logoHeight / 2) + 2;
+                                doc.text(restaurantName, margin + logoWidth + 10, textY);
+                                
+                                currentY += Math.max(logoHeight, 20) + 10;
+                                resolve();
+                            } catch (error) {
+                                console.warn('Error processing logo:', error);
+                                // Fallback to text-only header
+                                addTextOnlyHeader();
+                                resolve();
+                            }
+                        };
+                        
+                        logoImg.onerror = () => {
+                            console.warn('Could not load logo, using text-only header');
+                            addTextOnlyHeader();
+                            resolve();
+                        };
+                        
+                        // Set timeout for logo loading
+                        setTimeout(() => {
+                            console.warn('Logo loading timeout, using text-only header');
+                            addTextOnlyHeader();
+                            resolve();
+                        }, 3000);
+                        
+                        logoImg.src = logoPath;
+                    });
+                    
+                } catch (error) {
+                    console.warn('Error loading logo:', error);
+                    addTextOnlyHeader();
+                }
+                
+                function addTextOnlyHeader() {
+                    // Text-only header fallback
+                    doc.setFontSize(18);
+                    doc.setFont(undefined, 'bold');
+                    doc.setTextColor(139, 69, 19); // Brown color
+                    doc.text(restaurantName, margin, currentY);
+                    currentY += 15;
+                    
+                    // Add subtitle
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    doc.setTextColor(100, 100, 100);
+                    doc.text('Admin Dashboard Report', margin, currentY);
+                    currentY += 10;
+                }
+                
+                // Add separator line
+                doc.setDrawColor(139, 69, 19);
+                doc.setLineWidth(0.5);
+                doc.line(margin, currentY, pageWidth - margin, currentY);
+                currentY += 15;
+            }
+            
+            // Add restaurant header to first page
+            await addRestaurantHeader();
             
             // Parse HTML content for PDF
             const tempDiv = document.createElement('div');
@@ -1263,19 +1357,24 @@
             const titleElement = tempDiv.querySelector('h2');
             const title = titleElement ? titleElement.textContent : reportName;
             
-            // Add title
-            doc.setFontSize(18);
+            // Add report title
+            doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
             doc.setTextColor(0, 0, 0);
             doc.text(title, margin, currentY);
-            currentY += 15;
+            currentY += 12;
             
             // Add period info
             const periodText = tempDiv.querySelector('p').textContent;
-            addWrappedText(periodText, 12, false);
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(100, 100, 100);
+            doc.text(periodText, margin, currentY);
+            currentY += 10;
             
             // Add a line separator
             doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
             doc.line(margin, currentY, pageWidth - margin, currentY);
             currentY += 10;
             
@@ -1313,7 +1412,7 @@
                             const colWidth = maxWidth / headers.length;
                             
                             // Table headers
-                            doc.setFillColor(240, 240, 240);
+                            doc.setFillColor(245, 245, 245);
                             doc.rect(margin, currentY - 5, maxWidth, 8, 'F');
                             
                             doc.setFontSize(9);
@@ -1335,7 +1434,7 @@
                                 checkPageBreak(6);
                                 
                                 if (rowIndex % 2 === 1) {
-                                    doc.setFillColor(250, 250, 250);
+                                    doc.setFillColor(252, 252, 252);
                                     doc.rect(margin, currentY - 4, maxWidth, 6, 'F');
                                 }
                                 
@@ -1358,14 +1457,14 @@
                 }
             });
             
-            // Add footer
+            // Add footer to all pages
             const totalPages = doc.internal.getNumberOfPages();
             for (let i = 1; i <= totalPages; i++) {
                 doc.setPage(i);
                 doc.setFontSize(8);
                 doc.setTextColor(150, 150, 150);
                 doc.text(`Generated on ${new Date().toLocaleDateString()} - Page ${i} of ${totalPages}`, margin, pageHeight - 10);
-                doc.text('The Turmeric Indian Cuisine - Admin Dashboard', pageWidth - margin - 50, pageHeight - 10);
+                doc.text('The Turmeric Indian Cuisine - Admin Dashboard', pageWidth - margin - 70, pageHeight - 10);
             }
             
             // Download the PDF
